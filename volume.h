@@ -1,0 +1,64 @@
+#include <QPushButton>
+#include <QBoxLayout>
+#include <QSlider>
+
+#include <KF5/KConfigCore/KConfigGroup>
+
+#include <cmath>
+
+#include "pamixer/pulseaudio.hh"
+#include "pamixer/device.hh"
+
+#include "model.h"
+#include "panel.h"
+#include "frame.h"
+
+namespace Q
+{
+
+class Shell;
+class VolumeDialog;
+class Volume : public QPushButton, public Model
+{
+    Q_OBJECT
+public:
+    Volume(const QString &name, Shell *shell);
+    void load(KConfigGroup *grp) override;
+    inline Pulseaudio *pulse() { return &myPulse; };
+    inline Device *device() { return &myDevice; };
+    inline QTimer *timer() const { return myTimer; };
+    inline int volumePercent() { return myDevice.volume_percent; };
+    inline bool isMute() { return myDevice.mute; };
+    void mute() {
+        myPulse.set_mute(myDevice, !myDevice.mute);
+        myDevice = myPulse.get_default_sink();
+    };
+    void setVolume(int value) {
+        myPulse.set_volume(myDevice, round((double)value * (double)PA_VOLUME_NORM / 100.0));
+        myDevice = myPulse.get_default_sink();
+    };
+private:
+    Pulseaudio myPulse;
+    Device myDevice;
+    VolumeDialog *dialog;
+    QTimer *myTimer;
+};
+
+class VolumeDialog : public Frame
+{
+    Q_OBJECT
+public:
+    VolumeDialog(Volume *volume);
+    inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
+public slots:
+    void toggle() { setVisible(!isVisible()); };
+    void valueChanged(int value);
+protected:
+    virtual void showEvent(QShowEvent *);
+private:
+    Volume *myVolume;
+    QSlider *slider;
+    QPushButton *muteButton;
+};
+
+};
