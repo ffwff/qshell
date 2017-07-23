@@ -68,6 +68,7 @@ set(shell_SRCS
     date.cpp
     frame.cpp
     notificationsdialog.cpp
+    logout.cpp
 )
 
 set(pamixer_SRCS

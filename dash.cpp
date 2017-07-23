@@ -147,6 +147,7 @@ void Q::Dash::showEvent(QShowEvent *)
         move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
     shell()->desktop()->activateWindow(); // HACK to activate
     searchBar->setFocus();
+    KWindowSystem::setState(winId(), NET::SkipTaskbar);
 }
 
 // Configurations

@@ -1,10 +1,14 @@
 #include <QPushButton>
 #include <QTimer>
+#include <QNetworkAccessManager>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
 #include "model.h"
 #include "panel.h"
+
+#ifndef NETWORK_H
+#define NETWORK_H
 
 namespace Q
 {
@@ -18,6 +22,9 @@ public:
     void load(KConfigGroup *grp) override;
 private:
     QTimer *timer;
+    QNetworkAccessManager *manager;
 };
 
 };
+
+#endif

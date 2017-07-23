@@ -2,6 +2,7 @@
 #include <QPushButton>
 #include <QIcon>
 #include <QTimer>
+#include <QNetworkAccessManager>
 
 #include "network.h"
 #include "model.h"
@@ -13,11 +14,23 @@ QPushButton(), Model(name, shell)
 {
     setIcon(QIcon::fromTheme("network-connect"));
     
+    manager = new QNetworkAccessManager(this);
     timer = new QTimer(this);
     timer->setInterval(1000);
     connect(timer, &QTimer::timeout, [this]() {
-        
+        QNetworkAccessManager::NetworkAccessibility accessibility = manager->networkAccessible();
+        if(accessibility == QNetworkAccessManager::Accessible)
+        {
+            setIcon(QIcon::fromTheme("network-connect"));
+            setToolTip("Internet connected.");
+        }
+        else
+        {
+            setIcon(QIcon::fromTheme("network-disconnect"));
+            setToolTip("Internet disconnected.");
+        }
     });
+    timer->start();
 };
 
 void Q::Network::load(KConfigGroup *grp)

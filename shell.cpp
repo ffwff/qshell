@@ -22,6 +22,7 @@
 #include "volume.h"
 #include "network.h"
 #include "date.h"
+#include "logout.h"
 
 Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
@@ -157,6 +158,7 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Volume", Volume)
         COND_LOAD_MODEL("Network", Network)
         COND_LOAD_MODEL("Date", Date)
+        COND_LOAD_MODEL("Logout", Logout)
         else
             return 0;
         

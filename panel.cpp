@@ -28,7 +28,8 @@ myPosition(Q::PanelPosition::Top),
 myPoint(QPoint(0,0)),
 setStruts(true),
 blurRadius(0),
-displayShadow(false)
+displayShadow(true),
+myIconSize(24)
 {
     setObjectName(name);
     
@@ -53,9 +54,9 @@ void Q::Panel::load(KConfigGroup *grp)
     myWidth = grp->readEntry("Width", 100);
     myHeight = grp->readEntry("Height", 2);
     myPosition = (Q::PanelPosition)grp->readEntry("Position", 2);
-    
     blurRadius = grp->readEntry("BlurRadius", 0);
     displayShadow = grp->readEntry("DisplayShadow", true);
+    myIconSize = grp->readEntry("IconSize", 24);
     
     geometryChanged();
     

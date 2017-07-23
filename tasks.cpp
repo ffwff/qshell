@@ -255,7 +255,7 @@ void Q::Tasks::load(KConfigGroup *grp)
 // slots
 void Q::Tasks::windowAdded(WId wid)
 {
-    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMIcon|NET::WMState, 0);
+    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMIcon|NET::WMState, NET::WM2WindowClass);
     if(info.state() & NET::SkipTaskbar)
         return;
     QString cmdline = getCmdline(wid);
@@ -272,7 +272,8 @@ void Q::Tasks::windowAdded(WId wid)
         {
             QImage image(icon.data, icon.size.width, icon.size.height, QImage::Format_ARGB32);
             task->setIcon(QPixmap::fromImage(image));
-        }
+        } else
+            task->setIcon(QIcon::fromTheme(info.windowClassName()));
         
         task->addWindow(wid);
         addTask(task);

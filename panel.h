@@ -33,6 +33,7 @@ public:
     inline const bool struts() const { return setStruts; };
     inline const QString& name() const { return myName; };
     inline const bool displaysShadow() const { return displayShadow; };
+    inline int iconSize() { return myIconSize; };
     void load(KConfigGroup *grp) override;
     virtual void paintEvent(QPaintEvent *);
 public slots:
@@ -46,6 +47,7 @@ private:
     bool setStruts;
     int blurRadius;
     bool displayShadow;
+    int myIconSize;
 };
 
 }
