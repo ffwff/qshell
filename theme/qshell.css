@@ -1,0 +1,71 @@
+#TopPanel {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #ffffff, stop: 1 #e7e8eb);
+}
+
+.Q--WinCtrl QPushButton {
+    qproperty-iconSize: 24px;
+    width: 24px;
+    height: 24px;
+}
+
+#TopPanel QPushButton {
+    border: 0 none;
+}
+
+#TopPanel QLabel {
+    padding: 0 5px;
+}
+
+#TopPanel QPushButton:hover, #TopPanel QLabel:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #5ca8ff, stop: 1 #61a0ff);
+    color: white;
+}
+
+QPushButton {
+    background-color: transparent;
+}
+
+.Q--Task {
+    margin: 10px 0;
+}
+
+#Q--Dash-Apps
+{
+    width:100%;
+    height: 100px;
+}
+
+#Q--Dash-Search, #Q--Dash-Apps {
+    background-color: rgba(0,0,0,60%);
+}
+
+.Q--Dash QLabel {
+    color: white;
+    font-size: 16px;
+    background-color: rgba(24,24,24,25%);
+    padding-left: 5px;
+    qproperty-alignment: AlignLeft;
+}
+
+.Q--Dash QLineEdit {
+    margin: 10px;
+    margin-bottom: 0;
+    border-radius: 5px;
+    padding: 5px;
+    color: #000;
+    background-color: #fff;
+    min-height: 18px;
+    max-height: 18px;
+}
+
+.Q--Dash QScrollArea
+{
+    background: transparent;
+    border: 0 none;
+}
+
+.Q--Logout{
+    qproperty-iconSize: 16px;
+}
