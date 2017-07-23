@@ -23,10 +23,12 @@
 #include "network.h"
 #include "date.h"
 #include "logout.h"
+#include "winctrl.h"
 
 Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
      QCoreApplication::setApplicationName("qshell");
+     QGuiApplication::setApplicationDisplayName("Q::Shell Desktop");
      QCoreApplication::setApplicationVersion("0.1");
      Shell *myShell = new Shell();
 };
@@ -159,6 +161,7 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Network", Network)
         COND_LOAD_MODEL("Date", Date)
         COND_LOAD_MODEL("Logout", Logout)
+        COND_LOAD_MODEL("WindowControl", WinCtrl)
         else
             return 0;
         
