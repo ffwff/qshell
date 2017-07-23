@@ -10,8 +10,6 @@ class Frame : public QWidget
 public:
     Frame(QWidget *parent = 0);
     void setCentralWidget(QWidget *widget);
-protected:
-    virtual void resizeEvent(QResizeEvent *) override;
 private:
     QWidget *widget;
 };

@@ -25,7 +25,6 @@ myDevice(myPulse.get_default_sink()),
 dialog(new Q::VolumeDialog(this))
 {
     setIcon(QIcon::fromTheme("audio-volume-high"));
-    connect(this, SIGNAL(clicked()), dialog, SLOT(toggle()));
     
     myTimer = new QTimer(this);
     myTimer->setInterval(1000);
@@ -60,9 +59,9 @@ void Q::Volume::load(KConfigGroup *grp)
 // ----------
 
 Q::VolumeDialog::VolumeDialog(Volume *volume) :
-Q::NotificationsDialog(volume)
+Q::NotificationsDialog(volume),
+myVolume(volume)
 {
-    myVolume = volume;
     setLayout(new QHBoxLayout());
     
     muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute");

@@ -12,7 +12,7 @@
 #include "shell.h"
 #include "model.h"
 
-Q::NotificationsDialog::NotificationsDialog(QPushButton *button) : QWidget(), myButton(button)
+Q::NotificationsDialog::NotificationsDialog(QWidget *button) : QWidget(), myButton(button)
 {
     Model *m = dynamic_cast<Model*>(button);
     if(m)
@@ -22,6 +22,7 @@ Q::NotificationsDialog::NotificationsDialog(QPushButton *button) : QWidget(), my
     frame->setCentralWidget(this);
     move(0, 0);
     
+    connect(button, SIGNAL(clicked()), this, SLOT(toggle()));
     connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged, [this](WId wid) {
         if(frame->isVisible() && frame->winId() != wid)
             frame->hide();

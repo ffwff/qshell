@@ -27,8 +27,3 @@ void Q::Frame::setCentralWidget(QWidget *w)
     widget->setParent(this);
     widget->move(0, 0);
 };
-
-void Q::Frame::resizeEvent(QResizeEvent *) {
-    if(widget)
-        widget->resize(size());
-};

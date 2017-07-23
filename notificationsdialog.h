@@ -1,4 +1,4 @@
-#include <QPushButton>
+#include <QWidget>
 #include "frame.h"
 
 #ifndef NOTIFICATIONS_DIALOG_H
@@ -11,14 +11,14 @@ class NotificationsDialog : public QWidget
 {
     Q_OBJECT
 public:
-    NotificationsDialog(QPushButton *button);
+    NotificationsDialog(QWidget *button);
+    void updateDialog();
 public slots:
     void toggle() { frame->setVisible(!frame->isVisible()); };
 protected:
     Frame *frame;
-    void updateDialog();
 private:
-    QPushButton *myButton;
+    QWidget *myButton;
 };
 
 };
