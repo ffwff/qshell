@@ -23,7 +23,6 @@ public:
     Shell();
     void setPanelsOnTop(bool in) { panelsOnTop = in; };
     Q::Model *getModelByName(const QString& name, Model *parent = 0);
-    static QPixmap screenshot();
     inline Desktop *desktop() const { return myDesktop; };
     inline Dash *dash() const { return myDash; };
     inline int getStrutLeft() const { return strut_left; };

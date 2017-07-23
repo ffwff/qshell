@@ -67,6 +67,7 @@ set(shell_SRCS
     network.cpp
     date.cpp
     frame.cpp
+    notificationsdialog.cpp
 )
 
 set(pamixer_SRCS
@@ -99,6 +100,7 @@ target_link_libraries(shell
     KF5::Solid
 #     KF5::kcmutils
     KF5::WindowSystem
+    ${X11_X11_LIB}
     pulse
     )
 

@@ -196,17 +196,6 @@ void Q::Shell::calculateStruts()
     KWindowSystem::setStrut(winId(),strut_left,strut_right,strut_top,strut_bottom);
 };
 
-// Misc
-QPixmap Q::Shell::screenshot()
-{
-    QScreen *screen = QGuiApplication::primaryScreen();
-//    if (const QWindow *window = windowHandle())
-//        screen = window->screen();
-    if (!screen)
-        return QPixmap();
-    return screen->grabWindow(0);
-};
-
 // ----------
 
 void signalHandler(int signal)

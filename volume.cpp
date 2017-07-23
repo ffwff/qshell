@@ -7,7 +7,6 @@
 #include <QDebug>
 #include <QApplication>
 #include <QScreen>
-#include <algorithm>
 
 #include <pulse/pulseaudio.h>
 #include "pamixer/pulseaudio.hh"
@@ -45,7 +44,8 @@ dialog(new Q::VolumeDialog(this))
                 setIcon(QIcon::fromTheme("audio-volume-low"));
             setToolTip(QString::number(volumePercent()) + "%");
         }
-        
+        if(dialog->isVisible())
+            dialog->update();
     });
     myTimer->start();
 };
@@ -59,29 +59,20 @@ void Q::Volume::load(KConfigGroup *grp)
 
 // ----------
 
-Q::VolumeDialog::VolumeDialog(Volume *volume) : Q::Frame(volume->shell())
+Q::VolumeDialog::VolumeDialog(Volume *volume) :
+Q::NotificationsDialog(volume)
 {
     myVolume = volume;
     setLayout(new QHBoxLayout());
     
     muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute");
-    if(myVolume->isMute()) {
-        muteButton->setText("Unmute");
-    } else {
-        muteButton->setText("Mute");
-    }
     boxLayout()->addWidget(muteButton);
     connect(muteButton, &QPushButton::clicked, [this]() {
         myVolume->mute();
-        if(myVolume->isMute()) {
-            muteButton->setText("Unmute");
-        } else {
-            muteButton->setText("Mute");
-        }
+        update();
     });
     
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    resize(QSize(210,40));
+    frame->resize(QSize(210,40));
     
     slider = new QSlider(Qt::Horizontal, this);
     slider->setMinimum(0);
@@ -91,28 +82,20 @@ Q::VolumeDialog::VolumeDialog(Volume *volume) : Q::Frame(volume->shell())
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 };
 
+void Q::VolumeDialog::update()
+{
+    if(myVolume->isMute()) {
+        muteButton->setText("Unmute");
+    } else {
+        muteButton->setText("Mute");
+    }
+    slider->setValue(myVolume->volumePercent());
+};
+
 void Q::VolumeDialog::showEvent(QShowEvent *)
 {
-    QPoint p = myVolume->parentWidget()->pos();
-    Shell *shell = static_cast<Shell*>(parentWidget());
-    QScreen *screen = QGuiApplication::primaryScreen();
-    
-    int _x;
-    if((_x = std::max(shell->getStrutLeft(), p.x() + myVolume->x() + width())) < screen->size().width())
-        p.setX(_x);
-    else
-        p.setX(screen->size().width() - width() );
-    
-    int _y;
-    if((_y = std::max(shell->getStrutTop(), p.y() + myVolume->y() - height())) < screen->size().height())
-        p.setY(_y);
-    else
-        p.setY(screen->size().height() - static_cast<Shell*>(parentWidget())->getStrutBottom() - height() );
-    
-    move(p);
-    
-    slider->setValue(myVolume->volumePercent());
-    _showEvent();
+    updateDialog();
+    update();
 };
 
 void Q::VolumeDialog::valueChanged(int value)

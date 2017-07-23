@@ -1,5 +1,3 @@
-#include <QWidget>
-
 #ifndef FRAME_H
 #define FRAME_H
 
@@ -8,19 +6,14 @@ namespace Q
 
 class Frame : public QWidget
 {
+    Q_OBJECT
 public:
     Frame(QWidget *parent = 0);
+    void setCentralWidget(QWidget *widget);
 protected:
-    virtual void showEvent(QShowEvent *) { _showEvent(); };
-    virtual void paintEvent(QPaintEvent *) { _paintEvent(); };
-    virtual void moveEvent(QMoveEvent *) { _moveEvent(); };
-    void _showEvent();
-    void _paintEvent();
-    void _moveEvent();
-    inline void setBlurRadius(int b) { blurRadius = b; };
+    virtual void resizeEvent(QResizeEvent *) override;
 private:
-    QPixmap cachedShot;
-    int blurRadius;
+    QWidget *widget;
 };
 
 };

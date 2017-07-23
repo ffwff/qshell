@@ -104,6 +104,7 @@ void Q::Panel::geometryChanged()
 // Layout management
 void Q::Panel::addWidget(QWidget *widget)
 {
+    widget->setParent(this);
     boxLayout()->addWidget(widget);
 };
 

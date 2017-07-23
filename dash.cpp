@@ -82,9 +82,7 @@ void Q::DashItem::runCommand()
 
 // ----------
 
-Q::Dash::Dash(Shell *parent) :
-Q::Frame(parent),
-Model("Q::Dash", parent)
+Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
 {
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(0);
@@ -147,7 +145,6 @@ void Q::Dash::showEvent(QShowEvent *)
         move(shell()->getStrutLeft(), geometry.height() - shell()->getStrutBottom() - height());
     else
         move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
-    _showEvent();
     shell()->desktop()->activateWindow(); // HACK to activate
     searchBar->setFocus();
 }
@@ -158,7 +155,6 @@ void Q::Dash::load( KConfigGroup *grp )
     iconSize = grp->readEntry("IconSize", 48);
     searchBar->setVisible(grp->readEntry("ShowSearch", true));
     myPosition = (DashPosition)grp->readEntry("Position", 0);
-    setBlurRadius(grp->readEntry("BlurRadius",0));
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
     

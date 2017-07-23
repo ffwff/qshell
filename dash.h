@@ -57,7 +57,6 @@ private:
     QLineEdit *searchBar;
     QWidget *appsContainer;
     inline QBoxLayout *appsLayout() { return static_cast<QBoxLayout*>(appsContainer->layout()); };
-    //QList<DashItem*> favorites;
     bool repopulate(KServiceGroup::Ptr group, QHBoxLayout *layout = 0, const QString &filter = 0);
     DashPosition myPosition;
     QPixmap pixmap;

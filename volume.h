@@ -10,8 +10,7 @@
 #include "pamixer/device.hh"
 
 #include "model.h"
-#include "panel.h"
-#include "frame.h"
+#include "notificationsdialog.h"
 
 namespace Q
 {
@@ -44,17 +43,17 @@ private:
     QTimer *myTimer;
 };
 
-class VolumeDialog : public Frame
+class VolumeDialog : public NotificationsDialog
 {
     Q_OBJECT
 public:
     VolumeDialog(Volume *volume);
     inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
+    void update();
 public slots:
-    void toggle() { setVisible(!isVisible()); };
     void valueChanged(int value);
 protected:
-    virtual void showEvent(QShowEvent *);
+    void showEvent(QShowEvent *);
 private:
     Volume *myVolume;
     QSlider *slider;
