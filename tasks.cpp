@@ -228,6 +228,7 @@ void Q::Tasks::save(KConfigGroup *grp)
 void Q::Tasks::load(KConfigGroup *grp)
 {
     mySize = grp->readEntry("Size", 48);
+    static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
     
     QStringList pinned = grp->readEntry("Pinned", QStringList());
     foreach(QString pin, pinned)

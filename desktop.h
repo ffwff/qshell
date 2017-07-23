@@ -22,6 +22,8 @@ public:
     inline const QImage& image() const { return myImage; };
     virtual void paintEvent(QPaintEvent *);
     void load(KConfigGroup *group) override;
+public slots:
+    void geometryChanged();
 private:
     QString myFileName;
     QImage myImage;

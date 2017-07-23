@@ -41,3 +41,9 @@ void Q::NotificationsDialog::updateDialog()
         std::min(geo.height() - frame->height(), shell->getStrutTop() + myButton->y())
     );
 };
+
+
+void Q::NotificationsDialog::toggle() {
+    frame->setVisible(!frame->isVisible());
+    KWindowSystem::setState(frame->winId(), NET::SkipTaskbar);
+};

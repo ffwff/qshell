@@ -12,7 +12,7 @@
 namespace Q
 {
 
-enum PanelPosition { Left = 0, Right, Top, Bottom };
+enum PanelPosition { Top = 0, Left, Bottom, Right };
 
 class Shell;
 class PanelShadow : public QWidget
@@ -41,13 +41,14 @@ public slots:
 private:
     Shell *myShell;
     QString myName;
-    int myWidth, myHeight;
+    QString myWidth, myHeight;
     PanelPosition myPosition;
     QPoint myPoint;
     bool setStruts;
     int blurRadius;
     bool displayShadow;
     int myIconSize;
+    float offsetTop, offsetLeft, offsetRight, offsetBottom;
 };
 
 }

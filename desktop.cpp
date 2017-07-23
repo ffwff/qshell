@@ -25,7 +25,16 @@ Q::Desktop::Desktop(Shell *shell) : QLabel(static_cast<QWidget*>(shell)), Q::Mod
     setWindowFlags(Qt::Window);
     setAttribute(Qt::WA_X11NetWmWindowTypeDesktop, true);
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
+    geometryChanged();
+    
+    connect( QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()) );
+};
+
+// slots
+void Q::Desktop::geometryChanged()
+{
     resize(QGuiApplication::primaryScreen()->size());
+    repaint();
 };
 
 // configurations
@@ -37,6 +46,8 @@ void Q::Desktop::load(KConfigGroup *group)
 // set background
 bool Q::Desktop::setBackground(const QString &fileName)
 {
+    if(fileName.isEmpty())
+        return false;
     QImageReader reader(fileName);
     reader.setAutoTransform(true);
     const QImage newImage = reader.read();
@@ -63,17 +74,31 @@ void Q::Desktop::paintEvent(QPaintEvent *)
         {
             if(p->position() == Q::PanelPosition::Top)
             {
-                QLinearGradient gradient(0, p->height()+10, 0, 0);
-                gradient.setColorAt(0, Qt::transparent);
-                gradient.setColorAt(1, QColor(0,0,0,64));
-                painter.fillRect(p->x(), p->y(), p->width(), p->height() * 2, gradient);
+                QLinearGradient gradient(0, p->y(), 0, p->y() + p->height() + 10);
+                gradient.setColorAt(0, QColor(0,0,0,64));
+                gradient.setColorAt(1, Qt::transparent);
+                painter.fillRect(p->x(), p->y() + p->height(), p->width(), p->height(), gradient);
             }
             else if(p->position() == Q::PanelPosition::Bottom)
             {
-                QLinearGradient gradient(0, p->y(), 0, 0);
+                QLinearGradient gradient(0, p->y() , 0, p->y() - p->height());
                 gradient.setColorAt(0, QColor(0,0,0,64));
-                gradient.setColorAt(0.02, Qt::transparent);
-                painter.fillRect(p->x(),p->y() - p->height() - 20, p->width(), p->height() * 3, gradient);
+                gradient.setColorAt(1, Qt::transparent);
+                painter.fillRect(p->x(), p->y() - p->height(), p->width(), p->height(), gradient);
+            }
+            else if(p->position() == Q::PanelPosition::Left)
+            {
+                QLinearGradient gradient(p->x() + p->width() + 10, 0, p->x() + p->width(), 0);
+                gradient.setColorAt(0, Qt::transparent);
+                gradient.setColorAt(1, QColor(0,0,0,64));
+                painter.fillRect(p->x() + p->width(),p->y(), p->width(), p->height(), gradient);
+            }
+            else
+            {
+                QLinearGradient gradient(p->x() - p->width(), 0, p->x() - p->width(), 0);
+                gradient.setColorAt(0, Qt::transparent);
+                gradient.setColorAt(1, QColor(0,0,0,64));
+                painter.fillRect(p->x() - p->width(),p->y(), p->width(), p->height(), gradient);
             }
         }
     }

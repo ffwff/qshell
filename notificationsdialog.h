@@ -14,7 +14,7 @@ public:
     NotificationsDialog(QWidget *button);
     void updateDialog();
 public slots:
-    void toggle() { frame->setVisible(!frame->isVisible()); };
+    void toggle();
 protected:
     Frame *frame;
 private:

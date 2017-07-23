@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <QPainter>
 #include <QColor>
+#include <algorithm>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 
@@ -29,7 +30,11 @@ myPoint(QPoint(0,0)),
 setStruts(true),
 blurRadius(0),
 displayShadow(true),
-myIconSize(24)
+myIconSize(24),
+offsetTop(0),
+offsetLeft(0),
+offsetRight(0),
+offsetBottom(0)
 {
     setObjectName(name);
     
@@ -51,12 +56,17 @@ myIconSize(24)
 // Configurations
 void Q::Panel::load(KConfigGroup *grp)
 {
-    myWidth = grp->readEntry("Width", 100);
-    myHeight = grp->readEntry("Height", 2);
+    myWidth = grp->readEntry("Width", "100");
+    myHeight = grp->readEntry("Height", "2");
     myPosition = (Q::PanelPosition)grp->readEntry("Position", 2);
     blurRadius = grp->readEntry("BlurRadius", 0);
     displayShadow = grp->readEntry("DisplayShadow", true);
     myIconSize = grp->readEntry("IconSize", 24);
+    offsetTop = grp->readEntry("OffsetTop",0.0);
+    offsetLeft = grp->readEntry("OffsetLeft",0.0);
+    offsetRight = grp->readEntry("OffsetRight",0.0);
+    offsetBottom = grp->readEntry("OffsetBottom",0.0);
+    static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
     
     geometryChanged();
     
@@ -83,21 +93,31 @@ void Q::Panel::load(KConfigGroup *grp)
 void Q::Panel::geometryChanged()
 {
     QSize geometry = QGuiApplication::primaryScreen()->availableSize();
-    resize(geometry.width() * (float(myWidth) / 100), geometry.height() * (float(myHeight) / 100));
+    QSize size;
+    if(myWidth.endsWith("px"))
+        size.setWidth(myWidth.replace("px","").toInt());
+    else
+        size.setWidth(geometry.width() * (myWidth.toFloat() / 100));
+    if(myHeight.endsWith("px"))
+        size.setHeight(myHeight.replace("px","").toInt());
+    else
+        size.setHeight(geometry.height() * (myHeight.toFloat() / 100));
+    resize(size);
+    
     if(myPosition == Q::PanelPosition::Left || myPosition == Q::PanelPosition::Top)
     {
-        myPoint.setX(0);
-        myPoint.setY(0);
+        myPoint.setX(geometry.width() * (offsetLeft / 100));
+        myPoint.setY(geometry.height() * (offsetTop / 100));
     }
     else if(myPosition == Q::PanelPosition::Right)
     {
-        myPoint.setX(geometry.width() - width());
-        myPoint.setY(0);
+        myPoint.setX(geometry.width() - width() - (geometry.width() * (offsetRight / 100)));
+        myPoint.setY(geometry.height() * (offsetTop / 100));
     }
     else
     {
-        myPoint.setX(0);
-        myPoint.setY(geometry.height() - height());
+        myPoint.setX(geometry.width() * (offsetLeft / 100));
+        myPoint.setY(geometry.height() - height() - (geometry.height() * (offsetBottom / 100)));
     }
     move(myPoint);
 };
