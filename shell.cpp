@@ -90,8 +90,10 @@ void Q::Shell::saveAll()
 
 void Q::Shell::save(Model *m)
 {
-    KConfigGroup grp = KSharedConfig::openConfig("qshellrc")->group(m->name());
+    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
+    KConfigGroup grp = sharedConfig->group(m->name());
     m->save(&grp);
+    sharedConfig->sync();
 };
 
 void Q::Shell::loadAll()
