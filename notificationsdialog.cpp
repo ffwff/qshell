@@ -40,10 +40,24 @@ void Q::NotificationsDialog::updateDialog()
         std::min(geo.width() - frame->width(), shell->getStrutLeft() + myButton->x() + frame->width() / 2),
         std::min(geo.height() - frame->height(), shell->getStrutTop() + myButton->y())
     );
+
+    Display *display = QX11Info::display();
+    Atom atom = XInternAtom(display, "_KDE_SLIDE", false);
+
+    QVarLengthArray<long, 1024> data(4);
+
+    data[0] = 0;
+    data[1] = 1;
+    data[2] = 200;
+    data[3] = 200;
+
+    XChangeProperty(display, frame->winId(), atom, atom, 32, PropModeReplace,
+            reinterpret_cast<unsigned char *>(data.data()), data.size());
 };
 
 
-void Q::NotificationsDialog::toggle() {
+void Q::NotificationsDialog::toggle()
+{
     frame->setVisible(!frame->isVisible());
     KWindowSystem::setState(frame->winId(), NET::SkipTaskbar);
 };
