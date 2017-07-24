@@ -114,10 +114,7 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event)
         else if(myWindows.count() > 1)
         {
             populateWindowsContextMenu();
-            QPoint p = myParent->parentWidget()->pos();
-            p.setX(p.x() + pos().x());
-            p.setY(p.y() - myWindowsContextMenu.sizeHint().height());
-            myWindowsContextMenu.popup(p);
+            myWindowsContextMenu.popup(getContextMenuPos());
         }
         else if(KWindowSystem::activeWindow() == myWindows.first())
             KWindowSystem::minimizeWindow(myWindows.first());
@@ -127,11 +124,25 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event)
     else if(event->button() == Qt::RightButton)
     {
         populateContextMenu();
-        QPoint p = myParent->parentWidget()->pos();
-        p.setX(p.x() + pos().x());
-        p.setY(p.y() - myContextMenu.sizeHint().height());
-        myContextMenu.popup(p);
+        myContextMenu.popup(getContextMenuPos());
     }
+};
+
+QPoint Q::Task::getContextMenuPos()
+{
+    QPoint p = myParent->parentWidget()->pos();
+    QBoxLayout::Direction dir = static_cast<QBoxLayout*>(myParent->layout())->direction();
+    if(dir == QBoxLayout::LeftToRight || dir == QBoxLayout::RightToLeft)
+    {
+        p.setX(p.x() + x());
+        p.setY(p.y() - myContextMenu.sizeHint().height());
+    }
+    else
+    {
+        p.setX(p.x() + myParent->parentWidget()->width());
+        p.setY(p.y() + y() + myContextMenu.sizeHint().height());
+    }
+    return p;
 };
 
 // Context Menu

@@ -57,6 +57,7 @@ private:
     QProcess myProcess;
     QMenu myContextMenu, myWindowsContextMenu;
     void populateWindowsContextMenu();
+    QPoint getContextMenuPos();
 };
 
 class Tasks : public QWidget, public Model
