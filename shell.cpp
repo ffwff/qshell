@@ -187,6 +187,13 @@ void Q::Shell::addPanel(Q::Panel *panel)
     panel->show(); //TODO
 };
 
+void Q::Shell::repaintPanels()
+{
+    foreach (Q::Panel *panel, myPanels) {
+        panel->repaint();
+    }
+};
+
 // Struts
 void Q::Shell::calculateStruts()
 {

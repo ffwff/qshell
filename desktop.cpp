@@ -9,6 +9,11 @@
 #include <QDebug>
 #include <QImage>
 #include <QLinearGradient>
+#include <QMenu>
+#include <QAction>
+#include <QMouseEvent>
+#include <QFileDialog>
+#include <QStandardPaths>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 
@@ -16,7 +21,25 @@
 #include "desktop.h"
 #include "panel.h"
 
-Q::Desktop::Desktop(Shell *shell) : QLabel(static_cast<QWidget*>(shell)), Q::Model("Q::Desktop", shell)
+Q::DesktopWallpaperDialog::DesktopWallpaperDialog(QWidget *parent) : QFileDialog(parent, "Set desktop background", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
+{
+    connect(this, SIGNAL(fileSelected(const QString &)), this, SLOT(fileSelected(const QString &)));
+};
+
+void Q::DesktopWallpaperDialog::fileSelected(const QString &file)
+{
+    qDebug() << file;
+    Desktop *desktop = static_cast<Desktop *>(parentWidget());
+    desktop->setBackground(file);
+    desktop->shell()->save(desktop);
+};
+
+// ----------
+
+Q::Desktop::Desktop(Shell *shell) :
+QLabel(shell),
+Q::Model("Q::Desktop", shell),
+myDialog(new DesktopWallpaperDialog(this))
 {
     setBackgroundRole(QPalette::Base);
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -26,6 +49,7 @@ Q::Desktop::Desktop(Shell *shell) : QLabel(static_cast<QWidget*>(shell)), Q::Mod
     setAttribute(Qt::WA_X11NetWmWindowTypeDesktop, true);
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     geometryChanged();
+    populateContextMenu();
     
     connect( QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()) );
 };
@@ -34,6 +58,7 @@ Q::Desktop::Desktop(Shell *shell) : QLabel(static_cast<QWidget*>(shell)), Q::Mod
 void Q::Desktop::geometryChanged()
 {
     resize(QGuiApplication::primaryScreen()->size());
+    shell()->repaintPanels();
     repaint();
 };
 
@@ -41,6 +66,11 @@ void Q::Desktop::geometryChanged()
 void Q::Desktop::load(KConfigGroup *group)
 {
     setBackground(group->readEntry("Background", ""));
+};
+
+void Q::Desktop::save(KConfigGroup *group)
+{
+    group->writeEntry("Background", myFileName);
 };
 
 // set background
@@ -60,6 +90,7 @@ bool Q::Desktop::setBackground(const QString &fileName)
     myFileName = fileName;
     myImage = newImage;
     repaint();
+    shell()->repaintPanels();
     return true;
 };
 
@@ -102,4 +133,23 @@ void Q::Desktop::paintEvent(QPaintEvent *)
             }
         }
     }
+};
+
+void Q::Desktop::mouseReleaseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::RightButton)
+    {
+        myContextMenu.popup(event->pos());
+    }
+};
+
+// ctx menu
+void Q::Desktop::populateContextMenu()
+{
+    myContextMenu.clear();
+    
+    QAction *act;
+    act = new QAction(QIcon::fromTheme("preferences-desktop-wallpaper"), "Personalize");
+    connect(act, SIGNAL(triggered()), myDialog, SLOT(show()));
+    myContextMenu.addAction(act);
 };

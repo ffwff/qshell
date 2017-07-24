@@ -31,6 +31,7 @@ public:
     inline int getStrutBottom() const { return strut_bottom; };
     inline QList<Panel*> panels() const { return myPanels; };
     void save(Model *m);
+    void repaintPanels();
 public slots:
     void geometryChanged();
 private:
