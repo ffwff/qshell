@@ -1,14 +1,23 @@
+#ifndef WINCTRL_H
+#define WINCTRL_H
+
 #include <QWidget>
 #include <QBoxLayout>
 #include <QLabel>
 #include <KF5/KWindowSystem/KWindowSystem>
 #include "model.h"
 
-#ifndef WINCTRL_H
-#define WINCTRL_H
-
 namespace Q
 {
+
+class WinTitle : public QLabel
+{
+    Q_OBJECT
+public:
+    WinTitle(QWidget *parent = 0);
+protected:
+    void mouseDoubleClickEvent(QMouseEvent *);
+};
 
 class Shell;
 class WinCtrl : public QWidget, public Model

@@ -29,7 +29,7 @@ Background=
 
 [Q::Shell]
 Panels=TopPanel,BottomPanel
-Stylesheet=/home/primary/.config/qshell.css
+Stylesheet=qshell.css
 
 [Tasks]
 Pinned=vlc,palemoon,dolphin

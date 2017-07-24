@@ -1,3 +1,6 @@
+#ifndef NETWORK_H
+#define NETWORK_H
+
 #include <QPushButton>
 #include <QTimer>
 #include <QNetworkAccessManager>
@@ -6,9 +9,6 @@
 
 #include "model.h"
 #include "panel.h"
-
-#ifndef NETWORK_H
-#define NETWORK_H
 
 namespace Q
 {

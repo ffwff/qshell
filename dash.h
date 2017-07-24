@@ -1,3 +1,6 @@
+#ifndef DASH_H
+#define DASH_H
+
 #include <QLineEdit>
 #include <QWidget>
 #include <QList>
@@ -9,9 +12,6 @@
 
 #include "model.h"
 #include "frame.h"
-
-#ifndef DASH_H
-#define DASH_H
 
 namespace Q
 {
@@ -61,6 +61,7 @@ private:
     DashPosition myPosition;
     QPixmap pixmap;
     float myWidth, myHeight;
+    int mySlidePosition;
 };
 
 class DashButton : public QPushButton, public Model

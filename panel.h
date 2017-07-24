@@ -1,13 +1,18 @@
+#ifndef PANEL_H
+#define PANEL_H
+
 #include <QWidget>
 #include <QBoxLayout>
 #include <QPoint>
 
+#include <X11/Xatom.h>
+#include <QX11Info>
+#include <X11/Xlib.h>
+#include <fixx11h.h>
+
 #include <KF5/KConfigCore/KConfigGroup>
 
 #include "model.h"
-
-#ifndef PANEL_H
-#define PANEL_H
 
 namespace Q
 {
@@ -35,6 +40,8 @@ public:
     inline const bool displaysShadow() const { return displayShadow; };
     inline int iconSize() { return myIconSize; };
     void load(KConfigGroup *grp) override;
+protected:
+    virtual void showEvent(QShowEvent *);
     virtual void paintEvent(QPaintEvent *);
 public slots:
     void geometryChanged();

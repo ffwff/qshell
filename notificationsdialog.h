@@ -1,8 +1,8 @@
-#include <QWidget>
-#include "frame.h"
-
 #ifndef NOTIFICATIONS_DIALOG_H
 #define NOTIFICATIONS_DIALOG_H
+
+#include <QWidget>
+#include "frame.h"
 
 namespace Q
 {

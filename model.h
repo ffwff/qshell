@@ -1,9 +1,9 @@
+#ifndef MODEL_H
+#define MODEL_H
+
 #include <QString>
 
 #include <KF5/KConfigCore/KConfigGroup>
-
-#ifndef MODEL_H
-#define MODEL_H
 
 namespace Q
 {

@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QPixmap>
 #include <QWindow>
+#include <QStandardPaths>
 
 #include <KF5/KConfigCore/KConfigGroup>
 #include <KF5/KConfigCore/KSharedConfig>
@@ -110,6 +111,10 @@ void Q::Shell::loadAll()
     grp = sharedConfig->group("Q::Desktop");
     myDesktop->load(&grp);
     
+    // dash
+    grp = sharedConfig->group("Q::Dash");
+    myDash->load(&grp);
+    
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
     QStringList panels = shGroup.readEntry("Panels", QStringList());
@@ -123,17 +128,17 @@ void Q::Shell::loadAll()
     QString styleSheetLocation = shGroup.readEntry("Stylesheet", QString());
     if(!styleSheetLocation.isEmpty())
     {
-        QFile file(styleSheetLocation);
-        if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+        QFile *file;
+        if(QFile::exists(styleSheetLocation))
+            file = new QFile(styleSheetLocation);
+        else if(!QStandardPaths::locate(QStandardPaths::ConfigLocation, styleSheetLocation).isEmpty())
+            file = new QFile(QStandardPaths::locate(QStandardPaths::ConfigLocation, styleSheetLocation));
+        if (file && file->open(QIODevice::ReadOnly | QIODevice::Text))
         {
-            styleSheet = QString::fromUtf8(file.readAll());
+            styleSheet = QString::fromUtf8(file->readAll());
             setStyleSheet(styleSheet);
         }
     }
-    
-    // dash
-    grp = sharedConfig->group("Q::Dash");
-    myDash->load(&grp);
 };
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }

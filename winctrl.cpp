@@ -4,7 +4,6 @@
 #include <QX11Info>
 #include <QIcon>
 #include <QPushButton>
-#include <QTimer>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 #include <KF5/KWindowSystem/NETWM>
@@ -12,6 +11,28 @@
 
 #include "winctrl.h"
 #include "model.h"
+
+void toggleMaximize()
+{
+    NETWinInfo info(QX11Info::connection(), KWindowSystem::activeWindow(), QX11Info::appRootWindow(), NET::WMState, 0);
+    if(info.state() & NET::Max)
+        KWindowSystem::clearState(KWindowSystem::activeWindow(), NET::Max);
+    else
+        KWindowSystem::setState(KWindowSystem::activeWindow(), NET::Max);
+};
+
+// ----------
+
+Q::WinTitle::WinTitle(QWidget *parent) : QLabel(parent)
+{
+};
+
+void Q::WinTitle::mouseDoubleClickEvent(QMouseEvent *)
+{
+    toggleMaximize();
+};
+
+// ----------
 
 Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, shell)
 {
@@ -33,11 +54,12 @@ Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, 
     maximizeBtn->setIcon(QIcon::fromTheme("window-restore"));
     boxLayout()->addWidget(maximizeBtn);
     
-    label = new QLabel();
+    label = new WinTitle();
     boxLayout()->addWidget(label);
     update();
     
     connect(KWindowSystem::self(), SIGNAL(activeWindowChanged(WId)), this, SLOT(update(WId)));
+    connect(KWindowSystem::self(), SIGNAL(windowChanged(WId, const unsigned long*)), this, SLOT(update()));
     connect(closeBtn, &QPushButton::clicked, [this]() {
         NETRootInfo(QX11Info::connection(), NET::CloseWindow).closeWindowRequest(KWindowSystem::activeWindow());
     });
@@ -45,19 +67,9 @@ Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, 
         KWindowSystem::minimizeWindow(KWindowSystem::activeWindow());
         update();
     });
-    connect(maximizeBtn, &QPushButton::clicked, [this]() {
-        NETWinInfo info(QX11Info::connection(), KWindowSystem::activeWindow(), QX11Info::appRootWindow(), NET::WMState, 0);
-        if(info.state() & NET::Max)
-            KWindowSystem::clearState(KWindowSystem::activeWindow(), NET::Max);
-        else
-            KWindowSystem::setState(KWindowSystem::activeWindow(), NET::Max);
-        update();
+    connect(maximizeBtn, &QPushButton::clicked, []() {
+        toggleMaximize();
     });
-    
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(1000);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start();
 };
 
 void Q::WinCtrl::update(WId wid)

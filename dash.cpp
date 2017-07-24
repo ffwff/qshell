@@ -11,6 +11,11 @@
 #include <QScreen>
 #include <QScrollArea>
 
+#include <X11/Xatom.h>
+#include <QX11Info>
+#include <X11/Xlib.h>
+#include <fixx11h.h>
+
 #include <KF5/KConfigCore/KConfigGroup>
 #include <KF5/KIOWidgets/KRun>
 #include <KF5/KService/KService>
@@ -109,6 +114,7 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
     
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
+    setParent(shell());
     
     connect ( searchBar, SIGNAL(textChanged(QString)), this, SLOT(setSearch(QString)));
     connect ( KSycoca::self(), SIGNAL(databaseChanged()), this, SLOT(slotRepopulate()));
@@ -145,9 +151,22 @@ void Q::Dash::showEvent(QShowEvent *)
         move(shell()->getStrutLeft(), geometry.height() - shell()->getStrutBottom() - height());
     else
         move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
+    
     shell()->desktop()->activateWindow(); // HACK to activate
-    searchBar->setFocus();
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
+    
+    Display *display = QX11Info::display();
+    Atom atom = XInternAtom(display, "_KDE_SLIDE", false);
+
+    QVarLengthArray<long, 1024> data(4);
+
+    data[0] = 0;
+    data[1] = mySlidePosition;
+    data[2] = 200;
+    data[3] = 200;
+    
+    XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
+            reinterpret_cast<unsigned char *>(data.data()), data.size());
 }
 
 // Configurations
@@ -158,6 +177,7 @@ void Q::Dash::load( KConfigGroup *grp )
     myPosition = (DashPosition)grp->readEntry("Position", 0);
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
+    mySlidePosition = grp->readEntry("SlidePositition", 0);
     
     slotRepopulate();
 }

@@ -1,3 +1,6 @@
+#ifndef DATE_H
+#define DATE_H
+
 #include <QLabel>
 #include <QTimer>
 #include <QCalendarWidget>
@@ -7,9 +10,6 @@
 #include "model.h"
 #include "panel.h"
 #include "notificationsdialog.h"
-
-#ifndef DATE_H
-#define DATE_H
 
 namespace Q
 {

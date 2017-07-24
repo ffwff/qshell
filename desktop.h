@@ -1,3 +1,6 @@
+#ifndef DESKTOP_H
+#define DESKTOP_H
+
 #include <QLabel>
 #include <QWidget>
 #include <QString>
@@ -5,9 +8,6 @@
 
 #include "model.h"
 #include "shell.h"
-
-#ifndef DESKTOP_H
-#define DESKTOP_H
 
 namespace Q
 {

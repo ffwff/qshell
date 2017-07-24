@@ -1,3 +1,6 @@
+#ifndef LOGOUT_H
+#define LOGOUT_H
+
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QSlider>
@@ -25,3 +28,5 @@ private:
 };
 
 };
+
+#endif

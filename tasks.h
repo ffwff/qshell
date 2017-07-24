@@ -1,3 +1,6 @@
+#ifndef TASKS_H
+#define TASKS_H
+
 #include <QWidget>
 #include <QList>
 #include <QPushButton>
@@ -10,9 +13,6 @@
 
 #include "shell.h"
 #include "model.h"
-
-#ifndef TASKS_H
-#define TASKS_H
 
 namespace Q
 {

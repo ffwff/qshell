@@ -21,20 +21,7 @@ QT_END_NAMESPACE
 
 Q::Panel::Panel(const QString& name, Q::Shell *shell) :
 QWidget(static_cast<QWidget*>(shell)),
-Q::Model(name, shell),
-myName(name),
-myWidth(100),
-myHeight(2),
-myPosition(Q::PanelPosition::Top),
-myPoint(QPoint(0,0)),
-setStruts(true),
-blurRadius(0),
-displayShadow(true),
-myIconSize(24),
-offsetTop(0),
-offsetLeft(0),
-offsetRight(0),
-offsetBottom(0)
+Q::Model(name, shell)
 {
     setObjectName(name);
     
@@ -148,4 +135,27 @@ void Q::Panel::paintEvent(QPaintEvent *)
         painter.fillRect(rect(), QColor(0,0,0,180));
         painter.drawPixmap(-x(),-y(),pxDst);
     }
+};
+
+void Q::Panel::showEvent(QShowEvent *)
+{
+    Display *display = QX11Info::display();
+    Atom atom = XInternAtom(display, "_KDE_SLIDE", false);
+
+    QVarLengthArray<long, 1024> data(4);
+
+    data[0] = 0;
+    if(myPosition == PanelPosition::Top)
+        data[1] = 1;
+    else if(myPosition == PanelPosition::Left)
+        data[1] = 0;
+    else if(myPosition == PanelPosition::Right)
+        data[1] = 2;
+    else
+        data[1] = 3;
+    data[2] = 60;
+    data[3] = 60;
+    
+    XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
+            reinterpret_cast<unsigned char *>(data.data()), data.size());
 };

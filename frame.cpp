@@ -14,9 +14,10 @@ Q::Frame::Frame(QWidget *parent) : QWidget(parent)
     setAttribute(Qt::WA_X11NetWmWindowTypeDock);
     setAttribute(Qt::WA_TranslucentBackground);
     
+    Display *display = QX11Info::display();
     Atom atom;
-    atom = XInternAtom(QX11Info::display(), "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
-    XChangeProperty(QX11Info::display(), winId(), atom, XA_CARDINAL,
+    atom = XInternAtom(display, "_KDE_NET_WM_BLUR_BEHIND_REGION", False);
+    XChangeProperty(display, winId(), atom, XA_CARDINAL,
                     32, PropModeReplace, 0, 0);
     repaint();
 };

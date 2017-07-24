@@ -1,3 +1,6 @@
+#ifndef SHELL_H
+#define SHELL_H
+
 #include <QApplication>
 #include <QWidget>
 #include <QList>
@@ -5,9 +8,6 @@
 #include <QPixmap>
 
 #include "panel.h"
-
-#ifndef SHELL_H
-#define SHELL_H
 
 namespace Q
 {
