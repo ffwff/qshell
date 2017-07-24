@@ -160,13 +160,13 @@ void Q::Dash::showEvent(QShowEvent *)
 
     QVarLengthArray<long, 1024> data(4);
 
-    data[0] = 0;
+    data[0] = shell()->getStrutLeft();
     data[1] = mySlidePosition;
     data[2] = 200;
     data[3] = 200;
     
-    XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
-            reinterpret_cast<unsigned char *>(data.data()), data.size());
+     XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
+             reinterpret_cast<unsigned char *>(data.data()), data.size());
 }
 
 // Configurations

@@ -111,10 +111,6 @@ void Q::Shell::loadAll()
     grp = sharedConfig->group("Q::Desktop");
     myDesktop->load(&grp);
     
-    // dash
-    grp = sharedConfig->group("Q::Dash");
-    myDash->load(&grp);
-    
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
     QStringList panels = shGroup.readEntry("Panels", QStringList());
@@ -139,6 +135,10 @@ void Q::Shell::loadAll()
             setStyleSheet(styleSheet);
         }
     }
+
+    // dash
+    grp = sharedConfig->group("Q::Dash");
+    myDash->load(&grp);
 };
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }
@@ -193,7 +193,8 @@ void Q::Shell::calculateStruts()
     strut_right  = 0;
     strut_top    = 0;
     strut_bottom = 0;
-    foreach (Q::Panel *panel, myPanels)
+    foreach (Q::Panel *panel, myPanels) {
+        qDebug() << panel->struts();
         if(panel->struts())
             if(panel->position() == Q::PanelPosition::Left)
                 strut_left += panel->width();
@@ -203,6 +204,7 @@ void Q::Shell::calculateStruts()
                 strut_top += panel->height();
             else
                 strut_bottom += panel->height();
+    }
     KWindowSystem::setStrut(winId(),strut_left,strut_right,strut_top,strut_bottom);
 };
 

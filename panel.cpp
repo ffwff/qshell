@@ -53,6 +53,7 @@ void Q::Panel::load(KConfigGroup *grp)
     offsetLeft = grp->readEntry("OffsetLeft",0.0);
     offsetRight = grp->readEntry("OffsetRight",0.0);
     offsetBottom = grp->readEntry("OffsetBottom",0.0);
+    setStruts = grp->readEntry("Struts", true);
     static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
     
     geometryChanged();
