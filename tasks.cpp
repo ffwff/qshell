@@ -135,6 +135,8 @@ void Q::Task::removeWindow(WId wid)
     myWindows.removeAll(wid);
     if(myWindows.isEmpty() && !pinned)
         myParent->removeTask(this);
+    if(myParent->previewTasks())
+        myTaskPreview->removeWindow(wid);
 };
 
 void Q::Task::removeAllWindows()
@@ -179,12 +181,13 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event)
 
 void Q::Task::enterEvent(QEvent *)
 {
+    if(myParent->previewTasks())
+        myParent->hideAllPreviews();
     if(!myWindows.isEmpty())
     {
         if(myParent->previewTasks())
         {
             myTaskPreview->move(getContextMenuPos());
-            myParent->hideAllPreviews();
             myTaskPreview->show();
         }
         else
@@ -197,14 +200,7 @@ void Q::Task::enterEvent(QEvent *)
 
 void Q::Task::leaveEvent(QEvent *)
 {
-    if(myParent->previewTasks())
-    {
-        //myTaskPreview->hide();
-    }
-    else
-    {
-        myWindowsContextMenu.hide();
-    }
+    myWindowsContextMenu.hide();
 };
 
 QPoint Q::Task::getContextMenuPos()
@@ -299,6 +295,7 @@ void Q::Task::unpin()
 Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task)
 {
     setLayout(new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction()));
+    layout()->setSizeConstraint(QLayout::SetFixedSize);
     resize(0, 0);
 };
 
@@ -331,9 +328,10 @@ void Q::TaskPreview::removeWindow(WId wid)
     {
         if(preview->wid() == wid)
         {
+            wids.removeAll(preview->wid());
             myPreviews.removeAll(preview);
             layout()->removeWidget(preview);
-            preview->deleteLater();
+            delete preview;
             return;
         }
     }
