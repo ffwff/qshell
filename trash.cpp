@@ -25,6 +25,7 @@ KDirLister *trash = 0;
 Q::Trash::Trash(const QString &name, Shell *parent) : QLabel(), Q::Model(name, parent)
 {
     setAcceptDrops(true);
+    setAlignment(Qt::AlignCenter);
     
     if (!trash)
     {
@@ -33,8 +34,6 @@ Q::Trash::Trash(const QString &name, Shell *parent) : QLabel(), Q::Model(name, p
     }
     connect(trash, SIGNAL(clear()), this, SLOT(updateStatus()));
     connect(trash, SIGNAL(completed()), this, SLOT(updateStatus()));
-    
-    updateStatus();
     
     QAction *act;
     
@@ -51,6 +50,7 @@ Q::Trash::Trash(const QString &name, Shell *parent) : QLabel(), Q::Model(name, p
 void Q::Trash::load(KConfigGroup *grp)
 {
     mySize = grp->readEntry("Size", 48);
+    updateStatus();
 };
 
 // events

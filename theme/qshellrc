@@ -1,18 +1,21 @@
 [BottomPanel]
 BlurRadius=30
-OffsetTop=2.5
-Height=97
-Width=60px
-Position=1
 Direction=2
+Height=97.5
+OffsetTop=2.5
+Position=1
 Type=Panel
 Widgets=DashButton,Tasks,stretch,Trash
+Width=60px
 
 [DashButton]
 Type=DashButton
 
 [Date]
 Type=Date
+
+[Logout]
+Type=Logout
 
 [Network]
 Type=Network
@@ -32,26 +35,37 @@ Panels=TopPanel,BottomPanel
 Stylesheet=qshell.css
 
 [Tasks]
-Pinned=vlc,palemoon,dolphin
-Size=36
 Direction=2
+Pinned=vlc,palemoon,dolphin,kate,konsole
+Size=36
 Type=Tasks
 
 [TopPanel]
-Position=0
 Height=2.5
+Position=0
 Type=Panel
 Widgets=WinCtrl,stretch,Network,Volume,Date,Logout
 
-[WinCtrl]
-Type=WindowControl
+[Trash]
+Type=Trash
 
 [Volume]
 Type=Volume
 
+[WinCtrl]
+Type=WindowControl
+
 [dolphin]
 Command=/usr/bin/dolphin
 Icon=system-file-manager
+Type=Task
+
+[kate]
+Command=/usr/bin/kate
+Type=Task
+
+[konsole]
+Command=/usr/bin/konsole
 Type=Task
 
 [palemoon]
@@ -62,9 +76,3 @@ Type=Task
 Command=/usr/bin/vlc
 Name=vlc
 Type=Task
-
-[Logout]
-Type=Logout
-
-[Trash]
-Type=Trash
