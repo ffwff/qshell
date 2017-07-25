@@ -6,6 +6,7 @@
 #include <QList>
 #include <QMap>
 #include <QPixmap>
+#include <QProcess>
 
 #include "panel.h"
 
@@ -32,6 +33,7 @@ public:
     inline QList<Panel*> panels() const { return myPanels; };
     void save(Model *m);
     void repaintPanels();
+    void kcmshell5(const QString &arg);
 public slots:
     void geometryChanged();
 private:
@@ -55,6 +57,8 @@ private:
     void calculateStruts();
     //Stylesheet
     QString styleSheet;
+    // Process
+    QProcess myProcess;
 };
 
 class ShellApplication : public QApplication

@@ -55,6 +55,9 @@ void Q::WinTitle::doubleClick()
 
 void Q::WinTitle::click()
 {
+    KWindowInfo info(KWindowSystem::activeWindow(), NET::WMState);
+    if(info.state() & NET::SkipTaskbar)
+        return;
     populateContextMenu();
     QRect geometry = QGuiApplication::primaryScreen()->geometry();
     Shell *shell = static_cast<WinCtrl*>(parentWidget())->shell();

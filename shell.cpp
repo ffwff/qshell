@@ -123,6 +123,7 @@ void Q::Shell::loadAll()
             addPanel(m);
     }
     calculateStruts();
+    myDesktop->geometryChanged();
     QString styleSheetLocation = shGroup.readEntry("Stylesheet", QString());
     if(!styleSheetLocation.isEmpty())
     {
@@ -169,6 +170,7 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Date", Date)
         COND_LOAD_MODEL("Logout", Logout)
         COND_LOAD_MODEL("WindowControl", WinCtrl)
+        COND_LOAD_MODEL("DesktopIcon", DesktopIcon)
         else
             return 0;
         
@@ -215,6 +217,14 @@ void Q::Shell::calculateStruts()
                 strut_bottom += panel->height();
     }
     KWindowSystem::setStrut(winId(),strut_left,strut_right,strut_top,strut_bottom);
+};
+
+// Kcmshell5
+void Q::Shell::kcmshell5(const QString &arg)
+{
+    QStringList argument;
+    argument.append(arg);
+    myProcess.startDetached("kcmshell5", argument);
 };
 
 // ----------

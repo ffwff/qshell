@@ -12,6 +12,7 @@
 #include <QProcess>
 #include <QMenu>
 #include <QAction>
+#include <QProcess>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 #include <KF5/KWindowSystem/NETWM>
