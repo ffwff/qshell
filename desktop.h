@@ -60,6 +60,7 @@ public:
 protected:
     void paintEvent(QPaintEvent *);
     void mouseReleaseEvent(QMouseEvent *event);
+    void wheelEvent(QWheelEvent *we);
 public slots:
     void geometryChanged();
 private:

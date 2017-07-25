@@ -15,6 +15,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QPushButton>
+#include <QWheelEvent>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 
@@ -228,6 +229,23 @@ void Q::Desktop::mouseReleaseEvent(QMouseEvent *event)
     {
         myContextMenu.popup(event->pos());
     }
+};
+
+void Q::Desktop::wheelEvent(QWheelEvent *we)
+{
+    if (KWindowSystem::numberOfDesktops() < 2)
+        return;
+    int next = KWindowSystem::currentDesktop();
+    const int available = KWindowSystem::numberOfDesktops();
+    if ( we->delta() < 0 )
+        ++next;
+    else
+        --next;
+    if ( next < 1 )
+        next += available;
+    if ( next > available )
+        next -= available;
+    KWindowSystem::setCurrentDesktop( next );
 };
 
 // ctx menu

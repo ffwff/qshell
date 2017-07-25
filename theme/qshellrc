@@ -3,7 +3,7 @@ BlurRadius=30
 Direction=2
 Height=97.5
 OffsetTop=2.5
-Position=1
+Position=0
 Type=Panel
 Widgets=DashButton,Tasks,stretch,Trash
 Width=60px
@@ -42,7 +42,7 @@ Type=Tasks
 
 [TopPanel]
 Height=2.5
-Position=0
+Position=1
 Type=Panel
 Widgets=WinCtrl,stretch,Network,Volume,Date,Logout
 

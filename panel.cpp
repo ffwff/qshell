@@ -35,6 +35,7 @@ Q::Model(name, shell)
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
     setAttribute(Qt::WA_AlwaysShowToolTips, true);
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
+    KWindowSystem::setOnAllDesktops(winId(), true);
     geometryChanged();
     
     connect( QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()) );

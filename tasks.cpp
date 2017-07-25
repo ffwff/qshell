@@ -302,7 +302,19 @@ Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task)
 // events
 void Q::TaskPreview::showEvent(QShowEvent*)
 {
-    KWindowSystem::setState(winId(), NET::SkipTaskbar);  
+    Display *display = QX11Info::display();
+    Atom atom = XInternAtom(display, "_KDE_SLIDE", false);
+
+    QVarLengthArray<long, 1024> data(4);
+
+    data[0] = 0;
+    data[1] = (int)static_cast<Panel*>(myTask->tasks()->parentWidget())->position();
+    data[2] = 200;
+    data[3] = 200;
+    
+     XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
+             reinterpret_cast<unsigned char *>(data.data()), data.size());
+     KWindowSystem::setState(winId(), NET::SkipTaskbar);
 };
 
 void Q::TaskPreview::leaveEvent(QEvent *)
@@ -373,6 +385,8 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
 // events
 void Q::WindowPreview::showEvent(QShowEvent*)
 {
+    NETWinInfo info(QX11Info::connection(), myWid, QX11Info::appRootWindow(), NET::WMName, 0);
+    title->setText(info.name());
     grabWindow();
 };
 

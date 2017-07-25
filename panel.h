@@ -17,7 +17,7 @@
 namespace Q
 {
 
-enum PanelPosition { Top = 0, Left, Bottom, Right };
+enum PanelPosition { Left = 0, Top, Right, Bottom };
 
 class Shell;
 class PanelShadow : public QWidget
