@@ -1,5 +1,5 @@
 
-PROJECT( shell )
+PROJECT( qshell )
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 set(QT_MIN_VERSION "5.3.0")
@@ -113,9 +113,9 @@ set(pamixer_SRCS
 set(shell_MOC_HDRS shell.h)
 qt5_wrap_cpp(shell_MOC_SRCS ${shell_MOC_HDRS})
 
-add_executable(shell ${shell_SRCS} ${pamixer_SRCS} ${shell_MOC_HDRS})
+add_executable(qshell ${shell_SRCS} ${pamixer_SRCS} ${shell_MOC_HDRS})
 
-target_link_libraries(shell
+target_link_libraries(qshell
     Qt5::Concurrent
     Qt5::DBus
     Qt5::X11Extras
@@ -138,4 +138,4 @@ target_link_libraries(shell
     pulse
     )
 
-install(TARGETS shell DESTINATION ${BIN_INSTALL_DIR} )
+install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR} )

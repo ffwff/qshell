@@ -383,11 +383,18 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
 };
 
 // events
+bool _firstShown = false;
 void Q::WindowPreview::showEvent(QShowEvent*)
 {
     NETWinInfo info(QX11Info::connection(), myWid, QX11Info::appRootWindow(), NET::WMName, 0);
     title->setText(info.name());
-    grabWindow();
+    if(_firstShown)
+        QTimer::singleShot(100, [this](){ grabWindow(); });
+    else
+    {
+        grabWindow();
+        _firstShown = true;
+    }
 };
 
 void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *event)
@@ -500,7 +507,7 @@ void Q::WindowPreview::grabWindow()
                     this, SLOT(KWinDBusScreenshotHelper(quint64)));
         QDBusInterface interface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Screenshot"), QStringLiteral("org.kde.kwin.Screenshot"));
         
-        interface.call(QStringLiteral("screenshotForWindow"), (quint64)myWid, 1);
+        interface.call(QStringLiteral("screenshotForWindow"), (quint64)myWid, 0);
     }
 };
 
