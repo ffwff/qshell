@@ -373,7 +373,6 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
     window = new QLabel();
     window->resize(250,250);
     layout->addWidget(window);
-    grabWindow();
     
     layout->addStretch();
     
