@@ -4,7 +4,11 @@
 #include <QWidget>
 #include <QBoxLayout>
 #include <QLabel>
+#include <QMenu>
+#include <QTimer>
+
 #include <KF5/KWindowSystem/KWindowSystem>
+
 #include "model.h"
 
 namespace Q
@@ -16,7 +20,16 @@ class WinTitle : public QLabel
 public:
     WinTitle(QWidget *parent = 0);
 protected:
-    void mouseDoubleClickEvent(QMouseEvent *);
+    void mouseDoubleClickEvent(QMouseEvent *ev = 0);
+    void mousePressEvent(QMouseEvent *ev);
+    void mouseReleaseEvent(QMouseEvent *ev);
+private:
+    QMenu myContextMenu;
+    void populateContextMenu();
+    bool isDoubleClick;
+    void doubleClick();
+    void click();
+    QTimer *timer;
 };
 
 class Shell;
