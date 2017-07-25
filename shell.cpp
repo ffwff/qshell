@@ -25,6 +25,7 @@
 #include "date.h"
 #include "logout.h"
 #include "winctrl.h"
+#include "trash.h"
 
 Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
@@ -171,6 +172,7 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Logout", Logout)
         COND_LOAD_MODEL("WindowControl", WinCtrl)
         COND_LOAD_MODEL("DesktopIcon", DesktopIcon)
+        COND_LOAD_MODEL("Trash", Trash)
         else
             return 0;
         

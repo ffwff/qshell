@@ -70,6 +70,7 @@ set(shell_SRCS
     notificationsdialog.cpp
     logout.cpp
     winctrl.cpp
+    trash.cpp
 )
 
 set(pamixer_SRCS

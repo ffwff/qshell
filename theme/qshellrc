@@ -6,7 +6,7 @@ Width=60px
 Position=1
 Direction=2
 Type=Panel
-Widgets=DashButton,Tasks,stretch
+Widgets=DashButton,Tasks,stretch,Trash
 
 [DashButton]
 Type=DashButton
@@ -65,3 +65,6 @@ Type=Task
 
 [Logout]
 Type=Logout
+
+[Trash]
+Type=Trash

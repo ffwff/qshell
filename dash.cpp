@@ -52,7 +52,7 @@ myDash(dash)
     
     setIcon(icon);
     setToolTip(tooltip);
-}
+};
 
 // configs
 void Q::DashItem::load(KConfigGroup *grp)
@@ -61,7 +61,7 @@ void Q::DashItem::load(KConfigGroup *grp)
     mySize = QSize(size, size);
     setIconSize(mySize);
     setMinimumSize(mySize);
-}
+};
 
 // icons
 void Q::DashItem::setSize(int size)
@@ -69,21 +69,21 @@ void Q::DashItem::setSize(int size)
     mySize = QSize(size, size);
     setIconSize(mySize);
     setMinimumSize(mySize);
-}
+};
 
 // mouse
 void Q::DashItem::mouseReleaseEvent(QMouseEvent *)
 {
     runCommand();
     myDash->hide();
-}
+};
 
 // command
 void Q::DashItem::runCommand()
 {
     qDebug() << myCommand;
     myProcess.startDetached(myCommand, myArguments);
-}
+};
 
 // ----------
 
@@ -123,7 +123,7 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
         if(isVisible() && id != shell()->desktop()->winId())
             hide();
     });
-}
+};
 
 // Misc
 QString &normalize(QString cmd)
@@ -135,7 +135,7 @@ QString &normalize(QString cmd)
         .replace("%n", "", Qt::CaseInsensitive)
         .replace("%k", "")
         .replace("%v", "");
-}
+};
 
 // Events
 void Q::Dash::showEvent(QShowEvent *)
@@ -167,7 +167,7 @@ void Q::Dash::showEvent(QShowEvent *)
     
      XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
              reinterpret_cast<unsigned char *>(data.data()), data.size());
-}
+};
 
 // Configurations
 void Q::Dash::load( KConfigGroup *grp )
@@ -180,11 +180,11 @@ void Q::Dash::load( KConfigGroup *grp )
     mySlidePosition = grp->readEntry("SlidePositition", 0);
     
     slotRepopulate();
-}
+};
 
 void Q::Dash::save( KConfigGroup *grp )
 {
-}
+};
 
 // Populate apps
 void Q::Dash::slotRepopulate()
@@ -200,7 +200,7 @@ void Q::Dash::slotRepopulate()
     else
         repopulate(KServiceGroup::root(), 0, search);
     appsLayout()->addStretch();
-}
+};
 
 bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const QString &filter )
 {
@@ -268,14 +268,14 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const Q
     if (layout)
         layout->addStretch(1);
     return ret;
-}
+};
 
 // Search
 void Q::Dash::setSearch(QString s)
 {
     search = s;
     slotRepopulate();
-}
+};
 
 // ----------
 Q::DashButton::DashButton(const QString &name, Shell *parent) :
@@ -285,7 +285,7 @@ mySize(QSize(48,48))
 {
     setIconSize(mySize);
     setMinimumSize(mySize);
-}
+};
 
 void Q::DashButton::load(KConfigGroup *grp)
 {
@@ -294,9 +294,9 @@ void Q::DashButton::load(KConfigGroup *grp)
     mySize = QSize(size, size);
     setIconSize(mySize);
     setMinimumSize(mySize);
-}
+};
 
 void Q::DashButton::mouseReleaseEvent(QMouseEvent *mouseEvent)
 {
     shell()->dash()->setVisible(!shell()->dash()->isVisible());
-}
+};

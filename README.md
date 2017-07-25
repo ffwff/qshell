@@ -17,5 +17,5 @@ Standard stuff.
 ## Credits
 
 * Qt and KF5 for glorious framework
-* BE::Shell for inspiration
+* BE::Shell for inspiration and some code
 * [pamixer](https://github.com/cdemoulins/pamixer/)
