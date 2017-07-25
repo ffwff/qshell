@@ -5,6 +5,8 @@
 #include <X11/Xlib.h>
 #include <fixx11h.h>
 
+#include <KF5/KWindowSystem/KWindowSystem>
+
 #include "shell.h"
 #include "frame.h"
 
@@ -13,6 +15,7 @@ Q::Frame::Frame(QWidget *parent) : QWidget(parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_X11NetWmWindowTypeDock);
     setAttribute(Qt::WA_TranslucentBackground);
+    KWindowSystem::setState(winId(), NET::SkipTaskbar);
     
     Display *display = QX11Info::display();
     Atom atom;

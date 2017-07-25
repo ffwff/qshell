@@ -2,7 +2,6 @@
 #include <QPushButton>
 #include <QList>
 #include <QFile>
-#include <QX11Info>
 #include <QDebug>
 #include <QIcon>
 #include <QPixmap>
@@ -13,6 +12,24 @@
 #include <QMenu>
 #include <QAction>
 #include <QProcess>
+#include <QScreen>
+#include <QApplication>
+#include <QGraphicsDropShadowEffect>
+
+#include <QX11Info>
+#include <QDBusConnection>
+#include <QDBusInterface>
+#include <QDBusConnectionInterface>
+#include <QDBusReply>
+#include <QPainter>
+
+#include <xcb/xproto.h>
+#include <xcb/xcb.h>
+#include <xcb/xcb_image.h>
+#include <xcb/xcb_util.h>
+#include <xcb/xfixes.h>
+
+#include <algorithm>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 #include <KF5/KWindowSystem/NETWM>
@@ -20,6 +37,32 @@
 
 #include "shell.h"
 #include "tasks.h"
+#include "frame.h"
+
+template <typename T> using CScopedPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
+
+struct ScopedPointerXcbImageDeleter
+{
+    static inline void cleanup(xcb_image_t *xcbImage) {
+        if (xcbImage) {
+            xcb_image_destroy(xcbImage);
+        }
+    }
+};
+
+bool isKWinAvailable()
+{
+    if (QDBusConnection::sessionBus().interface()->isServiceRegistered(QStringLiteral("org.kde.KWin"))) {
+        QDBusInterface interface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Effects"), QStringLiteral("org.kde.kwin.Effects"));
+        QDBusReply<bool> reply = interface.call(QStringLiteral("isEffectLoaded"), "screenshot");
+
+        return reply.value();
+    }
+
+    return false;
+};
+
+// ----------
 
 Q::Task::Task(Q::Tasks *tasks, const QString &name) :
 QPushButton(static_cast<QWidget *>(tasks)),
@@ -33,6 +76,9 @@ pinned(false)
     setIconSize(mySize);
     setMinimumSize(mySize);
     populateContextMenu();
+
+    if(myParent->previewTasks())
+        myTaskPreview = new TaskPreview(this);
 };
 
 // Configurations
@@ -80,6 +126,8 @@ void Q::Task::addWindow(WId wid)
 {
     if(!myWindows.contains(wid))
         myWindows.append(wid);
+    if(myParent->previewTasks())
+        myTaskPreview->addWindow(wid);
 };
 
 void Q::Task::removeWindow(WId wid)
@@ -126,6 +174,36 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event)
     {
         populateContextMenu();
         myContextMenu.popup(getContextMenuPos());
+    }
+};
+
+void Q::Task::enterEvent(QEvent *)
+{
+    if(!myWindows.isEmpty())
+    {
+        if(myParent->previewTasks())
+        {
+            myTaskPreview->move(getContextMenuPos());
+            myParent->hideAllPreviews();
+            myTaskPreview->show();
+        }
+        else
+        {
+            populateWindowsContextMenu();
+            myWindowsContextMenu.popup(getContextMenuPos());
+        }
+    }
+};
+
+void Q::Task::leaveEvent(QEvent *)
+{
+    if(myParent->previewTasks())
+    {
+        //myTaskPreview->hide();
+    }
+    else
+    {
+        myWindowsContextMenu.hide();
     }
 };
 
@@ -218,6 +296,213 @@ void Q::Task::unpin()
 
 // ----------
 
+Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task)
+{
+    setLayout(new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction()));
+    resize(0, 0);
+};
+
+// events
+void Q::TaskPreview::showEvent(QShowEvent*)
+{
+    KWindowSystem::setState(winId(), NET::SkipTaskbar);  
+};
+
+void Q::TaskPreview::leaveEvent(QEvent *)
+{
+    hide();
+};
+
+// slots
+void Q::TaskPreview::addWindow(WId wid)
+{
+    if(wids.contains(wid))
+        return;
+    
+    wids.append(wid);
+    WindowPreview *preview = new WindowPreview(wid);
+    myPreviews.append(preview);
+    layout()->addWidget(preview);
+};
+
+void Q::TaskPreview::removeWindow(WId wid)
+{
+    foreach(WindowPreview *preview, myPreviews)
+    {
+        if(preview->wid() == wid)
+        {
+            myPreviews.removeAll(preview);
+            layout()->removeWidget(preview);
+            preview->deleteLater();
+            return;
+        }
+    }
+};
+
+// ----------
+Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setSpacing(0);
+    layout->setMargin(0);
+    setLayout(layout);
+    
+    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMName, 0);
+    title = new QLabel(info.name());
+    title->setStyleSheet("color: white;");
+    title->setWordWrap(true);
+    layout->addWidget(title);
+    
+    QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
+    effect->setColor(QColor("#000000"));
+    effect->setBlurRadius(5);
+    effect->setOffset(0, 0);
+    title->setGraphicsEffect(effect);
+    
+    QScreen *screen = QGuiApplication::primaryScreen();
+    window = new QLabel();
+    window->resize(250,250);
+    layout->addWidget(window);
+    grabWindow();
+    
+    layout->addStretch();
+    
+    connect(this, &Q::WindowPreview::pixmapChanged, [this](QPixmap pixmap){
+        window->setPixmap(pixmap.scaledToWidth(250));
+    });
+};
+
+// events
+void Q::WindowPreview::showEvent(QShowEvent*)
+{
+    grabWindow();
+};
+
+void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *event)
+{
+    KWindowSystem::forceActiveWindow(myWid);
+};
+
+// Code from KDE's spectacle
+// TODO might need to move this to another file
+QPixmap convertFromNative(xcb_image_t *xcbImage)
+{
+    QImage::Format format = QImage::Format_Invalid;
+
+    switch (xcbImage->depth) {
+    case 1:
+        format = QImage::Format_MonoLSB;
+        break;
+    case 16:
+        format = QImage::Format_RGB16;
+        break;
+    case 24:
+        format = QImage::Format_RGB32;
+        break;
+    case 30:
+        format = QImage::Format_BGR30;
+        break;
+    case 32:
+        format = QImage::Format_ARGB32_Premultiplied;
+        break;
+    default:
+        return QPixmap(); // we don't know
+    }
+
+    // The RGB32 format requires data format 0xffRRGGBB, ensure that this fourth byte really is 0xff
+    if (format == QImage::Format_RGB32) {
+        quint32 *data = reinterpret_cast<quint32 *>(xcbImage->data);
+        for (int i = 0; i < xcbImage->width * xcbImage->height; i++) {
+            data[i] |= 0xff000000;
+        }
+    }
+
+    QImage image(xcbImage->data, xcbImage->width, xcbImage->height, format);
+
+    if (image.isNull()) {
+        return QPixmap();
+    }
+
+    // work around an abort in QImage::color
+
+    if (image.format() == QImage::Format_MonoLSB) {
+        image.setColorCount(2);
+        image.setColor(0, QColor(Qt::white).rgb());
+        image.setColor(1, QColor(Qt::black).rgb());
+    }
+
+    // Image is ready. Since the backing data from xcbImage could be freed
+    // before the QPixmap goes away, a deep copy is necessary.
+    return QPixmap::fromImage(image).copy();
+};
+
+QPixmap getPixmapFromDrawable(xcb_drawable_t drawableId, const QRect &rect)
+{
+    xcb_connection_t *xcbConn = QX11Info::connection();
+
+    // proceed to get an image based on the geometry (in device pixels)
+
+    QScopedPointer<xcb_image_t, ScopedPointerXcbImageDeleter> xcbImage(
+        xcb_image_get(
+            xcbConn,
+            drawableId,
+            rect.x(),
+            rect.y(),
+            rect.width(),
+            rect.height(),
+            ~0,
+            XCB_IMAGE_FORMAT_Z_PIXMAP
+        )
+    );
+
+    // too bad, the capture failed.
+    if (xcbImage.isNull()) {
+        return QPixmap();
+    }
+
+    // now process the image
+
+    QPixmap nativePixmap = convertFromNative(xcbImage.data());
+    return nativePixmap;
+};
+
+QRect getDrawableGeometry(xcb_drawable_t drawable)
+{
+    xcb_connection_t *xcbConn = QX11Info::connection();
+
+    xcb_get_geometry_cookie_t geomCookie = xcb_get_geometry_unchecked(xcbConn, drawable);
+    CScopedPointer<xcb_get_geometry_reply_t> geomReply(xcb_get_geometry_reply(xcbConn, geomCookie, NULL));
+
+    return QRect(geomReply->x, geomReply->y, geomReply->width, geomReply->height);
+};
+
+void Q::WindowPreview::grabWindow()
+{
+    if(isKWinAvailable())
+    {
+        QDBusConnection bus = QDBusConnection::sessionBus();
+        bus.connect(QStringLiteral("org.kde.KWin"),
+                    QStringLiteral("/Screenshot"),
+                    QStringLiteral("org.kde.kwin.Screenshot"),
+                    QStringLiteral("screenshotCreated"),
+                    this, SLOT(KWinDBusScreenshotHelper(quint64)));
+        QDBusInterface interface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Screenshot"), QStringLiteral("org.kde.kwin.Screenshot"));
+        
+        interface.call(QStringLiteral("screenshotForWindow"), (quint64)myWid, 1);
+    }
+};
+
+void Q::WindowPreview::KWinDBusScreenshotHelper(quint64 pixmapId)
+{
+    QRect rect = getDrawableGeometry((xcb_drawable_t)pixmapId);
+    mPixmap = getPixmapFromDrawable((xcb_drawable_t)pixmapId, rect);
+    if (!mPixmap.isNull()) {
+        emit pixmapChanged(mPixmap);
+    }
+};
+
+// ----------
+
 Q::Tasks::Tasks(const QString& name, Q::Shell *parent) : QWidget(), Q::Model(name, parent)
 {
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight, this);
@@ -239,6 +524,7 @@ void Q::Tasks::save(KConfigGroup *grp)
 
 void Q::Tasks::load(KConfigGroup *grp)
 {
+    myPreviewTasks = grp->readEntry("PreviewTasks", true);
     mySize = grp->readEntry("Size", 48);
     static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
     
@@ -357,4 +643,16 @@ QString Q::Tasks::getCmdline(WId wid)
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return QString();
     return whichCmd(QString::fromUtf8(file.readAll()));
+};
+
+void Q::Tasks::hideAllPreviews()
+{
+    foreach(Task *task, myTasks)
+    {
+        TaskPreview *preview = task->taskPreview();
+        if(preview)
+        {
+            preview->hide();
+        }
+    }
 };

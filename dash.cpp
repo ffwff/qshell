@@ -153,7 +153,6 @@ void Q::Dash::showEvent(QShowEvent *)
         move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
     
     shell()->desktop()->activateWindow(); // HACK to activate
-    KWindowSystem::setState(winId(), NET::SkipTaskbar);
     
     Display *display = QX11Info::display();
     Atom atom = XInternAtom(display, "_KDE_SLIDE", false);

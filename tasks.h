@@ -8,16 +8,21 @@
 #include <QMouseEvent>
 #include <QProcess>
 #include <QMenu>
+#include <QLabel>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
 #include "shell.h"
 #include "model.h"
+#include "frame.h"
 
 namespace Q
 {
 
+class Task;
+class TaskPreview;
 class Tasks;
+
 class Task : public QPushButton, public Model
 {
     Q_OBJECT
@@ -39,6 +44,8 @@ public:
     inline void setPinned(bool in) { pinned = in; };
     // Ctx menu
     void populateContextMenu();
+    // previews
+    inline TaskPreview *taskPreview() { return myTaskPreview; };
 public slots:
     void runCommand();
     void closeAllWindows();
@@ -47,6 +54,8 @@ public slots:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
+    void enterEvent(QEvent *) override;
+    void leaveEvent(QEvent *) override;
 private:
     Tasks* myParent;
     QString myName, myCommand;
@@ -58,6 +67,45 @@ private:
     QMenu myContextMenu, myWindowsContextMenu;
     void populateWindowsContextMenu();
     QPoint getContextMenuPos();
+    TaskPreview *myTaskPreview;
+};
+
+class WindowPreview;
+class TaskPreview : public Frame
+{
+    Q_OBJECT
+public:
+    TaskPreview(Task *task);
+    void addWindow(WId wid);
+    void removeWindow(WId wid);
+protected:
+    void showEvent(QShowEvent *);
+    void leaveEvent(QEvent*);
+private:
+    Task *myTask;
+    QList<WindowPreview*> myPreviews;
+    QList<WId> wids;
+};
+
+class WindowPreview : public QWidget
+{
+    Q_OBJECT
+public:
+    WindowPreview(WId id);
+    inline const WId wid() const { return myWid; };
+    void grabWindow();
+signals:
+    void pixmapChanged(QPixmap);
+protected:
+    void showEvent(QShowEvent*);
+    void mouseReleaseEvent(QMouseEvent *event);
+private slots:
+    void KWinDBusScreenshotHelper(quint64 pixmapId);
+private:
+    WId myWid;
+    QLabel *title;
+    QLabel *window;
+    QPixmap mPixmap;
 };
 
 class Tasks : public QWidget, public Model
@@ -71,6 +119,8 @@ public:
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
     inline int size() const { return mySize; };
+    inline bool previewTasks() const { return myPreviewTasks; };
+    void hideAllPreviews();
 private slots:
     void windowAdded(WId wid);
     void windowRemoved(WId wid);
@@ -81,6 +131,7 @@ private:
     QList<WId> myWindows;
     QString getCmdline(WId wid);
     int mySize;
+    bool myPreviewTasks;
 };
 
 }
