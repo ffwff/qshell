@@ -19,3 +19,4 @@ Standard stuff.
 * Qt and KF5 for glorious framework
 * BE::Shell for inspiration and some code
 * [pamixer](https://github.com/cdemoulins/pamixer/)
+* [screenshot code from spectacle](https://www.kde.org/applications/graphics/ksnapshot)
