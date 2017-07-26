@@ -6,7 +6,8 @@ QPushButton {
 #TopPanel QWidget {
     height: 100%;
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                stop: 0 #ffffff, stop: 1 #e7e8eb);
+                                stop: 0 #3c404f, stop: 1 #383c4a);
+    color: white;
 }
 
 #TopPanel QLabel {
@@ -16,7 +17,6 @@ QPushButton {
 #TopPanel QPushButton:hover, #TopPanel QLabel:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #5ca8ff, stop: 1 #61a0ff);
-    color: white;
 }
 
 /* Window Controls */
