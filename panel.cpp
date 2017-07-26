@@ -33,7 +33,6 @@ void Q::PanelContainer::showEvent(QShowEvent *)
     move(0, 0);
     resize(myPanel->size());
     setMaximumSize(myPanel->size());
-    //setStyleSheet("background: red");
     qDebug() << size();
 };
 

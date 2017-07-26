@@ -164,7 +164,7 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event)
         else if(myWindows.count() > 1)
         {
             populateWindowsContextMenu();
-            myWindowsContextMenu.popup(getContextMenuPos());
+            myWindowsContextMenu.popup(getContextMenuPos(&myWindowsContextMenu));
         }
         else if(KWindowSystem::activeWindow() == myWindows.first())
             KWindowSystem::minimizeWindow(myWindows.first());
@@ -174,7 +174,7 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event)
     else if(event->button() == Qt::RightButton)
     {
         populateContextMenu();
-        myContextMenu.popup(getContextMenuPos());
+        myContextMenu.popup(getContextMenuPos(&myContextMenu));
     }
 };
 
@@ -186,13 +186,13 @@ void Q::Task::enterEvent(QEvent *)
     {
         if(myParent->previewTasks())
         {
-            myTaskPreview->move(getContextMenuPos());
+            myTaskPreview->move(getContextMenuPos(myTaskPreview));
             myTaskPreview->show();
         }
         else
         {
             populateWindowsContextMenu();
-            myWindowsContextMenu.popup(getContextMenuPos());
+            myWindowsContextMenu.popup(getContextMenuPos(&myWindowsContextMenu));
         }
     }
 };
@@ -202,19 +202,24 @@ void Q::Task::leaveEvent(QEvent *)
     myWindowsContextMenu.hide();
 };
 
-QPoint Q::Task::getContextMenuPos()
+QPoint Q::Task::getContextMenuPos(QWidget *widget)
 {
-    QPoint p = myParent->parentWidget()->pos();
-    QBoxLayout::Direction dir = static_cast<QBoxLayout*>(myParent->layout())->direction();
-    if(dir == QBoxLayout::LeftToRight || dir == QBoxLayout::RightToLeft)
+    widget->setAttribute(Qt::WA_DontShowOnScreen, true);
+    widget->show();
+    widget->hide();
+    widget->setAttribute(Qt::WA_DontShowOnScreen, false);
+    
+    QPoint p = myParent->parentWidget()->parentWidget()->pos();
+    PanelPosition position = static_cast<Panel*>(myParent->parentWidget()->parentWidget())->position();
+    if(position == PanelPosition::Bottom)
     {
         p.setX(p.x() + x());
-        p.setY(p.y() - myContextMenu.sizeHint().height());
+        p.setY(p.y() - y() - widget->height());
     }
     else
     {
         p.setX(p.x() + myParent->parentWidget()->width());
-        p.setY(p.y() + y() + myContextMenu.sizeHint().height());
+        p.setY(p.y() + y() + widget->height());
     }
     return p;
 };
@@ -307,8 +312,17 @@ void Q::TaskPreview::showEvent(QShowEvent*)
 
     QVarLengthArray<long, 1024> data(4);
 
-    data[0] = 0;
-    data[1] = (int)static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->position();
+    PanelPosition position = static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->position();
+    Shell *shell = static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->shell();
+    if(position == PanelPosition::Left)
+        data[0] = shell->getStrutLeft();
+    else if(position == PanelPosition::Right)
+        data[0] = shell->getStrutRight();
+    else if(position == PanelPosition::Top)
+        data[0] = shell->getStrutTop();
+    else
+        data[0] = shell->getStrutBottom();
+    data[1] = (int)position;
     data[2] = 200;
     data[3] = 200;
     
@@ -375,6 +389,8 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
     layout->addWidget(window);
     
     layout->addStretch();
+    
+    grabWindow();
     
     connect(this, &Q::WindowPreview::pixmapChanged, [this](QPixmap pixmap){
         window->setPixmap(pixmap.scaledToWidth(250));

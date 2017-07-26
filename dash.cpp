@@ -110,7 +110,6 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
     searchBarContainer = new QWidget();
     searchBarContainer->setObjectName("Q--Dash-Search");
     searchBarContainer->setLayout(new QVBoxLayout(searchBarContainer));
-    boxLayout()->addWidget(searchBarContainer);
     
     searchBar = new QLineEdit(searchBarContainer);
     searchBar->setPlaceholderText("search for applications and programs...");
@@ -173,7 +172,10 @@ void Q::Dash::showEvent(QShowEvent *)
 
     QVarLengthArray<long, 1024> data(4);
 
-    data[0] = shell()->getStrutLeft();
+    if(myPosition == DashPosition::TopLeft || myPosition == DashPosition::BottomLeft)
+        data[0] = shell()->getStrutLeft();
+    else
+        data[0] = shell()->getStrutRight();
     data[1] = mySlidePosition;
     data[2] = 200;
     data[3] = 200;
@@ -190,7 +192,12 @@ void Q::Dash::load( KConfigGroup *grp )
     myPosition = (DashPosition)grp->readEntry("Position", 0);
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
-    mySlidePosition = grp->readEntry("SlidePositition", 0);
+    mySlidePosition = grp->readEntry("SlidePosition", 0);
+    bool searchBelow = grp->readEntry("SearchBelow", true);
+    if(searchBelow)
+        boxLayout()->addWidget(searchBarContainer);
+    else
+        boxLayout()->insertWidget(0, searchBarContainer);
     
     slotRepopulate();
 };

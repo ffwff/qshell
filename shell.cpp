@@ -134,7 +134,7 @@ void Q::Shell::loadAll()
     QString styleSheetLocation = shGroup.readEntry("Stylesheet", QString());
     if(!styleSheetLocation.isEmpty())
     {
-        QFile *file;
+        QFile *file = 0;
         if(QFile::exists(styleSheetLocation))
             file = new QFile(styleSheetLocation);
         else if(!QStandardPaths::locate(QStandardPaths::ConfigLocation, styleSheetLocation).isEmpty())

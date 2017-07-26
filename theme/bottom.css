@@ -1,0 +1,92 @@
+QPushButton {
+    border: 0 none;
+}
+
+/* top panel */
+#TopPanel QWidget {
+    height: 100%;
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #ffffff, stop: 1 #e7e8eb);
+}
+
+#TopPanel QLabel {
+    padding: 0 5px;
+}
+
+#TopPanel QPushButton:hover, #TopPanel QLabel:hover {
+    background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #5ca8ff, stop: 1 #61a0ff);
+    color: white;
+}
+
+/* Window Controls */
+.Q--WinCtrl QPushButton {
+    qproperty-iconSize: 24px;
+    width: 24px;
+    height: 2.5%;
+}
+
+/* Logout buttons */
+#TopPanel .Q--Logout{
+    qproperty-iconSize: 16px;
+}
+
+/* Bottom panel */
+#BottomPanel * {
+    background: red;
+    width: 60px;
+    max-width: 60px;
+    background-color: rgba(0,0,0,30%);
+}
+
+/* Dash button */
+.Q--DashButton {
+    qproperty-icon: url("/usr/share/icons/Papirus/22x22/places/org.kde.plasma.kickoff.svg");
+    qproperty-iconSize: 50px;
+    padding-top: 5px;
+    width: 60px;
+}
+
+/* Dash */
+#Q--Dash-Apps
+{
+    width:100%;
+    height: 100px;
+}
+
+#Q--Dash-Search, #Q--Dash-Apps {
+    background-color: rgba(0,0,0,60%);
+}
+
+.Q--Dash QLineEdit {
+    margin: 10px;
+    margin-top: 0;
+    border-radius: 5px;
+    padding: 5px;
+    color: #000;
+    background-color: #fff;
+    min-height: 18px;
+    max-height: 18px;
+}
+
+.Q--Dash QScrollArea
+{
+    background: transparent;
+    border: 0 none;
+}
+
+.Q--DashLabelContainer QLabel {
+    color: white;
+    font-size: 16px;
+}
+
+/* Tasks */
+.Q--Task {
+    padding: 10px 0;
+}
+
+/* Trash */
+.Q--Trash {
+    width: 64px;
+    height: 64px;
+}

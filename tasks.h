@@ -47,6 +47,7 @@ public:
     void populateContextMenu();
     // previews
     inline TaskPreview *taskPreview() { return myTaskPreview; };
+    QPoint getContextMenuPos(QWidget *widget);
 public slots:
     void runCommand();
     void closeAllWindows();
@@ -67,7 +68,6 @@ private:
     QProcess myProcess;
     QMenu myContextMenu, myWindowsContextMenu;
     void populateWindowsContextMenu();
-    QPoint getContextMenuPos();
     TaskPreview *myTaskPreview;
 };
 
