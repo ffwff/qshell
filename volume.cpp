@@ -62,9 +62,9 @@ Q::VolumeDialog::VolumeDialog(Volume *volume) :
 Q::NotificationsDialog(volume),
 myVolume(volume)
 {
-    setLayout(new QHBoxLayout());
+    setLayout(new QHBoxLayout(this));
     
-    muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute");
+    muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute", this);
     boxLayout()->addWidget(muteButton);
     connect(muteButton, &QPushButton::clicked, [this]() {
         myVolume->mute();

@@ -37,6 +37,12 @@ Q::DashLabelContainer::DashLabelContainer(QWidget *parent) : QWidget(parent)
 };
 
 // ----------
+Q::DashAppsContainer::DashAppsContainer(QWidget *parent) : QWidget(parent)
+{
+    setLayout(new QHBoxLayout(this));
+};
+
+// ----------
 
 Q::DashItem::DashItem(QWidget *parent, QString name, QIcon icon, QString command, QString tooltip, bool isTerminal, Dash* dash) :
 QPushButton(parent),
@@ -267,11 +273,14 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const Q
                 container->layout()->setAlignment(item, Qt::AlignVCenter);
                 static_cast<QHBoxLayout*>(container->layout())->addStretch(1);
                 
-                QWidget *widget = new QWidget();
-                QHBoxLayout *layout = new QHBoxLayout();
-                widget->setLayout(layout);
+                DashAppsContainer *widget;
+                if(layout)
+                    widget = new DashAppsContainer(layout->parentWidget());
+                else
+                    widget = new DashAppsContainer(appsLayout()->parentWidget());
+                
                 appsLayout()->addWidget(widget);
-                if (repopulate(g, layout, search))
+                if (repopulate(g, static_cast<QHBoxLayout*>(widget->layout()), search))
                     ret = true;
                 else {
                     delete container;
@@ -295,6 +304,7 @@ void Q::Dash::setSearch(QString s)
 };
 
 // ----------
+
 Q::DashButton::DashButton(const QString &name, Shell *parent) :
 QPushButton(static_cast<QWidget *>(parent)),
 Q::Model(name, parent),

@@ -23,6 +23,13 @@ public:
     DashLabelContainer(QWidget *parent = 0);
 };
 
+class DashAppsContainer : public QWidget
+{
+    Q_OBJECT
+public:
+    DashAppsContainer(QWidget *parent = 0);
+};
+
 class Dash;
 class DashItem : public QPushButton
 {

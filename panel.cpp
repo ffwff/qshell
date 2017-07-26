@@ -19,17 +19,31 @@ QT_BEGIN_NAMESPACE
   extern Q_WIDGETS_EXPORT void qt_blurImage( QPainter *p, QImage &blurImage, qreal radius, bool quality, bool alphaOnly, int transposed = 0 );
 QT_END_NAMESPACE
 
-Q::Panel::Panel(const QString& name, Q::Shell *shell) :
-QWidget(static_cast<QWidget*>(shell)),
-Q::Model(name, shell)
+Q::PanelContainer::PanelContainer(Panel *panel) : QWidget(panel), myPanel(panel)
 {
-    setObjectName(name);
-    
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight, this);
     layout->setSpacing(0);
     layout->setMargin(0);
     layout->setAlignment(Qt::AlignCenter);
     setLayout(layout);
+};
+
+void Q::PanelContainer::showEvent(QShowEvent *)
+{
+    move(0, 0);
+    resize(myPanel->size());
+    setMaximumSize(myPanel->size());
+    //setStyleSheet("background: red");
+    qDebug() << size();
+};
+
+// ----------
+
+Q::Panel::Panel(const QString& name, Q::Shell *shell) : QWidget(shell), Q::Model(name, shell)
+{
+    setObjectName(name);
+    
+    container = new PanelContainer(this);
     
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
@@ -46,7 +60,7 @@ void Q::Panel::load(KConfigGroup *grp)
 {
     myWidth = grp->readEntry("Width", "100");
     myHeight = grp->readEntry("Height", "2");
-    myPosition = (Q::PanelPosition)grp->readEntry("Position", 2);
+    myPosition = (Q::PanelPosition)grp->readEntry("Position", 0);
     blurRadius = grp->readEntry("BlurRadius", 0);
     displayShadow = grp->readEntry("DisplayShadow", true);
     myIconSize = grp->readEntry("IconSize", 24);
@@ -55,7 +69,7 @@ void Q::Panel::load(KConfigGroup *grp)
     offsetRight = grp->readEntry("OffsetRight",0.0);
     offsetBottom = grp->readEntry("OffsetBottom",0.0);
     setStruts = grp->readEntry("Struts", true);
-    static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
+    static_cast<QBoxLayout*>(container->layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
     
     geometryChanged();
     
@@ -81,6 +95,7 @@ void Q::Panel::load(KConfigGroup *grp)
 // Slots
 void Q::Panel::geometryChanged()
 {
+    container->hide();
     QSize geometry = QGuiApplication::primaryScreen()->availableSize();
     QSize size;
     if(myWidth.endsWith("px"))
@@ -109,18 +124,21 @@ void Q::Panel::geometryChanged()
         myPoint.setY(geometry.height() - height() - (geometry.height() * (offsetBottom / 100)));
     }
     move(myPoint);
+    container->show();
 };
 
 // Layout management
 void Q::Panel::addWidget(QWidget *widget)
 {
-    widget->setParent(this);
-    boxLayout()->addWidget(widget);
+    widget->setParent(container);
+    container->layout()->addWidget(widget);
 };
 
 void Q::Panel::addStretch(int stretch)
 {
-    boxLayout()->addStretch(stretch);
+    QWidget *w = new QWidget(container);
+    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    static_cast<QBoxLayout*>(container->layout())->addWidget(w);
 };
 
 // Rendering

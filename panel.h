@@ -17,20 +17,27 @@
 namespace Q
 {
 
+class Panel;
+class PanelContainer : public QWidget
+{
+    Q_OBJECT
+public:
+    PanelContainer(Panel *panel);
+    inline Panel *panel() { return myPanel; };
+protected:
+    void showEvent(QShowEvent *);
+private:
+    Panel *myPanel;
+};
+
 enum PanelPosition { Left = 0, Top, Right, Bottom };
 
 class Shell;
-class PanelShadow : public QWidget
-{
-public:
-    PanelShadow(QWidget *parent = 0);
-};
 class Panel : public QWidget, public Model
 {
     Q_OBJECT
 public:
     Panel(const QString& name, Shell *shell);
-    inline QBoxLayout *boxLayout() const { return static_cast<QBoxLayout*>(layout()); };
     void addWidget(QWidget *widget);
     void addStretch(int stretch = 0);
     inline PanelPosition position() const { return myPosition; };
@@ -56,6 +63,7 @@ private:
     bool displayShadow;
     int myIconSize;
     float offsetTop, offsetLeft, offsetRight, offsetBottom;
+    PanelContainer *container;
 };
 
 }

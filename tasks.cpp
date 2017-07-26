@@ -308,7 +308,7 @@ void Q::TaskPreview::showEvent(QShowEvent*)
     QVarLengthArray<long, 1024> data(4);
 
     data[0] = 0;
-    data[1] = (int)static_cast<Panel*>(myTask->tasks()->parentWidget())->position();
+    data[1] = (int)static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->position();
     data[2] = 200;
     data[3] = 200;
     

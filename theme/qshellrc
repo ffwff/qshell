@@ -1,3 +1,6 @@
+[Battery]
+Type=Battery
+
 [BottomPanel]
 BlurRadius=30
 Direction=2
@@ -6,10 +9,11 @@ OffsetTop=2.5
 Position=0
 Type=Panel
 Widgets=DashButton,Tasks,stretch,Trash
-Width=60px
+Width=64px
 
 [DashButton]
 Type=DashButton
+Size=60
 
 [Date]
 Type=Date
@@ -41,6 +45,7 @@ Size=36
 Type=Tasks
 
 [TopPanel]
+BlurRadius=30
 Height=2.5
 Position=1
 Type=Panel
