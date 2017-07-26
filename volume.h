@@ -28,7 +28,6 @@ public:
     void load(KConfigGroup *grp) override;
     inline Pulseaudio *pulse() { return &myPulse; };
     inline Device *device() { return &myDevice; };
-    inline QTimer *timer() const { return myTimer; };
     inline int volumePercent() { return myDevice.volume_percent; };
     inline bool isMute() { return myDevice.mute; };
     void mute() {
@@ -43,7 +42,6 @@ private:
     Pulseaudio myPulse;
     Device myDevice;
     VolumeDialog *dialog;
-    QTimer *myTimer;
 };
 
 class VolumeDialog : public NotificationsDialog

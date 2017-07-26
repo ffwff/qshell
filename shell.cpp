@@ -7,6 +7,7 @@
 #include <QPixmap>
 #include <QWindow>
 #include <QStandardPaths>
+#include <QTimer>
 
 #include <KF5/KConfigCore/KConfigGroup>
 #include <KF5/KConfigCore/KSharedConfig>
@@ -55,6 +56,9 @@ strut_bottom(0)
     myDesktop->show();
     
     myDash = new Dash(this);
+    
+    myOneSecond = new QTimer(this);
+    myOneSecond->setInterval(1000);
     
     loadAll();
     
@@ -149,6 +153,8 @@ void Q::Shell::loadAll()
     // dash
     grp = sharedConfig->group("Q::Dash");
     myDash->load(&grp);
+    
+    myOneSecond->start();
 };
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }

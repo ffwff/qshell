@@ -7,6 +7,7 @@
 #include <QMap>
 #include <QPixmap>
 #include <QProcess>
+#include <QTimer>
 
 #include "panel.h"
 
@@ -31,6 +32,7 @@ public:
     inline int getStrutTop() const { return strut_top; };
     inline int getStrutBottom() const { return strut_bottom; };
     inline QList<Panel*> panels() const { return myPanels; };
+    inline QTimer *oneSecond() const { return myOneSecond; };
     void save(Model *m);
     void repaintPanels();
     void kcmshell5(const QString &arg);
@@ -59,6 +61,8 @@ private:
     QString styleSheet;
     // Process
     QProcess myProcess;
+    // timer
+    QTimer *myOneSecond;
 };
 
 class ShellApplication : public QApplication

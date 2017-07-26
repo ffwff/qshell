@@ -216,10 +216,15 @@ QPoint Q::Task::getContextMenuPos(QWidget *widget)
         p.setX(p.x() + x());
         p.setY(p.y() - y() - widget->height());
     }
-    else
+    else if(position == PanelPosition::Left || position == PanelPosition::Right)
     {
         p.setX(p.x() + myParent->parentWidget()->width());
-        p.setY(p.y() + y() + widget->height());
+        p.setY(p.y() + y());
+    }
+    else
+    {
+        p.setX(p.x() + x());
+        p.setY(p.y());
     }
     return p;
 };

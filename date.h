@@ -2,7 +2,6 @@
 #define DATE_H
 
 #include <QLabel>
-#include <QTimer>
 #include <QCalendarWidget>
 
 #include <KF5/KConfigCore/KConfigGroup>
@@ -27,7 +26,6 @@ protected:
 private slots:
     void update();
 private:
-    QTimer *timer;
     QString format;
     DateDialog *myDateDialog;
 };

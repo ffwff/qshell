@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Q::Shell
+Comment=Log in using the Q::Shell desktop environment
+Exec=/usr/bin/qshell-session
+TryExec=/usr/bin/qshell-session
+Icon=kde
+Type=Application

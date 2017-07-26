@@ -3,6 +3,7 @@
 #include <QIcon>
 #include <QDateTime>
 #include <QHBoxLayout>
+#include <QTimer>
 
 #include "date.h"
 #include "model.h"
@@ -15,10 +16,7 @@ QLabel(), Model(name, shell),
 myDateDialog(new Q::DateDialog(this)),
 format("hh:mm AP")
 {
-    timer = new QTimer(this);
-    timer->setInterval(1000);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start();
+    connect(shell->oneSecond(), SIGNAL(timeout()), this, SLOT(update()));
 };
 
 void Q::Date::load(KConfigGroup *grp)

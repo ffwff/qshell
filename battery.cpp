@@ -8,6 +8,7 @@
 
 #include "battery.h"
 #include "model.h"
+#include "shell.h"
 
 Q::Battery::Battery(const QString &name, Shell *shell) : QPushButton(), Q::Model(name, shell)
 {
@@ -16,10 +17,7 @@ Q::Battery::Battery(const QString &name, Shell *shell) : QPushButton(), Q::Model
     connect(Solid::DeviceNotifier::instance(), SIGNAL(deviceRemoved(QString)),
             this,                              SLOT(deviceRemoved(QString)));
     
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(1000);
-    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-    timer->start();
+    connect(shell->oneSecond(), SIGNAL(timeout()), this, SLOT(update()));
 };
 
 void Q::Battery::update()

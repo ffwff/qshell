@@ -88,6 +88,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 set(BIN_INSTALL_DIR "/usr/bin")
+set(CONFIG_INSTALL_DIR "/usr/share/qshell")
+set(XSESSION_INSTALL_DIR "/usr/share/xsessions")
 
 # ----
 set(shell_SRCS
@@ -143,5 +145,7 @@ target_link_libraries(qshell
     pulse
     )
 
-install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR} )
-install(DIRECTORY "theme" DESTINATION "/usr/share/qshell")
+install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR})
+install(PROGRAMS "qshell-session" DESTINATION ${BIN_INSTALL_DIR})
+install(DIRECTORY "theme" DESTINATION ${CONFIG_INSTALL_DIR})
+install(FILES "qshell.desktop" DESTINATION ${XSESSION_INSTALL_DIR})

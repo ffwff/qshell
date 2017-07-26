@@ -26,9 +26,7 @@ dialog(new Q::VolumeDialog(this))
 {
     setIcon(QIcon::fromTheme("audio-volume-high"));
     
-    myTimer = new QTimer(this);
-    myTimer->setInterval(1000);
-    connect(myTimer, &QTimer::timeout, [this]() {
+    connect(shell->oneSecond(), &QTimer::timeout, [this]() {
         if(isMute()) {
             setIcon(QIcon::fromTheme("audio-volume-muted"));
             setToolTip("Muted");
@@ -46,7 +44,6 @@ dialog(new Q::VolumeDialog(this))
         if(dialog->isVisible())
             dialog->update();
     });
-    myTimer->start();
 };
 
 void Q::Volume::load(KConfigGroup *grp)

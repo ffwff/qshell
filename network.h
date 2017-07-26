@@ -2,7 +2,6 @@
 #define NETWORK_H
 
 #include <QPushButton>
-#include <QTimer>
 #include <QNetworkAccessManager>
 
 #include <KF5/KConfigCore/KConfigGroup>
@@ -21,7 +20,6 @@ public:
     Network(const QString &name, Shell *shell);
     void load(KConfigGroup *grp) override;
 private:
-    QTimer *timer;
     QNetworkAccessManager *manager;
 };
 

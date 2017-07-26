@@ -15,9 +15,7 @@ QPushButton(), Model(name, shell)
     setIcon(QIcon::fromTheme("network-connect"));
     
     manager = new QNetworkAccessManager(this);
-    timer = new QTimer(this);
-    timer->setInterval(1000);
-    connect(timer, &QTimer::timeout, [this]() {
+    connect(shell->oneSecond(), &QTimer::timeout, [this]() {
         QNetworkAccessManager::NetworkAccessibility accessibility = manager->networkAccessible();
         if(accessibility == QNetworkAccessManager::Accessible)
         {
@@ -30,7 +28,6 @@ QPushButton(), Model(name, shell)
             setToolTip("Internet disconnected.");
         }
     });
-    timer->start();
 };
 
 void Q::Network::load(KConfigGroup *grp)

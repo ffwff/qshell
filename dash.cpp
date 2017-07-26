@@ -193,7 +193,7 @@ void Q::Dash::load( KConfigGroup *grp )
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
     mySlidePosition = grp->readEntry("SlidePosition", 0);
-    bool searchBelow = grp->readEntry("SearchBelow", true);
+    bool searchBelow = grp->readEntry("SearchBelow", false);
     if(searchBelow)
         boxLayout()->addWidget(searchBarContainer);
     else
