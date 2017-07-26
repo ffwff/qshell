@@ -45,6 +45,8 @@ find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
     WindowSystem
 )
 
+find_package(KF5Solid NO_MODULE)
+
 find_package(X11)
 set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
                         URL "http://www.x.org"
@@ -85,6 +87,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_definitions("-Wno-mismatched-tags")
 endif()
 
+set(BIN_INSTALL_DIR "/usr/bin")
+
 # ----
 set(shell_SRCS
     shell.cpp
@@ -101,6 +105,7 @@ set(shell_SRCS
     logout.cpp
     winctrl.cpp
     trash.cpp
+    battery.cpp
 )
 
 set(pamixer_SRCS
@@ -139,3 +144,4 @@ target_link_libraries(qshell
     )
 
 install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR} )
+install(DIRECTORY "theme" DESTINATION "/usr/share/qshell")

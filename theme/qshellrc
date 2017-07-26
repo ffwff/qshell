@@ -36,7 +36,7 @@ Stylesheet=qshell.css
 
 [Tasks]
 Direction=2
-Pinned=vlc,palemoon,dolphin,kate,konsole
+Pinned=
 Size=36
 Type=Tasks
 
@@ -44,7 +44,7 @@ Type=Tasks
 Height=2.5
 Position=1
 Type=Panel
-Widgets=WinCtrl,stretch,Network,Volume,Date,Logout
+Widgets=WinCtrl,stretch,Battery,Network,Volume,Date,Logout
 
 [Trash]
 Type=Trash
@@ -54,25 +54,3 @@ Type=Volume
 
 [WinCtrl]
 Type=WindowControl
-
-[dolphin]
-Command=/usr/bin/dolphin
-Icon=system-file-manager
-Type=Task
-
-[kate]
-Command=/usr/bin/kate
-Type=Task
-
-[konsole]
-Command=/usr/bin/konsole
-Type=Task
-
-[palemoon]
-Command=/usr/bin/palemoon
-Type=Task
-
-[vlc]
-Command=/usr/bin/vlc
-Name=vlc
-Type=Task

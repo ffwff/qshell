@@ -7,7 +7,6 @@
 #include <QPixmap>
 #include <QImage>
 #include <QMouseEvent>
-#include <QTimer>
 #include <QProcess>
 #include <QMenu>
 #include <QAction>
@@ -294,6 +293,7 @@ void Q::Task::unpin()
 
 Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task)
 {
+    setWindowFlags(Qt::ToolTip);
     setLayout(new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction()));
     layout()->setSizeConstraint(QLayout::SetFixedSize);
     resize(0, 0);
@@ -359,13 +359,13 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
     
     NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMName, 0);
     title = new QLabel(info.name());
-    title->setStyleSheet("color: white;");
+    title->setStyleSheet("color: white; max-width: 250px;");
     title->setWordWrap(true);
     layout->addWidget(title);
     
     QGraphicsDropShadowEffect *effect = new QGraphicsDropShadowEffect(this);
     effect->setColor(QColor("#000000"));
-    effect->setBlurRadius(5);
+    effect->setBlurRadius(10);
     effect->setOffset(0, 0);
     title->setGraphicsEffect(effect);
     
@@ -382,18 +382,11 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid)
 };
 
 // events
-bool _firstShown = false;
 void Q::WindowPreview::showEvent(QShowEvent*)
 {
     NETWinInfo info(QX11Info::connection(), myWid, QX11Info::appRootWindow(), NET::WMName, 0);
     title->setText(info.name());
-    if(_firstShown)
-        QTimer::singleShot(100, [this](){ grabWindow(); });
-    else
-    {
-        grabWindow();
-        _firstShown = true;
-    }
+    grabWindow();
 };
 
 void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *event)

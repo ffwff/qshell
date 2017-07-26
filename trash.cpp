@@ -68,7 +68,6 @@ void Q::Trash::mouseReleaseEvent(QMouseEvent *event)
 
 void Q::Trash::dragEnterEvent(QDragEnterEvent *dee)
 {
-    qDebug() << "DRAG";
     if ( dee && dee->mimeData() && dee->mimeData()->hasUrls() )
         dee->accept();
 }

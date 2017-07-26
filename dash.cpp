@@ -31,6 +31,13 @@
 #include "desktop.h"
 #include "frame.h"
 
+Q::DashLabelContainer::DashLabelContainer(QWidget *parent) : QWidget(parent)
+{
+    setLayout(new QHBoxLayout(this));
+};
+
+// ----------
+
 Q::DashItem::DashItem(QWidget *parent, QString name, QIcon icon, QString command, QString tooltip, bool isTerminal, Dash* dash) :
 QPushButton(parent),
 myDash(dash)
@@ -248,8 +255,18 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const Q
             g->setShowEmptyMenu(false);
             if( g->entries(true,true).count() != 0 )
             {
-                QLabel *item = new QLabel(g->caption());
-                appsLayout()->addWidget(item);
+                DashLabelContainer *container = new DashLabelContainer(appsLayout()->parentWidget());
+                appsLayout()->addWidget(container);
+                
+                QLabel *icon = new QLabel(container);
+                icon->setPixmap(QIcon::fromTheme(g->icon()).pixmap(24));
+                container->layout()->addWidget(icon);
+                container->layout()->setAlignment(icon, Qt::AlignVCenter);
+                QLabel *item = new QLabel(g->caption(), container);
+                container->layout()->addWidget(item);
+                container->layout()->setAlignment(item, Qt::AlignVCenter);
+                static_cast<QHBoxLayout*>(container->layout())->addStretch(1);
+                
                 QWidget *widget = new QWidget();
                 QHBoxLayout *layout = new QHBoxLayout();
                 widget->setLayout(layout);
@@ -257,7 +274,7 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const Q
                 if (repopulate(g, layout, search))
                     ret = true;
                 else {
-                    delete item;
+                    delete container;
                     delete widget;
                 }
             }

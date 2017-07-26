@@ -15,6 +15,13 @@
 
 namespace Q
 {
+    
+class DashLabelContainer : public QWidget
+{
+    Q_OBJECT
+public:
+    DashLabelContainer(QWidget *parent = 0);
+};
 
 class Dash;
 class DashItem : public QPushButton

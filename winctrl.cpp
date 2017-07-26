@@ -107,11 +107,36 @@ void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event)
 // Context Menu
 void Q::WinTitle::populateContextMenu()
 {
-    KWindowInfo info(KWindowSystem::activeWindow(), NET::WMName|NET::WMState);
+    KWindowInfo info(KWindowSystem::activeWindow(), NET::WMName|NET::WMState|NET::WMDesktop);
 
     myContextMenu.clear();
 
     QAction *act;
+    
+    QMenu *menu = myContextMenu.addMenu("Move to desktop");
+    
+    act = new QAction("All desktops");
+    act->setCheckable(true);
+    act->setChecked(info.onAllDesktops());
+    connect(act, &QAction::triggered, [](){
+        KWindowSystem::setOnAllDesktops(KWindowSystem::activeWindow(), true);
+    });
+    menu->addAction(act);
+    
+    menu->addSeparator();
+    
+    for(int i = 1; i <= KWindowSystem::numberOfDesktops(); i++)
+    {
+        act = new QAction(KWindowSystem::desktopName(i));
+        act->setCheckable(true);
+        act->setChecked(info.isOnDesktop(i));
+        connect(act, &QAction::triggered, [i](){
+            KWindowSystem::setOnDesktop(KWindowSystem::activeWindow(), i);
+        });
+        menu->addAction(act);
+    }
+    
+    myContextMenu.addSeparator();
 
     act = new QAction(QIcon::fromTheme("up"), "Keep above others");
     act->setCheckable(true);

@@ -13,6 +13,7 @@ class NotificationsDialog : public QWidget
 public:
     NotificationsDialog(QWidget *button);
     void updateDialog();
+    static void hideAll();
 public slots:
     void toggle();
 protected:

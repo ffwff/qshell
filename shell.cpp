@@ -26,6 +26,7 @@
 #include "logout.h"
 #include "winctrl.h"
 #include "trash.h"
+#include "battery.h"
 
 Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
@@ -99,6 +100,11 @@ void Q::Shell::save(Model *m)
 
 void Q::Shell::loadAll()
 {
+    if(!QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc")))
+    {
+        QFile::copy("/usr/share/qshell/qshellrc", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshellrc");
+        QFile::copy("/usr/share/qshell/qshell.css", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshell.css");
+    }
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     
     // models
@@ -173,6 +179,7 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("WindowControl", WinCtrl)
         COND_LOAD_MODEL("DesktopIcon", DesktopIcon)
         COND_LOAD_MODEL("Trash", Trash)
+        COND_LOAD_MODEL("Battery", Battery)
         else
             return 0;
         

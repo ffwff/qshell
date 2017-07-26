@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QDebug>
+#include <QList>
 #include <algorithm>
 
 #include <KF5/KWindowSystem/KWindowSystem>
@@ -12,6 +13,8 @@
 #include "shell.h"
 #include "model.h"
 
+QList<Q::Frame*> notificationFrames;
+
 Q::NotificationsDialog::NotificationsDialog(QWidget *button) : QWidget(), myButton(button)
 {
     Model *m = dynamic_cast<Model*>(button);
@@ -20,7 +23,9 @@ Q::NotificationsDialog::NotificationsDialog(QWidget *button) : QWidget(), myButt
     else
         frame = new Q::Frame();
     frame->setCentralWidget(this);
+    frame->setWindowFlags(Qt::ToolTip);
     move(0, 0);
+    notificationFrames.append(frame);
     
     connect(button, SIGNAL(clicked()), this, SLOT(toggle()));
     connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged, [this](WId wid) {
@@ -58,6 +63,13 @@ void Q::NotificationsDialog::updateDialog()
 
 void Q::NotificationsDialog::toggle()
 {
+    Q::NotificationsDialog::hideAll();
     frame->setVisible(!frame->isVisible());
     KWindowSystem::setState(frame->winId(), NET::SkipTaskbar);
+};
+
+void Q::NotificationsDialog::hideAll()
+{
+    foreach(Frame *frame, notificationFrames)
+        frame->hide();
 };
