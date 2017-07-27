@@ -42,7 +42,7 @@ void Q::Date::mouseReleaseEvent(QMouseEvent *)
 
 Q::DateDialog::DateDialog(Q::Date *date) : NotificationsDialog(date), myDate(date)
 {
-    setLayout(new QHBoxLayout());
+    setLayout(new QHBoxLayout(this));
 
     calendar = new QCalendarWidget(this);
     boxLayout()->addWidget(calendar);

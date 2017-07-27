@@ -29,6 +29,8 @@
 #include "trash.h"
 #include "battery.h"
 
+#define NOOP [](void*){}
+
 Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
      QCoreApplication::setApplicationName("qshell");
@@ -77,7 +79,7 @@ void Q::Shell::saveAll()
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     
     // models
-    foreach (Model *m, myModels) {
+    foreach (auto m, myModels) {
         KConfigGroup grp = sharedConfig->group(m->name());
         m->save(&grp);
     }
@@ -89,12 +91,12 @@ void Q::Shell::saveAll()
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
     QStringList list;
-    foreach (Panel *p, myPanels)
+    foreach (auto p, myPanels)
         list.append(p->name());
     shGroup.writeEntry("Panels", list.join(","));
 };
 
-void Q::Shell::save(Model *m)
+void Q::Shell::save(QSharedPointer<Model> m)
 {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     KConfigGroup grp = sharedConfig->group(m->name());
@@ -114,9 +116,7 @@ void Q::Shell::loadAll()
     // models
     QStringList groups = sharedConfig->groupList();
     foreach (const QString &group, groups)
-    {
-        Model *m = getModelByName(group);
-    }
+        getModelByName(group);
     
     KConfigGroup grp;
     
@@ -129,8 +129,8 @@ void Q::Shell::loadAll()
     QStringList panels = shGroup.readEntry("Panels", QStringList());
     foreach (const QString &panel, panels)
     {
-        Panel *m = static_cast<Panel *>(getModelByName(panel));
-        if(m)
+        QSharedPointer<Panel> m = qSharedPointerDynamicCast<Panel>(getModelByName(panel));
+        if(!m.isNull())
             addPanel(m);
     }
     calculateStruts();
@@ -148,6 +148,7 @@ void Q::Shell::loadAll()
             styleSheet = QString::fromUtf8(file->readAll());
             setStyleSheet(styleSheet);
         }
+        delete file;
     }
 
     // dash
@@ -157,10 +158,20 @@ void Q::Shell::loadAll()
     myOneSecond->start();
 };
 
+void Q::Shell::reloadAll()
+{
+    myOneSecond->stop();
+    myOneSecond->disconnect();
+    myPanels.clear();
+    myModels.clear();
+    loadAll();
+};
+
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }
 
-Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
+QSharedPointer<Q::Model> Q::Shell::getModelByName(const QString& name, QSharedPointer<Q::Model> parent)
 {
+    QSharedPointer<Q::Model> null = QSharedPointer<Q::Model>();
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     if(myModels.contains(name))
         return myModels.value(name);
@@ -170,12 +181,12 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         KConfigGroup group = sharedConfig->group(name);
         QString type = group.readEntry("Type", "");
         if(type.isEmpty())
-            return 0;
+            return null;
         COND_LOAD_MODEL("Panel", Panel)
         COND_LOAD_MODEL("Tasks", Tasks)
-        else if(type == "Task" && parent) { // prevents loading outside of Tasks
-            m = new Task(dynamic_cast<Tasks*>(parent), name);
-            static_cast<Task *>(m)->load(&group);
+        else if(type == "Task" && !parent.isNull()) { // prevents loading outside of Tasks
+            m = new Task(qSharedPointerDynamicCast<Tasks>(parent), name);
+            static_cast<Task*>(m)->load(&group);
         }
         COND_LOAD_MODEL("DashButton", DashButton)
         COND_LOAD_MODEL("Volume", Volume)
@@ -187,26 +198,26 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Trash", Trash)
         COND_LOAD_MODEL("Battery", Battery)
         else
-            return 0;
+            return null;
         
-        myModels.insert(name, m);
-        return m;
+        QSharedPointer<Q::Model> spm = QSharedPointer<Q::Model>(m, NOOP);
+        myModels.insert(name, spm);
+        return spm;
     }
     else
-        return 0;
+        return null;
 };
 
 // Panels
-void Q::Shell::addPanel(Q::Panel *panel)
+void Q::Shell::addPanel(QSharedPointer<Q::Panel> panel)
 {
-    qDebug() << "add panel" << panel->name();
     myPanels.append(panel);
-    panel->show(); //TODO
+    panel->show();
 };
 
 void Q::Shell::repaintPanels()
 {
-    foreach (Q::Panel *panel, myPanels) {
+    foreach (auto panel, myPanels) {
         panel->repaint();
     }
 };
@@ -219,7 +230,7 @@ void Q::Shell::calculateStruts()
     strut_right  = 0;
     strut_top    = 0;
     strut_bottom = 0;
-    foreach (Q::Panel *panel, myPanels) {
+    foreach (auto panel, myPanels) {
         qDebug() << panel->struts();
         if(panel->struts())
             if(panel->position() == Q::PanelPosition::Left)

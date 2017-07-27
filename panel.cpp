@@ -78,14 +78,14 @@ void Q::Panel::load(KConfigGroup *grp)
             addStretch();
         else
         {
-            Model *m = shell()->getModelByName(w);
-            if(m)
+            QSharedPointer<Model> m = shell()->getModelByName(w);
+            if(!m.isNull())
             {
-                QWidget *g = dynamic_cast<QWidget*>(m);
-                if(g)
+                QSharedPointer<QWidget> g = qSharedPointerDynamicCast<QWidget>(m);
+                if(!g.isNull())
                 {
                     qDebug() << "add widget" << m->name();
-                    addWidget(g);
+                    addWidget(g.data());
                 }
             }
         }

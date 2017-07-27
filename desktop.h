@@ -71,7 +71,7 @@ private:
     DesktopWallpaperDialog *myDialog;
     QWidget *iconContainer;
     bool showIcons;
-    QList<DesktopIcon*> myIcons;
+    QList<QSharedPointer<DesktopIcon>> myIcons;
     int myIconSize;
 };
 

@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QSlider>
+#include <QScopedPointer>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
@@ -41,7 +42,7 @@ public:
 private:
     Pulseaudio myPulse;
     Device myDevice;
-    VolumeDialog *dialog;
+    QScopedPointer<VolumeDialog> dialog;
 };
 
 class VolumeDialog : public NotificationsDialog
@@ -56,6 +57,7 @@ public slots:
 protected:
     void showEvent(QShowEvent *);
 private:
+    Q_DISABLE_COPY(VolumeDialog)
     Volume *myVolume;
     QSlider *slider;
     QPushButton *muteButton;

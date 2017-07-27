@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <QCalendarWidget>
+#include <QScopedPointer>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
@@ -20,6 +21,7 @@ class Date : public QLabel, public Model
     Q_OBJECT
 public:
     Date(const QString &name, Shell *shell);
+    ~Date() {};
     void load(KConfigGroup *grp) override;
 protected:
     void mouseReleaseEvent(QMouseEvent *);
@@ -27,7 +29,7 @@ private slots:
     void update();
 private:
     QString format;
-    DateDialog *myDateDialog;
+    QScopedPointer<DateDialog> myDateDialog;
 };
 
 class DateDialog : public NotificationsDialog
@@ -36,6 +38,7 @@ public:
     DateDialog(Date *date);
     inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
 private:
+    Q_DISABLE_COPY(DateDialog)
     Date *myDate;
     QCalendarWidget *calendar;
 };

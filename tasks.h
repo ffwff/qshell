@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QMenu>
 #include <QLabel>
+#include <QDebug>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
@@ -27,8 +28,12 @@ class Task : public QPushButton, public Model
 {
     Q_OBJECT
 public:
-    Task(Tasks *tasks, const QString &name);
-    inline Tasks *tasks() { return myParent; };
+    Task(QSharedPointer<Tasks> tasks, const QString &name);
+    ~Task() {
+        qDebug() << "TEST";
+    };
+    inline QSharedPointer<Tasks> tasks() { return myParent; };
+    inline QSharedPointer<Task> ptr() { return myPtr; };
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
     // Command
@@ -48,6 +53,7 @@ public:
     // previews
     inline TaskPreview *taskPreview() { return myTaskPreview; };
     QPoint getContextMenuPos(QWidget *widget);
+    static void deleteLater(){};
 public slots:
     void runCommand();
     void closeAllWindows();
@@ -59,7 +65,7 @@ protected:
     void enterEvent(QEvent *) override;
     void leaveEvent(QEvent *) override;
 private:
-    Tasks* myParent;
+    QSharedPointer<Tasks> myParent;
     QString myName, myCommand;
     QStringList myArguments;
     QSize mySize;
@@ -69,6 +75,7 @@ private:
     QMenu myContextMenu, myWindowsContextMenu;
     void populateWindowsContextMenu();
     TaskPreview *myTaskPreview;
+    QSharedPointer<Task> myPtr;
 };
 
 class WindowPreview;
@@ -76,15 +83,15 @@ class TaskPreview : public Frame
 {
     Q_OBJECT
 public:
-    TaskPreview(Task *task);
+    TaskPreview(QSharedPointer<Task> task);
     void addWindow(WId wid);
     void removeWindow(WId wid);
 protected:
     void showEvent(QShowEvent *);
     void leaveEvent(QEvent*);
 private:
-    Task *myTask;
-    QList<WindowPreview*> myPreviews;
+    QSharedPointer<Task> myTask;
+    QList<QSharedPointer<WindowPreview>> myPreviews;
     QList<WId> wids;
 };
 
@@ -115,8 +122,8 @@ class Tasks : public QWidget, public Model
 public:
     Tasks(const QString& name, Shell *parent);
     inline QBoxLayout *boxLayout() const { return static_cast<QBoxLayout*>(layout()); };
-    void addTask(Task *t);
-    void removeTask(Task *t);
+    void addTask(QSharedPointer<Task> t);
+    void removeTask(QSharedPointer<Task> t);
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
     inline int size() const { return mySize; };
@@ -127,8 +134,8 @@ private slots:
     void windowRemoved(WId wid);
     void populateWindows();
 private:
-    QList<Task*> myTasks;
-    Task *getTaskByCommand(const QString &command);
+    QList<QSharedPointer<Task>> myTasks;
+    QSharedPointer<Task> getTaskByCommand(const QString &command);
     QList<WId> myWindows;
     QString getCmdline(WId wid);
     int mySize;

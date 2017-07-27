@@ -2,7 +2,7 @@
 #define MODEL_H
 
 #include <QString>
-
+#include <QSharedPointer>
 #include <KF5/KConfigCore/KConfigGroup>
 
 namespace Q
@@ -18,6 +18,7 @@ public:
     virtual void load(KConfigGroup *grp) {};
     inline QString name() const { return myName; };
     inline Shell *shell() const { return myShell; };
+    void sync();
 private:
     QString myName;
     Shell *myShell;

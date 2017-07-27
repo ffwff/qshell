@@ -16,6 +16,7 @@
 #include <QStandardPaths>
 #include <QPushButton>
 #include <QWheelEvent>
+#include <QSharedPointer>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 
@@ -93,7 +94,7 @@ void Q::DesktopWallpaperDialog::fileSelected(const QString &file)
     qDebug() << file;
     Desktop *desktop = static_cast<Desktop *>(parentWidget());
     desktop->setBackground(file);
-    desktop->shell()->save(desktop);
+    desktop->sync();
 };
 
 // ----------
@@ -137,11 +138,11 @@ void Q::Desktop::load(KConfigGroup *group)
     myIconSize = group->readEntry("IconSize", 64);
     iconContainer->setVisible(showIcons);
     QStringList icons = group->readEntry("Icons", QStringList());
-    foreach(QString i, icons)
+    foreach (const QString& i, icons)
     {
-        Q::DesktopIcon *icon = dynamic_cast<Q::DesktopIcon*>(shell()->getModelByName(i));
+        QSharedPointer<DesktopIcon> icon = qSharedPointerDynamicCast<DesktopIcon>(shell()->getModelByName(i));
         qDebug() << icon;
-        if(icon)
+        if(!icon.isNull())
         {
             if(!icon->size().width() && !icon->size().height())
             {
@@ -187,7 +188,7 @@ void Q::Desktop::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
     painter.drawImage(QGuiApplication::primaryScreen()->geometry(), myImage);
-    foreach (Q::Panel *p, shell()->panels()) // HACK way to make shadows under windows on top of desktop
+    foreach (auto p, shell()->panels()) // HACK way to make shadows under windows on top of desktop
     {
         if(p->displaysShadow())
         {
@@ -254,6 +255,10 @@ void Q::Desktop::populateContextMenu()
     myContextMenu.clear();
     
     QAction *act;
+    
+    act = new QAction("Reload configurations");
+    connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
+    myContextMenu.addAction(act);
 
     act = new QAction(QIcon::fromTheme("preferences-desktop-display"), "Display");
     connect(act, &QAction::triggered, [this](){ shell()->kcmshell5("kcm_kscreen"); });
