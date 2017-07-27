@@ -104,6 +104,14 @@ void Q::Shell::save(QSharedPointer<Model> m)
     sharedConfig->sync();
 };
 
+void Q::Shell::save(Model *m)
+{
+    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
+    KConfigGroup grp = sharedConfig->group(m->name());
+    m->save(&grp);
+    sharedConfig->sync();
+};
+
 void Q::Shell::loadAll()
 {
     if(!QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc")))

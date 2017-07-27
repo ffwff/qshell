@@ -37,13 +37,16 @@ private:
     QProcess myProcess;
 };
 
+class Desktop;
 class DesktopWallpaperDialog : public QFileDialog
 {
     Q_OBJECT
 public:
-    DesktopWallpaperDialog(QWidget *parent = 0);
+    DesktopWallpaperDialog(Desktop *parent);
 public slots:
     void fileSelected(const QString &file);
+private:
+    Desktop *myParent;
 };
 
 class Desktop : public QLabel, public Model

@@ -35,6 +35,7 @@ public:
     inline QList<QSharedPointer<Panel>> panels() const { return myPanels; };
     inline QTimer *oneSecond() const { return myOneSecond; };
     void save(QSharedPointer<Model> m);
+    void save(Model *m);
     void repaintPanels();
     void kcmshell5(const QString &arg);
     void reloadAll();

@@ -84,17 +84,15 @@ void Q::DesktopIcon::mouseReleaseEvent(QMouseEvent *event)
 
 // ----------
 
-Q::DesktopWallpaperDialog::DesktopWallpaperDialog(QWidget *parent) : QFileDialog(parent, "Set desktop background", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation))
+Q::DesktopWallpaperDialog::DesktopWallpaperDialog(Desktop *parent) : QFileDialog(parent, "Set desktop background", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)), myParent(parent)
 {
     connect(this, SIGNAL(fileSelected(const QString &)), this, SLOT(fileSelected(const QString &)));
 };
 
 void Q::DesktopWallpaperDialog::fileSelected(const QString &file)
 {
-    qDebug() << file;
-    Desktop *desktop = static_cast<Desktop *>(parentWidget());
-    desktop->setBackground(file);
-    desktop->sync();
+    myParent->setBackground(file);
+    myParent->shell()->save(myParent);
 };
 
 // ----------
