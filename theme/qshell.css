@@ -31,6 +31,14 @@ QPushButton {
     qproperty-iconSize: 16px;
 }
 
+/* Bottom panel */
+#BottomPanel * {
+    background: red;
+    width: 60px;
+    max-width: 60px;
+    background-color: rgba(0,0,0,30%);
+}
+
 /* Dash button */
 .Q--DashButton {
     qproperty-icon: url("/usr/share/icons/Papirus/22x22/places/org.kde.plasma.kickoff.svg");

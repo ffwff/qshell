@@ -9,7 +9,7 @@
 #include <QProcess>
 #include <QMenu>
 #include <QLabel>
-#include <QDebug>
+#include <QTimer>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
@@ -125,6 +125,10 @@ public:
     inline int size() const { return mySize; };
     inline bool previewTasks() const { return myPreviewTasks; };
     void hideAllPreviews();
+    inline QTimer *timer() const { return myTimer; };
+protected:
+    void enterEvent(QEvent *);
+    void leaveEvent(QEvent*);
 private slots:
     void windowAdded(WId wid);
     void windowRemoved(WId wid);
@@ -136,6 +140,7 @@ private:
     QString getCmdline(WId wid);
     int mySize;
     bool myPreviewTasks;
+    QTimer *myTimer;
 };
 
 }

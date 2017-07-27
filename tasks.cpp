@@ -14,6 +14,7 @@
 #include <QScreen>
 #include <QApplication>
 #include <QGraphicsDropShadowEffect>
+#include <QTimer>
 
 #include <QX11Info>
 #include <QDBusConnection>
@@ -190,8 +191,14 @@ void Q::Task::enterEvent(QEvent *)
     {
         if(myParent->previewTasks())
         {
-            myTaskPreview->move(getContextMenuPos(myTaskPreview));
-            myTaskPreview->show();
+            connect(myParent->timer(), &QTimer::timeout, this, [this](){ // performance reasons + rid of the annoyance if you just want to use the dash
+                if(underMouse())
+                {
+                    myTaskPreview->move(getContextMenuPos(myTaskPreview));
+                    myTaskPreview->show();
+                }
+                myParent->timer()->disconnect(this);
+            });
         }
         else
         {
@@ -546,6 +553,9 @@ Q::Tasks::Tasks(const QString& name, Q::Shell *parent) : QWidget(), Q::Model(nam
     layout->setMargin(0);
     layout->setAlignment(Qt::AlignCenter);
     setLayout(layout);
+    
+    myTimer = new QTimer(this);
+    myTimer->setInterval(300);
 };
 
 // configurations
@@ -631,6 +641,17 @@ void Q::Tasks::populateWindows()
         windowAdded(wid);
 };
 
+void Q::Tasks::enterEvent(QEvent *)
+{
+    myTimer->start();
+};
+
+void Q::Tasks::leaveEvent(QEvent *)
+{
+    myTimer->disconnect();
+    myTimer->stop();
+};
+
 // tasks
 QSharedPointer<Q::Task> Q::Tasks::getTaskByCommand(const QString &command)
 {
@@ -652,6 +673,8 @@ void Q::Tasks::removeTask(QSharedPointer<Task> t)
 {
     if(myTasks.contains(t))
     {
+        t->hide();
+        updateGeometry();
         boxLayout()->removeWidget(t.data());
         myTasks.removeAll(t);
     }

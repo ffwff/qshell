@@ -9,7 +9,7 @@ OffsetTop=2.5
 Position=0
 Type=Panel
 Widgets=DashButton,Tasks,stretch,Trash
-Width=64px
+Width=60px
 
 [DashButton]
 Type=DashButton
