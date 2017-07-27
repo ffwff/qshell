@@ -571,12 +571,14 @@ void Q::Tasks::load(KConfigGroup *grp)
         if(m)
         {
             QSharedPointer<Task> t = qSharedPointerDynamicCast<Task>(m);
+            t->setParent(this);
             t->setPinned(true);
             addTask(t);
         }
         else
         {
             QSharedPointer<Task> t = QSharedPointer<Task>(new Task(QSharedPointer<Tasks>(this), pin));
+            t->setParent(this);
             t->setCommand(pin);
             addTask(t);
         }

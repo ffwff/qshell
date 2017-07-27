@@ -29,9 +29,6 @@ class Task : public QPushButton, public Model
     Q_OBJECT
 public:
     Task(QSharedPointer<Tasks> tasks, const QString &name);
-    ~Task() {
-        qDebug() << "TEST";
-    };
     inline QSharedPointer<Tasks> tasks() { return myParent; };
     inline QSharedPointer<Task> ptr() { return myPtr; };
     void load(KConfigGroup *grp) override;
@@ -53,7 +50,6 @@ public:
     // previews
     inline TaskPreview *taskPreview() { return myTaskPreview; };
     QPoint getContextMenuPos(QWidget *widget);
-    static void deleteLater(){};
 public slots:
     void runCommand();
     void closeAllWindows();
