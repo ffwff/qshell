@@ -19,6 +19,8 @@ class Network : public QPushButton, public Model
 public:
     Network(const QString &name, Shell *shell);
     void load(KConfigGroup *grp) override;
+private:
+    QNetworkAccessManager *manager;
 };
 
 };

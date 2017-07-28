@@ -16,16 +16,7 @@ namespace Q
 {
 
 class Shell;
-class MediaPlayerDialog;
-class MediaPlayer : public QPushButton, public Model
-{
-    Q_OBJECT
-public:
-    MediaPlayer(const QString &name, Shell *shell);
-private:
-    QScopedPointer<MediaPlayerDialog> dialog;
-};
-
+class MediaPlayer;
 class MediaPlayerDialog : public NotificationsDialog
 {
     Q_OBJECT
@@ -38,7 +29,6 @@ private slots:
     void previousTrack();
     void nextTrack();
 private:
-    Q_DISABLE_COPY(MediaPlayerDialog)
     MediaPlayer *myMedia;
     QDBusInterface *myPropertyInterface, *myCtrlInterface;
     QString myPlayer;
@@ -46,6 +36,16 @@ private:
     QLabel *artist;
     QSlider *slider;
     QPushButton *next, *previous, *play;
+};
+
+class MediaPlayer : public QPushButton, public Model
+{
+    Q_OBJECT
+public:
+    MediaPlayer(const QString &name, Shell *shell);
+    ~MediaPlayer() { dialog->deleteLater(); };
+private:
+    MediaPlayerDialog *dialog;
 };
 
 };

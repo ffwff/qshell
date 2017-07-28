@@ -9,16 +9,12 @@
 #include "shell.h"
 #include "panel.h"
 
-QNetworkAccessManager* manager = 0;
-
 Q::Network::Network(const QString &name, Q::Shell *shell) :
 QPushButton(), Model(name, shell)
 {
     setIcon(QIcon::fromTheme("network-connect"));
     
-    if(!manager)
-        manager = new QNetworkAccessManager();
-    
+    manager = new QNetworkAccessManager(this);
     connect(shell->oneSecond(), &QTimer::timeout, [this]() {
         QNetworkAccessManager::NetworkAccessibility accessibility = manager->networkAccessible();
         if(accessibility == QNetworkAccessManager::Accessible)

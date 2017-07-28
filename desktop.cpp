@@ -138,9 +138,8 @@ void Q::Desktop::load(KConfigGroup *group)
     QStringList icons = group->readEntry("Icons", QStringList());
     foreach (const QString& i, icons)
     {
-        QSharedPointer<DesktopIcon> icon = qSharedPointerDynamicCast<DesktopIcon>(shell()->getModelByName(i));
-        qDebug() << icon;
-        if(!icon.isNull())
+        DesktopIcon *icon = static_cast<DesktopIcon*>(shell()->getModelByName(i));
+        if(icon)
         {
             if(!icon->size().width() && !icon->size().height())
             {
@@ -150,7 +149,7 @@ void Q::Desktop::load(KConfigGroup *group)
             icon->setParent(iconContainer);
             icon->move(icon->left(), icon->top());
             icon->show();
-            myIcons.append(icon);
+            myIcons << icon;
         }
     }
 };
@@ -253,6 +252,10 @@ void Q::Desktop::populateContextMenu()
     myContextMenu.clear();
     
     QAction *act;
+    
+    act = new QAction("Reload configurations");
+    connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
+    myContextMenu.addAction(act);
 
     act = new QAction(QIcon::fromTheme("preferences-desktop-display"), "Display");
     connect(act, &QAction::triggered, [this](){ shell()->kcmshell5("kcm_kscreen"); });
@@ -260,9 +263,5 @@ void Q::Desktop::populateContextMenu()
 
     act = new QAction(QIcon::fromTheme("preferences-desktop-wallpaper"), "Personalize");
     connect(act, SIGNAL(triggered()), myDialog, SLOT(show()));
-    myContextMenu.addAction(act);
-    
-    act = new QAction(QIcon::fromTheme("dialog-error"), "Reload configurations [BUGGY!]");
-    connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
     myContextMenu.addAction(act);
 };

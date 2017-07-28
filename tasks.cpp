@@ -14,7 +14,6 @@
 #include <QScreen>
 #include <QApplication>
 #include <QGraphicsDropShadowEffect>
-#include <QTimer>
 
 #include <QX11Info>
 #include <QDBusConnection>
@@ -38,8 +37,6 @@
 #include "shell.h"
 #include "tasks.h"
 #include "frame.h"
-
-#define NOOP [](void*){}
 
 template <typename T> using CScopedPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
 
@@ -66,22 +63,20 @@ bool isKWinAvailable()
 
 // ----------
 
-Q::Task::Task(QSharedPointer<Q::Tasks> tasks, const QString &name) :
-QPushButton(tasks.data()),
+Q::Task::Task(Q::Tasks *tasks, const QString &name) :
+QPushButton(tasks),
 Model(name, tasks->shell()),
 myParent(tasks),
 myName(name),
 myCommand(""),
-mySize(QSize(48, 48)),
-pinned(false),
-myPtr(QSharedPointer<Q::Task>(this))
+mySize(QSize(48, 48))
 {
     setIconSize(mySize);
     setMinimumSize(mySize);
     populateContextMenu();
 
     if(myParent->previewTasks())
-        myTaskPreview = new TaskPreview(myPtr);
+        myTaskPreview = new TaskPreview(this);
 };
 
 // Configurations
@@ -135,12 +130,11 @@ void Q::Task::addWindow(WId wid)
 
 void Q::Task::removeWindow(WId wid)
 {
-    int r = myWindows.removeAll(wid);
-    if(r < 1) return;
+    myWindows.removeAll(wid);
     if(myWindows.isEmpty() && !pinned)
-         myParent->removeTask(myPtr);
+        myParent->removeTask(this);
     if(myParent->previewTasks())
-         myTaskPreview->removeWindow(wid);
+        myTaskPreview->removeWindow(wid);
 };
 
 void Q::Task::removeAllWindows()
@@ -296,23 +290,23 @@ void Q::Task::populateWindowsContextMenu()
 void Q::Task::pin()
 {
     pinned = true;
-    myParent->shell()->save(QSharedPointer<Model>(myPtr));
-    myParent->sync();
+    myParent->shell()->save(this);
+    myParent->shell()->save(myParent);
 };
 
 void Q::Task::unpin()
 {
     if(myWindows.isEmpty())
-        myParent->removeTask(myPtr);
+        myParent->removeTask(this);
     else
         pinned = false;
-    myParent->shell()->save(QSharedPointer<Model>(this));
-    myParent->sync();
+    myParent->shell()->save(this);
+    myParent->shell()->save(myParent);
 };
 
 // ----------
 
-Q::TaskPreview::TaskPreview(QSharedPointer<Q::Task> task) : Q::Frame(), myTask(task)
+Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task)
 {
     setWindowFlags(Qt::ToolTip);
     setLayout(new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction()));
@@ -359,21 +353,21 @@ void Q::TaskPreview::addWindow(WId wid)
         return;
     
     wids.append(wid);
-    QSharedPointer<WindowPreview> preview = QSharedPointer<WindowPreview>(new WindowPreview(wid));
+    WindowPreview *preview = new WindowPreview(wid);
     myPreviews.append(preview);
-    layout()->addWidget(preview.data());
+    layout()->addWidget(preview);
 };
 
 void Q::TaskPreview::removeWindow(WId wid)
 {
-    foreach(auto preview, myPreviews)
+    foreach(WindowPreview *preview, myPreviews)
     {
         if(preview->wid() == wid)
         {
             wids.removeAll(preview->wid());
             myPreviews.removeAll(preview);
-            layout()->removeWidget(preview.data());
-            preview.clear();
+            layout()->removeWidget(preview);
+            delete preview;
             return;
         }
     }
@@ -555,14 +549,14 @@ Q::Tasks::Tasks(const QString& name, Q::Shell *parent) : QWidget(), Q::Model(nam
     setLayout(layout);
     
     myTimer = new QTimer(this);
-    myTimer->setInterval(500);
+    myTimer->setInterval(300);
 };
 
 // configurations
 void Q::Tasks::save(KConfigGroup *grp)
 {
     QStringList pinned;
-    foreach(auto t, myTasks)
+    foreach(Task *t, myTasks)
         if(t->isPinned())
             pinned.append(t->name());
     grp->writeEntry("Pinned", pinned);
@@ -577,18 +571,16 @@ void Q::Tasks::load(KConfigGroup *grp)
     QStringList pinned = grp->readEntry("Pinned", QStringList());
     foreach(QString pin, pinned)
     {
-        QSharedPointer<Model> m = shell()->getModelByName(pin, QSharedPointer<Model>(this));
+        Model *m = shell()->getModelByName(pin, this);
         if(m)
         {
-            QSharedPointer<Task> t = qSharedPointerDynamicCast<Task>(m);
-            t->setParent(this);
+            Task *t = dynamic_cast<Task*>(m);
             t->setPinned(true);
             addTask(t);
         }
         else
         {
-            QSharedPointer<Task> t = QSharedPointer<Task>(new Task(QSharedPointer<Tasks>(this), pin));
-            t->setParent(this);
+            Task *t = new Task(this, pin);
             t->setCommand(pin);
             addTask(t);
         }
@@ -606,12 +598,12 @@ void Q::Tasks::windowAdded(WId wid)
     if(info.state() & NET::SkipTaskbar)
         return;
     QString cmdline = getCmdline(wid);
-    QSharedPointer<Task> task = getTaskByCommand(cmdline);
-    if(!task.isNull())
+    Task *task = getTaskByCommand(cmdline);
+    if(task)
         task->addWindow(wid);
     else
     {
-        task = QSharedPointer<Task>(new Task(QSharedPointer<Tasks>(this), cmdline.split("/").last()), NOOP);
+        task = new Task(this, cmdline.split("/").last());
         task->setCommand(cmdline);
         
         NETIcon icon = info.icon();
@@ -629,9 +621,9 @@ void Q::Tasks::windowAdded(WId wid)
 
 void Q::Tasks::windowRemoved(WId wid)
 {
-    foreach (auto task, myTasks)
+    foreach (Task *task, myTasks)
         task->removeWindow(wid);
-     myWindows.removeAll(wid);
+    myWindows.removeAll(wid);
 };
 
 void Q::Tasks::populateWindows()
@@ -653,30 +645,29 @@ void Q::Tasks::leaveEvent(QEvent *)
 };
 
 // tasks
-QSharedPointer<Q::Task> Q::Tasks::getTaskByCommand(const QString &command)
+Q::Task *Q::Tasks::getTaskByCommand(const QString &command)
 {
-    foreach (auto task, myTasks)
+    foreach (Task *task, myTasks)
         if(task->command() == command)
             return task;
-    return QSharedPointer<Task>();
+    return 0;
 };
 
-void Q::Tasks::addTask(QSharedPointer<Task> t)
+void Q::Tasks::addTask(Task *t)
 {
     t->setIconSize(QSize(mySize,mySize));
     t->setMinimumSize(QSize(mySize,mySize));
-    boxLayout()->addWidget(t.data());
+    boxLayout()->addWidget(t);
     myTasks << t;
 };
 
-void Q::Tasks::removeTask(QSharedPointer<Task> t)
+void Q::Tasks::removeTask(Task *t)
 {
     if(myTasks.contains(t))
     {
-        t->hide();
-        updateGeometry();
-        boxLayout()->removeWidget(t.data());
+        boxLayout()->removeWidget(t);
         myTasks.removeAll(t);
+        t->deleteLater();
     }
 };
 
@@ -707,7 +698,7 @@ QString Q::Tasks::getCmdline(WId wid)
 
 void Q::Tasks::hideAllPreviews()
 {
-    foreach(auto task, myTasks)
+    foreach(Task *task, myTasks)
     {
         TaskPreview *preview = task->taskPreview();
         if(preview)

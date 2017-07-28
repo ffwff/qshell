@@ -4,7 +4,6 @@
 #include <QPushButton>
 #include <QBoxLayout>
 #include <QSlider>
-#include <QScopedPointer>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
@@ -20,12 +19,31 @@ namespace Q
 {
 
 class Shell;
-class VolumeDialog;
+
+class Volume;
+class VolumeDialog : public NotificationsDialog
+{
+    Q_OBJECT
+public:
+    VolumeDialog(Volume *volume);
+    inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
+    void update();
+public slots:
+    void valueChanged(int value);
+protected:
+    void showEvent(QShowEvent *);
+private:
+    Volume *myVolume;
+    QSlider *slider;
+    QPushButton *muteButton;
+};
+
 class Volume : public QPushButton, public Model
 {
     Q_OBJECT
 public:
     Volume(const QString &name, Shell *shell);
+    ~Volume() { dialog->deleteLater(); };
     void load(KConfigGroup *grp) override;
     inline Pulseaudio *pulse() { return &myPulse; };
     inline Device *device() { return &myDevice; };
@@ -42,25 +60,7 @@ public:
 private:
     Pulseaudio myPulse;
     Device myDevice;
-    QScopedPointer<VolumeDialog> dialog;
-};
-
-class VolumeDialog : public NotificationsDialog
-{
-    Q_OBJECT
-public:
-    VolumeDialog(Volume *volume);
-    inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
-    void update();
-public slots:
-    void valueChanged(int value);
-protected:
-    void showEvent(QShowEvent *);
-private:
-    Q_DISABLE_COPY(VolumeDialog)
-    Volume *myVolume;
-    QSlider *slider;
-    QPushButton *muteButton;
+    VolumeDialog *dialog;
 };
 
 };

@@ -13,8 +13,7 @@
 #include "shell.h"
 #include "model.h"
 
-QList<Q::Frame*> Q::NotificationsDialog::frames;
-QList<Q::NotificationsDialog*> Q::NotificationsDialog::dialogs;
+QList<Q::Frame*> notificationFrames;
 
 Q::NotificationsDialog::NotificationsDialog(QWidget *button) : QWidget(), myButton(button)
 {
@@ -25,8 +24,8 @@ Q::NotificationsDialog::NotificationsDialog(QWidget *button) : QWidget(), myButt
         frame = new Q::Frame();
     frame->setCentralWidget(this);
     frame->setWindowFlags(Qt::ToolTip);
-    Q::NotificationsDialog::frames << (frame);
-    Q::NotificationsDialog::dialogs << this;
+    move(0, 0);
+    notificationFrames.append(frame);
     
     connect(button, SIGNAL(clicked()), this, SLOT(toggle()));
     connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged, [this](WId wid) {
@@ -71,6 +70,6 @@ void Q::NotificationsDialog::toggle()
 
 void Q::NotificationsDialog::hideAll()
 {
-    foreach(Frame *frame, Q::NotificationsDialog::frames)
+    foreach(Frame *frame, notificationFrames)
         frame->hide();
 };

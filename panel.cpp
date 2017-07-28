@@ -6,7 +6,6 @@
 #include <QScreen>
 #include <QPainter>
 #include <QColor>
-#include <QTimer>
 #include <algorithm>
 
 #include <KF5/KWindowSystem/KWindowSystem>
@@ -34,18 +33,7 @@ void Q::PanelContainer::showEvent(QShowEvent *)
     move(0, 0);
     resize(myPanel->size());
     setMaximumSize(myPanel->size());
-};
-
-void Q::PanelContainer::deleteLater()
-{
-    QLayoutItem *item;
-    while((item = layout()->takeAt(0))) {
-        if (item->widget()) {
-            qDebug() << item->widget();
-            item->widget()->deleteLater();
-        }
-        delete item;
-    }
+    qDebug() << size();
 };
 
 // ----------
@@ -90,14 +78,14 @@ void Q::Panel::load(KConfigGroup *grp)
             addStretch();
         else
         {
-            QSharedPointer<Model> m = shell()->getModelByName(w);
-            if(!m.isNull())
+            Model *m = shell()->getModelByName(w);
+            if(m)
             {
-                QSharedPointer<QWidget> g = qSharedPointerDynamicCast<QWidget>(m);
-                if(!g.isNull())
+                QWidget *g = dynamic_cast<QWidget*>(m);
+                if(g)
                 {
                     qDebug() << "add widget" << m->name();
-                    addWidget(g.data());
+                    addWidget(g);
                 }
             }
         }
@@ -189,10 +177,4 @@ void Q::Panel::showEvent(QShowEvent *)
     
     XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
             reinterpret_cast<unsigned char *>(data.data()), data.size());
-};
-
-void Q::Panel::deleteLater()
-{
-    disconnect();
-    container->deleteLater();
 };

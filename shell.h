@@ -8,7 +8,6 @@
 #include <QPixmap>
 #include <QProcess>
 #include <QTimer>
-#include <QSharedPointer>
 
 #include "panel.h"
 
@@ -25,16 +24,15 @@ class Shell : public QWidget
 public:
     Shell();
     void setPanelsOnTop(bool in) { panelsOnTop = in; };
-    QSharedPointer<Q::Model> getModelByName(const QString& name, QSharedPointer<Model> parent = QSharedPointer<Model>());
+    Q::Model *getModelByName(const QString& name, Model *parent = 0);
     inline Desktop *desktop() const { return myDesktop; };
     inline Dash *dash() const { return myDash; };
     inline int getStrutLeft() const { return strut_left; };
     inline int getStrutRight() const { return strut_right; };
     inline int getStrutTop() const { return strut_top; };
     inline int getStrutBottom() const { return strut_bottom; };
-    inline QList<QSharedPointer<Panel>> panels() const { return myPanels; };
+    inline QList<Panel*> panels() const { return myPanels; };
     inline QTimer *oneSecond() const { return myOneSecond; };
-    void save(QSharedPointer<Model> m);
     void save(Model *m);
     void repaintPanels();
     void kcmshell5(const QString &arg);
@@ -45,14 +43,15 @@ private:
     // Configurations
     void saveAll();
     void loadAll();
-    QMap<QString,QSharedPointer<Model>> myModels;
+    QMap<QString,Model *> myModels;
     //Desktop
     Desktop *myDesktop;
     // Dash
     Dash *myDash;
     // Panels
     bool panelsOnTop = false;
-    QList<QSharedPointer<Panel>> myPanels;
+    QList<Panel *> myPanels;
+    void addPanel(Panel *panel);
     // Struts
     int strut_left,
         strut_right,
