@@ -28,6 +28,7 @@
 #include "winctrl.h"
 #include "trash.h"
 #include "battery.h"
+#include "mediaplayer.h"
 
 #define NOOP [](void*){}
 
@@ -205,6 +206,7 @@ QSharedPointer<Q::Model> Q::Shell::getModelByName(const QString& name, QSharedPo
         COND_LOAD_MODEL("DesktopIcon", DesktopIcon)
         COND_LOAD_MODEL("Trash", Trash)
         COND_LOAD_MODEL("Battery", Battery)
+        COND_LOAD_MODEL("MediaPlayer", MediaPlayer)
         else
             return null;
         

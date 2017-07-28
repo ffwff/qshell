@@ -24,7 +24,6 @@ Q::NotificationsDialog::NotificationsDialog(QWidget *button) : QWidget(), myButt
         frame = new Q::Frame();
     frame->setCentralWidget(this);
     frame->setWindowFlags(Qt::ToolTip);
-    move(0, 0);
     notificationFrames.append(frame);
     
     connect(button, SIGNAL(clicked()), this, SLOT(toggle()));

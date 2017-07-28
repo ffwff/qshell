@@ -68,7 +68,7 @@ myVolume(volume)
         update();
     });
     
-    frame->resize(QSize(210,40));
+    frame->resize(QSize(250,45));
     
     slider = new QSlider(Qt::Horizontal, this);
     slider->setMinimum(0);

@@ -108,6 +108,7 @@ set(shell_SRCS
     winctrl.cpp
     trash.cpp
     battery.cpp
+    mediaplayer.cpp
 )
 
 set(pamixer_SRCS

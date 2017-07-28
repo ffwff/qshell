@@ -18,6 +18,7 @@ Q::Battery::Battery(const QString &name, Shell *shell) : QPushButton(), Q::Model
             this,                              SLOT(deviceRemoved(QString)));
     
     connect(shell->oneSecond(), SIGNAL(timeout()), this, SLOT(update()));
+    QTimer::singleShot(0, [this](){ hide(); });
 };
 
 void Q::Battery::update()

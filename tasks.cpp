@@ -555,7 +555,7 @@ Q::Tasks::Tasks(const QString& name, Q::Shell *parent) : QWidget(), Q::Model(nam
     setLayout(layout);
     
     myTimer = new QTimer(this);
-    myTimer->setInterval(300);
+    myTimer->setInterval(500);
 };
 
 // configurations

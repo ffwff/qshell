@@ -18,6 +18,7 @@ public slots:
     void toggle();
 protected:
     Frame *frame;
+    virtual void showEvent(QShowEvent *) { updateDialog(); };
 private:
     QWidget *myButton;
 };
