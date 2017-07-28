@@ -1,4 +1,3 @@
-// shamelessly reused my own code
 #include <QBoxLayout>
 #include <QHBoxLayout>
 #include <QDebug>

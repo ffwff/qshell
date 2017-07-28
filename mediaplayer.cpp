@@ -20,7 +20,7 @@ QPushButton(), Model(name, shell),
 dialog(new MediaPlayerDialog(this))
 {
     setIcon(QIcon::fromTheme("media-playback-start"));
-    connect(shell->oneSecond(), SIGNAL(timeout()), dialog, SLOT(update()));
+    connect(shell->oneSecond(), &QTimer::timeout, [this](){ dialog->update(); });
 };
 
 // ----------

@@ -253,10 +253,6 @@ void Q::Desktop::populateContextMenu()
     myContextMenu.clear();
     
     QAction *act;
-    
-    act = new QAction("Reload configurations");
-    connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
-    myContextMenu.addAction(act);
 
     act = new QAction(QIcon::fromTheme("preferences-desktop-display"), "Display");
     connect(act, &QAction::triggered, [this](){ shell()->kcmshell5("kcm_kscreen"); });
@@ -264,5 +260,9 @@ void Q::Desktop::populateContextMenu()
 
     act = new QAction(QIcon::fromTheme("preferences-desktop-wallpaper"), "Personalize");
     connect(act, SIGNAL(triggered()), myDialog, SLOT(show()));
+    myContextMenu.addAction(act);
+    
+    act = new QAction(QIcon::fromTheme("dialog-error"), "Reload configurations [BUGGY!]");
+    connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
     myContextMenu.addAction(act);
 };

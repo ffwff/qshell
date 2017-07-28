@@ -22,7 +22,7 @@
 
 KDirLister *trash = 0;
 
-Q::Trash::Trash(const QString &name, Shell *parent) : QLabel(), Q::Model(name, parent)
+Q::Trash::Trash(const QString &name, Shell *shell) : QLabel(), Q::Model(name, shell)
 {
     setAcceptDrops(true);
     setAlignment(Qt::AlignCenter);

@@ -53,7 +53,6 @@ private:
     // Panels
     bool panelsOnTop = false;
     QList<QSharedPointer<Panel>> myPanels;
-    void addPanel(QSharedPointer<Panel> panel);
     // Struts
     int strut_left,
         strut_right,

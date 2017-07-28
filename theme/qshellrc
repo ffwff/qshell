@@ -45,7 +45,6 @@ Size=36
 Type=Tasks
 
 [TopPanel]
-BlurRadius=30
 Height=2.5
 Position=1
 Type=Panel

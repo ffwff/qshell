@@ -7,6 +7,7 @@
 namespace Q
 {
 
+class NotificationsDialog;
 class NotificationsDialog : public QWidget
 {
     Q_OBJECT
@@ -14,6 +15,8 @@ public:
     NotificationsDialog(QWidget *button);
     void updateDialog();
     static void hideAll();
+    static QList<Frame*> frames;
+    static QList<NotificationsDialog*> dialogs;
 public slots:
     void toggle();
 protected:

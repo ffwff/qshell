@@ -4,6 +4,7 @@
 #include <QString>
 #include <QSharedPointer>
 #include <KF5/KConfigCore/KConfigGroup>
+#include <QDebug>
 
 namespace Q
 {
@@ -13,7 +14,7 @@ class Model
 {
 public:
     Model(const QString& name, Shell *shell = 0) : myName(name), myShell(shell) {};
-    virtual ~Model() {};
+    virtual ~Model() { qDebug()<<"DELETE"<<myName;};
     virtual void save(KConfigGroup *grp) {};
     virtual void load(KConfigGroup *grp) {};
     inline QString name() const { return myName; };

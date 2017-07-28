@@ -29,6 +29,7 @@
 #include "trash.h"
 #include "battery.h"
 #include "mediaplayer.h"
+#include "notificationsdialog.h"
 
 #define NOOP [](void*){}
 
@@ -136,12 +137,8 @@ void Q::Shell::loadAll()
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
     QStringList panels = shGroup.readEntry("Panels", QStringList());
-    foreach (const QString &panel, panels)
-    {
-        QSharedPointer<Panel> m = qSharedPointerDynamicCast<Panel>(getModelByName(panel));
-        if(!m.isNull())
-            addPanel(m);
-    }
+    foreach (QSharedPointer<Panel> panel, myPanels)
+        panel->show();
     calculateStruts();
     myDesktop->geometryChanged();
     QString styleSheetLocation = shGroup.readEntry("Stylesheet", QString());
@@ -171,17 +168,29 @@ void Q::Shell::reloadAll()
 {
     myOneSecond->stop();
     myOneSecond->disconnect();
-    myPanels.clear();
-    myModels.clear();
-    loadAll();
+    KWindowSystem::self()->disconnect();
+    foreach(NotificationsDialog *n, NotificationsDialog::dialogs)
+    {
+        n->deleteLater();
+    }
+     foreach(QSharedPointer<Model> m, myModels)
+     {
+         qSharedPointerDynamicCast<QObject>(m)->disconnect();
+     }
+     myModels.clear();
+     myPanels.clear();
+     loadAll();
 };
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }
 
 QSharedPointer<Q::Model> Q::Shell::getModelByName(const QString& name, QSharedPointer<Q::Model> parent)
 {
-    QSharedPointer<Q::Model> null = QSharedPointer<Q::Model>();
+    QSharedPointer<Q::Model> null = QSharedPointer<Model>();
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
+    foreach(QSharedPointer<Q::Panel> p, myPanels)
+        if(p->name() == name)
+            return p;
     if(myModels.contains(name))
         return myModels.value(name);
     else if(sharedConfig->hasGroup(name))
@@ -191,11 +200,18 @@ QSharedPointer<Q::Model> Q::Shell::getModelByName(const QString& name, QSharedPo
         QString type = group.readEntry("Type", "");
         if(type.isEmpty())
             return null;
-        COND_LOAD_MODEL("Panel", Panel)
+        else if(type == "Panel") {
+            QSharedPointer<Panel> p(new Panel(name, this));
+            p->load(&group);
+            myPanels << p;
+            return QSharedPointer<Model>(p);
+        }
         COND_LOAD_MODEL("Tasks", Tasks)
         else if(type == "Task" && !parent.isNull()) { // prevents loading outside of Tasks
             m = new Task(qSharedPointerDynamicCast<Tasks>(parent), name);
+//             m = new Task(static_cast<Tasks*>(parent.data()), name);
             static_cast<Task*>(m)->load(&group);
+            return QSharedPointer<Model>(m);
         }
         COND_LOAD_MODEL("DashButton", DashButton)
         COND_LOAD_MODEL("Volume", Volume)
@@ -210,7 +226,7 @@ QSharedPointer<Q::Model> Q::Shell::getModelByName(const QString& name, QSharedPo
         else
             return null;
         
-        QSharedPointer<Q::Model> spm = QSharedPointer<Q::Model>(m, NOOP);
+        QSharedPointer<Model> spm = QSharedPointer<Model>(m);
         myModels.insert(name, spm);
         return spm;
     }
@@ -219,12 +235,6 @@ QSharedPointer<Q::Model> Q::Shell::getModelByName(const QString& name, QSharedPo
 };
 
 // Panels
-void Q::Shell::addPanel(QSharedPointer<Q::Panel> panel)
-{
-    myPanels.append(panel);
-    panel->show();
-};
-
 void Q::Shell::repaintPanels()
 {
     foreach (auto panel, myPanels) {

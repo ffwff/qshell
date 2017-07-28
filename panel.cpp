@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <QPainter>
 #include <QColor>
+#include <QTimer>
 #include <algorithm>
 
 #include <KF5/KWindowSystem/KWindowSystem>
@@ -33,6 +34,18 @@ void Q::PanelContainer::showEvent(QShowEvent *)
     move(0, 0);
     resize(myPanel->size());
     setMaximumSize(myPanel->size());
+};
+
+void Q::PanelContainer::deleteLater()
+{
+    QLayoutItem *item;
+    while((item = layout()->takeAt(0))) {
+        if (item->widget()) {
+            qDebug() << item->widget();
+            item->widget()->deleteLater();
+        }
+        delete item;
+    }
 };
 
 // ----------
@@ -176,4 +189,10 @@ void Q::Panel::showEvent(QShowEvent *)
     
     XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
             reinterpret_cast<unsigned char *>(data.data()), data.size());
+};
+
+void Q::Panel::deleteLater()
+{
+    disconnect();
+    container->deleteLater();
 };

@@ -21,7 +21,6 @@ class Date : public QLabel, public Model
     Q_OBJECT
 public:
     Date(const QString &name, Shell *shell);
-    ~Date() {};
     void load(KConfigGroup *grp) override;
 protected:
     void mouseReleaseEvent(QMouseEvent *);

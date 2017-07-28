@@ -24,6 +24,7 @@ class PanelContainer : public QWidget
 public:
     PanelContainer(Panel *panel);
     inline Panel *panel() { return myPanel; };
+    void deleteLater();
 protected:
     void showEvent(QShowEvent *);
 private:
@@ -47,6 +48,7 @@ public:
     inline const bool displaysShadow() const { return displayShadow; };
     inline int iconSize() { return myIconSize; };
     void load(KConfigGroup *grp) override;
+    void deleteLater();
 protected:
     virtual void showEvent(QShowEvent *);
     virtual void paintEvent(QPaintEvent *);
