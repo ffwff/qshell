@@ -7,6 +7,7 @@ QPushButton {
     height: 100%;
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #ffffff, stop: 1 #e7e8eb);
+    padding: 0 3px;
 }
 
 #TopPanel QLabel {

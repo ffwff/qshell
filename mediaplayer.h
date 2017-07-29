@@ -44,8 +44,11 @@ class MediaPlayer : public QPushButton, public Model
 public:
     MediaPlayer(const QString &name, Shell *shell);
     ~MediaPlayer() { dialog->deleteLater(); };
+    bool showLabel() { return myShowLabel; };
+    void load(KConfigGroup *grp);
 private:
     MediaPlayerDialog *dialog;
+    bool myShowLabel;
 };
 
 };

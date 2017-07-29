@@ -29,6 +29,7 @@
 #include "trash.h"
 #include "battery.h"
 #include "mediaplayer.h"
+#include "button.h"
 
 Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
@@ -162,6 +163,13 @@ void Q::Shell::reloadAll()
 {
     myOneSecond->stop();
     myOneSecond->disconnect();
+    foreach(Model *m, myModels)
+    {
+        QWidget *w = dynamic_cast<QWidget*>(m);
+        if(w) w->deleteLater();
+    }
+    foreach(Panel *p, myPanels)
+        p->deleteLater();
     myModels.clear();
     myPanels.clear();
     loadAll();
@@ -197,6 +205,7 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Trash", Trash)
         COND_LOAD_MODEL("Battery", Battery)
         COND_LOAD_MODEL("MediaPlayer", MediaPlayer)
+        COND_LOAD_MODEL("Button", Button)
         else
             return 0;
         
@@ -212,7 +221,7 @@ void Q::Shell::addPanel(Q::Panel *panel)
 {
     qDebug() << "add panel" << panel->name();
     myPanels.append(panel);
-    panel->show(); //TODO
+    panel->show();
 };
 
 void Q::Shell::repaintPanels()

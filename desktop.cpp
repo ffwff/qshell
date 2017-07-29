@@ -253,9 +253,10 @@ void Q::Desktop::populateContextMenu()
     
     QAction *act;
     
-    act = new QAction("Reload configurations");
-    connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
-    myContextMenu.addAction(act);
+    // TODO FIX THIS
+//     act = new QAction("Reload configurations");
+//     connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
+//     myContextMenu.addAction(act);
 
     act = new QAction(QIcon::fromTheme("preferences-desktop-display"), "Display");
     connect(act, &QAction::triggered, [this](){ shell()->kcmshell5("kcm_kscreen"); });

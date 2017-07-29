@@ -87,7 +87,6 @@ void Q::DashItem::setSize(int size)
 void Q::DashItem::mouseReleaseEvent(QMouseEvent *)
 {
     runCommand();
-    myDash->hide();
 };
 
 // command
@@ -95,18 +94,19 @@ void Q::DashItem::runCommand()
 {
     qDebug() << myCommand;
     myProcess.startDetached(myCommand, myArguments);
+    myDash->hide();
 };
 
 // ----------
 
 Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
 {
-    QVBoxLayout *layout = new QVBoxLayout();
+    QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setSpacing(0);
     layout->setMargin(0);
     setLayout(layout);
     
-    searchBarContainer = new QWidget();
+    searchBarContainer = new QWidget(this);
     searchBarContainer->setObjectName("Q--Dash-Search");
     searchBarContainer->setLayout(new QVBoxLayout(searchBarContainer));
     
@@ -114,7 +114,7 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
     searchBar->setPlaceholderText("search for applications and programs...");
     searchBarContainer->layout()->addWidget(searchBar);
     
-    QScrollArea *scrollArea = new QScrollArea();
+    QScrollArea *scrollArea = new QScrollArea(this);
     boxLayout()->addWidget(scrollArea);
     
     appsContainer = new QWidget(scrollArea);
@@ -127,9 +127,6 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent)
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
     setParent(shell());
     
-    connect ( searchBar, SIGNAL(textChanged(QString)), this, SLOT(setSearch(QString)));
-    connect ( KSycoca::self(), SIGNAL(databaseChanged()), this, SLOT(slotRepopulate()));
-    connect ( KSycoca::self(), SIGNAL(databaseChanged(const QStringList&)), this, SLOT(slotRepopulate()));
     connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged, [this](WId id) {
         if(isVisible() && id != shell()->desktop()->winId())
             hide();
@@ -198,6 +195,13 @@ void Q::Dash::load( KConfigGroup *grp )
     else
         boxLayout()->insertWidget(0, searchBarContainer);
     
+    connect ( searchBar, &QLineEdit::returnPressed, [this](){
+        if(!items.isEmpty()) items.first()->runCommand();
+    });
+    connect ( searchBar, SIGNAL(textChanged(QString)), this, SLOT(setSearch(QString)));
+    connect ( KSycoca::self(), SIGNAL(databaseChanged()), this, SLOT(slotRepopulate()));
+    connect ( KSycoca::self(), SIGNAL(databaseChanged(const QStringList&)), this, SLOT(slotRepopulate()));
+    
     slotRepopulate();
 };
 
@@ -214,6 +218,7 @@ void Q::Dash::slotRepopulate()
         delete item->widget();
         delete item;
     }
+    items.clear();
     if(search.isEmpty())
         repopulate(KServiceGroup::root());
     else
@@ -237,7 +242,7 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const Q
             KService::Ptr a(static_cast<KService*>(p.data()));
             if( a->isApplication() && layout )
             {
-                if(filter != 0 && !a->name().contains(filter, Qt::CaseInsensitive) && !a->comment().contains(filter, Qt::CaseInsensitive))
+                if(filter != 0 && !a->name().contains(filter, Qt::CaseInsensitive))
                 {
                     continue;
                 }
@@ -256,6 +261,7 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QHBoxLayout *layout, const Q
                 );
                 item->setSize(iconSize);
                 layout->addWidget(item);
+                items << item;
                 ret = true;
             }
             else

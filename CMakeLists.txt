@@ -109,6 +109,7 @@ set(shell_SRCS
     trash.cpp
     battery.cpp
     mediaplayer.cpp
+    button.cpp
 )
 
 set(pamixer_SRCS

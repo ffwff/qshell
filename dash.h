@@ -66,6 +66,7 @@ private slots:
     void slotRepopulate();
 private:
     int iconSize;
+    QList<DashItem *> items;
     QWidget *searchBarContainer;
     QString search;
     QLineEdit *searchBar;

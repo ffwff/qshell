@@ -23,6 +23,11 @@ dialog(new MediaPlayerDialog(this))
     connect(shell->oneSecond(), &QTimer::timeout, [this](){ dialog->update(); });
 };
 
+void Q::MediaPlayer::load(KConfigGroup *grp)
+{
+    myShowLabel = grp->readEntry("ShowLabel", false);
+};
+
 // ----------
 
 Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media) :
@@ -106,6 +111,8 @@ void Q::MediaPlayerDialog::update()
             artist->setText(elems["xesam:artist"].toString());
             slider->setMinimum(0);
             slider->setMaximum(elems["mpris:length"].toLongLong() * 1e-6); // 1 microsecond = 1e-6 seconds
+            if(myMedia->showLabel())
+                myMedia->setText(elems["xesam:title"].toString() + " - " + elems["xesam:artist"].toString());
             QDBusReply<QDBusVariant> reply = myPropertyInterface->call("Get", "org.mpris.MediaPlayer2.Player", "Position");
             if(reply.isValid())
                 slider->setValue(reply.value().variant().toLongLong() * 1e-6);
@@ -118,6 +125,7 @@ void Q::MediaPlayerDialog::update()
     title->setText("(Not playing)");
     artist->setText("");
     slider->setValue(0);
+    if(myMedia->showLabel()) myMedia->setText("");
 };
 
 void Q::MediaPlayerDialog::playPause()
