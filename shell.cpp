@@ -64,13 +64,7 @@ strut_bottom(0)
     
     loadAll();
     
-    connect( QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()) );
-};
-
-// Slots
-void Q::Shell::geometryChanged()
-{
-    calculateStruts();
+    connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(calculateStruts()) );
 };
 
 // Configurations
@@ -234,13 +228,11 @@ void Q::Shell::repaintPanels()
 // Struts
 void Q::Shell::calculateStruts()
 {
-    QSize geometry = QGuiApplication::primaryScreen()->availableSize();
     strut_left   = 0;
     strut_right  = 0;
     strut_top    = 0;
     strut_bottom = 0;
-    foreach (Q::Panel *panel, myPanels) {
-        qDebug() << panel->struts();
+    foreach (Q::Panel *panel, myPanels)
         if(panel->struts())
             if(panel->position() == Q::PanelPosition::Left)
                 strut_left += panel->width();
@@ -250,7 +242,6 @@ void Q::Shell::calculateStruts()
                 strut_top += panel->height();
             else
                 strut_bottom += panel->height();
-    }
     KWindowSystem::setStrut(winId(),strut_left,strut_right,strut_top,strut_bottom);
 };
 

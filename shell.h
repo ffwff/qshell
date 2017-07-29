@@ -37,8 +37,8 @@ public:
     void repaintPanels();
     void kcmshell5(const QString &arg);
     void reloadAll();
-public slots:
-    void geometryChanged();
+private slots:
+    void calculateStruts();
 private:
     // Configurations
     void saveAll();
@@ -57,7 +57,6 @@ private:
         strut_right,
         strut_top,
         strut_bottom;
-    void calculateStruts();
     //Stylesheet
     QString styleSheet;
     // Process

@@ -52,6 +52,7 @@ Q::Panel::Panel(const QString& name, Q::Shell *shell) : QWidget(shell), Q::Model
     geometryChanged();
     
     connect( QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()) );
+    connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(geometryChanged()) );
 };
 
 // Configurations
@@ -95,14 +96,14 @@ void Q::Panel::load(KConfigGroup *grp)
 void Q::Panel::geometryChanged()
 {
     container->hide();
-    QSize geometry = QGuiApplication::primaryScreen()->availableSize();
+    QSize geometry = QGuiApplication::primaryScreen()->size();
     QSize size;
     if(myWidth.endsWith("px"))
-        size.setWidth(myWidth.replace("px","").toInt());
+        size.setWidth(QString(myWidth).replace("px","").toInt());
     else
         size.setWidth(geometry.width() * (myWidth.toFloat() / 100));
     if(myHeight.endsWith("px"))
-        size.setHeight(myHeight.replace("px","").toInt());
+        size.setHeight(QString(myHeight).replace("px","").toInt());
     else
         size.setHeight(geometry.height() * (myHeight.toFloat() / 100));
     resize(size);
