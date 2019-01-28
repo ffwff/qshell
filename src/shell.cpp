@@ -30,6 +30,7 @@
 #include "battery.h"
 #include "mediaplayer.h"
 #include "button.h"
+#include "systray.h"
 
 Q::ShellApplication::ShellApplication(int argc, char **argv) : QApplication(argc, argv) {
     QCoreApplication::setApplicationName("qshell");
@@ -178,6 +179,7 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
                 return 0;
             }
         }
+        COND_LOAD_MODEL("Systray", Systray)
         COND_LOAD_MODEL("Network", Network)
         COND_LOAD_MODEL("Date", Date)
         COND_LOAD_MODEL("Logout", Logout)

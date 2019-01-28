@@ -157,8 +157,9 @@ Q::Desktop::Desktop(Shell *shell)
 
 // slots
 void Q::Desktop::geometryChanged() {
-    resize(QGuiApplication::primaryScreen()->size());
-    myShadows->resize(QGuiApplication::primaryScreen()->size());
+    const auto &size = QGuiApplication::primaryScreen()->size();
+    setFixedSize(size);
+    myShadows->setFixedSize(size);
     shell()->repaintPanels();
     repaint();
     qDebug() << shell()->getStrutLeft();

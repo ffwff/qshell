@@ -1,84 +1,51 @@
-// TODO port me to appindicator/kdestatusnotifier
-
 #include <QAbstractEventDispatcher>
 #include <QWidget>
 #include <QByteArray>
 #include <QDebug>
+#include <cstring>
 
 #include <QX11Info>
 #include <X11/Xlib.h>
 #include <xcb/xcb.h>
 #include <fixx11h.h>
 
+#include <KF5/KWindowSystem/KWindowSystem>
+
 #include "systray.h"
 #include "shell.h"
 #include "model.h"
 
-#define SYSTEM_TRAY_REQUEST_DOCK    0
-#define SYSTEM_TRAY_BEGIN_MESSAGE   1
-#define SYSTEM_TRAY_CANCEL_MESSAGE  2
+Q::Systray::Systray(const QString &name, Q::Shell *shell) : QLabel(), Model(name, shell) {
+    stalonetray.start("stalonetray -t -p --window-layer top --sticky");
+    connect(KWindowSystem::self(), SIGNAL(windowAdded(WId)), this, SLOT(windowAdded(WId)));
+    connect(KWindowSystem::self(), SIGNAL(windowRemoved(WId)), this, SLOT(windowRemoved(WId)));
+    connect(KWindowSystem::self(), SIGNAL(windowChanged(WId, NET::Properties, NET::Properties2)),
+            this, SLOT(windowChanged(WId, NET::Properties, NET::Properties2)));
+}
 
-bool Q::SystrayEventFilter::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
-{
-    if (eventType == "xcb_generic_event_t") {
-        xcb_generic_event_t* ev = static_cast<xcb_generic_event_t *>(message);
-        qDebug()<<ev->response_type ;
-        if(ev->response_type == XCB_CLIENT_MESSAGE)
-        {
-            xcb_client_message_event_t* cev = (xcb_client_message_event_t*)ev;
-            qDebug() << "XCB"<< cev->window;
+void Q::Systray::windowAdded(WId wid) {
+    if(this->wid) return;
+    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMIcon|NET::WMState, NET::WM2WindowClass);
+    if(strcmp(info.windowClassClass(), "stalonetray") == 0) {
+        KWindowInfo info(wid, NET::WMGeometry);
+        XReparentWindow(QX11Info::display(), wid, winId(), 0, 0);
+        const QRect &rect = info.geometry();
+        setMinimumSize(rect.width(), rect.height());
+        this->wid = wid;
+    }
+}
+
+void Q::Systray::windowRemoved(WId wid) {
+    if(this->wid == wid) this->wid = 0;
+}
+
+void Q::Systray::windowChanged(WId wid, NET::Properties properties, NET::Properties2 properties2) {
+    if(this->wid != wid) return;
+    if(properties.testFlag(NET::WMGeometry)) {
+        KWindowInfo info(wid, NET::WMGeometry);
+        QRect rect = info.geometry();
+        if(rect.width() != width() && rect.height() != height()) {
+            setMinimumSize(rect.width(), rect.height());
         }
     }
-    return false;
-};
-
-// ---------
-
-Atom net_system_tray_selection,
-     net_system_tray_opcode,
-     net_message_data_atom;
-
-Q::Systray::Systray(const QString &name, Q::Shell *shell) : QWidget(), Model(name, shell)
-{
-//     qDebug() << "SYSTRAY";
-//         
-//     Display *display = QX11Info::display();
-//     
-//     char trayatom[20] = {0};
-//     qsnprintf(trayatom, 20, "_NET_SYSTEM_TRAY_S%d", DefaultScreen(display));
-//     
-//     net_system_tray_selection = XInternAtom(display, trayatom, False);
-//     net_system_tray_opcode = XInternAtom(display, "_NET_SYSTEM_TRAY_OPCODE", False);
-//     net_message_data_atom = XInternAtom(display, "_NET_SYSTEM_TRAY_MESSAGE_DATA", False);
-//     
-//     // Acquire system tray
-//     XSetSelectionOwner(display,
-//                        net_system_tray_selection,
-//                        effectiveWinId(),
-//                        CurrentTime);
-// 
-//     WId root = QX11Info::appRootWindow();
-//     
-//     if (XGetSelectionOwner(display, net_system_tray_selection) == effectiveWinId()) {
-//         XClientMessageEvent xev;
-// 
-//         xev.type = ClientMessage;
-//         xev.window = root;
-// 
-//         xev.message_type = XInternAtom(display, "MANAGER", False);
-//         xev.format = 32;
-//         xev.data.l[0] = CurrentTime;
-//         xev.data.l[1] = net_system_tray_selection;
-//         xev.data.l[2] = effectiveWinId();
-//         xev.data.l[3] = 0;       /* Manager specific data */
-//         xev.data.l[4] = 0;       /* Manager specific data */
-// 
-//         XSendEvent(display, root, False, StructureNotifyMask, (XEvent *)&xev);
-//     }
-//     else
-//     {
-//         qDebug() <<"SAD";
-//     }
-//     
-//     QAbstractEventDispatcher::instance()->installNativeEventFilter(new SystrayEventFilter());
-};
+}

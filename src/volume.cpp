@@ -23,8 +23,7 @@ Q::Volume::Volume(const QString &name, Q::Shell *shell) :
     QPushButton(), Model(name, shell),
     myPulse(Pulseaudio("qshell")),
     myDevice(myPulse.get_default_sink()),
-    dialog(new Q::VolumeDialog(this))
-{
+    dialog(new Q::VolumeDialog(this)) {
     setIcon(QIcon::fromTheme("audio-volume-high"));
 
     connect(shell->oneSecond(), &QTimer::timeout, this, &Q::Volume::update);
