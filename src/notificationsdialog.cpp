@@ -43,7 +43,7 @@ void Q::NotificationsDialog::updateDialog() {
     if(!m) return;
     Shell *shell = m->shell();
     frame->move(
-        std::min(geo.width() - frame->width(), shell->getStrutLeft() + myButton->x() + frame->width() / 2),
+        std::min(geo.width() - frame->width(), shell->getStrutLeft() + myButton->x() + myButton->width()/2 - width()/2),
         std::min(geo.height() - frame->height(), shell->getStrutTop() + myButton->y())
     );
 

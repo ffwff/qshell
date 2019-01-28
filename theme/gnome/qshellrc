@@ -1,21 +1,13 @@
 [Battery]
 Type=Battery
 
-[BottomPanel]
-BlurRadius=30
-Direction=2
-Height=97.5
-OffsetTop=2.5
-Position=0
-Type=Panel
-Widgets=DashButton,Tasks,stretch,Trash
-Width=64px
-
 [DashButton]
+Icon=
+Text=Activities
 Type=DashButton
-Size=60
 
 [Date]
+Format=ddd hh:mm
 Type=Date
 
 [Logout]
@@ -28,15 +20,18 @@ Type=Network
 BlurRadius=30
 Height=70
 Position=0
-Size=32
+Size=30
 Width=40
 
 [Q::Desktop]
 Background=
 
 [Q::Shell]
-Panels=TopPanel,BottomPanel
+Panels=TopPanel
 Stylesheet=qshell.css
+
+[Systray]
+Type=Systray
 
 [Tasks]
 Direction=2
@@ -45,11 +40,11 @@ Size=36
 Type=Tasks
 
 [TopPanel]
-BlurRadius=30
 Height=2.5
 Position=1
+Transparent=true
 Type=Panel
-Widgets=WinCtrl,stretch,Battery,Network,Volume,Date,Logout
+Widgets=DashButton,stretch,Date,stretch,Battery,Systray,Network,Volume,Logout
 
 [Trash]
 Type=Trash

@@ -152,7 +152,7 @@ Q::Desktop::Desktop(Shell *shell)
 
     myShadows->resize(QGuiApplication::primaryScreen()->size());
 
-    connect( QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()) );
+    connect(QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()));
 };
 
 // slots
@@ -253,17 +253,17 @@ void Q::Desktop::populateContextMenu() {
 
     QAction *act;
 
-    act = new QAction(QIcon::fromTheme("refresh"), "Reload configurations");
+    act = new QAction(QIcon::fromTheme("refresh"), "Reload configurations", this);
     connect(act, &QAction::triggered, [this](){ shell()->reloadAll(); });
     myContextMenu.addAction(act);
 
     myContextMenu.addSeparator();
 
-    act = new QAction(QIcon::fromTheme("preferences-desktop-display"), "Display");
+    act = new QAction(QIcon::fromTheme("preferences-desktop-display"), "Display", this);
     connect(act, &QAction::triggered, [this](){ shell()->kcmshell5("kcm_kscreen"); });
     myContextMenu.addAction(act);
 
-    act = new QAction(QIcon::fromTheme("preferences-desktop-wallpaper"), "Personalize");
+    act = new QAction(QIcon::fromTheme("preferences-desktop-wallpaper"), "Personalize", this);
     connect(act, SIGNAL(triggered()), myDialog, SLOT(show()));
     myContextMenu.addAction(act);
 };

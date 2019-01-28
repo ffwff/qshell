@@ -116,14 +116,14 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent) {
     layout->setMargin(0);
     setLayout(layout);
 
-    searchBarContainer = new QWidget(this);
-    searchBarContainer->setObjectName("Q--Dash-Search");
-    searchBarContainer->setLayout(new QVBoxLayout(searchBarContainer));
+    mySearchBarContainer = new QWidget(this);
+    mySearchBarContainer->setObjectName("Q--Dash-Search");
+    mySearchBarContainer->setLayout(new QVBoxLayout(mySearchBarContainer));
 
-    searchBar = new QLineEdit(searchBarContainer);
-    searchBar->setFocusPolicy(Qt::StrongFocus);
-    searchBar->setPlaceholderText("search for applications and programs...");
-    searchBarContainer->layout()->addWidget(searchBar);
+    mySearchBar = new QLineEdit(mySearchBarContainer);
+    mySearchBar->setFocusPolicy(Qt::StrongFocus);
+    mySearchBar->setPlaceholderText("search for applications and programs...");
+    mySearchBarContainer->layout()->addWidget(mySearchBar);
 
     QScrollArea *scrollArea = new QScrollArea(this);
     boxLayout()->addWidget(scrollArea);
@@ -138,10 +138,8 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent) {
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
     setParent(shell());
 
-    connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged, [this](WId id) {
-        if(isVisible() && id != shell()->desktop()->winId())
-            hide();
-    });
+    connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged,
+            this, &Q::Dash::activeWindowChanged);
 };
 
 // Misc
@@ -156,6 +154,11 @@ static QString &normalize(QString cmd) {
 };
 
 // Events
+void Q::Dash::activeWindowChanged(WId id) {
+    if(isVisible() && id != shell()->desktop()->winId())
+        hide();
+}
+
 void Q::Dash::showEvent(QShowEvent *) {
     QSize geometry = QGuiApplication::primaryScreen()->size();
     if(myWidth && myHeight)
@@ -189,27 +192,27 @@ void Q::Dash::showEvent(QShowEvent *) {
     XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
              reinterpret_cast<unsigned char *>(data.data()), data.size());
 
-    searchBar->setFocus();
+    mySearchBar->setFocus();
 };
 
 // Configurations
 void Q::Dash::load( KConfigGroup *grp ) {
     iconSize = grp->readEntry("IconSize", 48);
-    searchBar->setVisible(grp->readEntry("ShowSearch", true));
+    mySearchBar->setVisible(grp->readEntry("ShowSearch", true));
     myPosition = (DashPosition)grp->readEntry("Position", 0);
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
     mySlidePosition = grp->readEntry("SlidePosition", 0);
     bool searchBelow = grp->readEntry("SearchBelow", false);
     if(searchBelow)
-        boxLayout()->addWidget(searchBarContainer);
+        boxLayout()->addWidget(mySearchBarContainer);
     else
-        boxLayout()->insertWidget(0, searchBarContainer);
+        boxLayout()->insertWidget(0, mySearchBarContainer);
 
-    connect ( searchBar, &QLineEdit::returnPressed, [this](){
+    connect ( mySearchBar, &QLineEdit::returnPressed, [this](){
         if(!items.isEmpty()) items.first()->runCommand();
     });
-    connect ( searchBar, SIGNAL(textChanged(QString)), this, SLOT(setSearch(QString)));
+    connect ( mySearchBar, SIGNAL(textChanged(QString)), this, SLOT(setSearch(QString)));
     connect ( KSycoca::self(), SIGNAL(databaseChanged()), this, SLOT(slotRepopulate()));
     connect ( KSycoca::self(), SIGNAL(databaseChanged(const QStringList&)), this, SLOT(slotRepopulate()));
 
@@ -318,17 +321,22 @@ void Q::Dash::setSearch(const QString &s) {
 
 Q::DashButton::DashButton(const QString &name, Shell *parent)
     : QPushButton(static_cast<QWidget *>(parent)),
-      Q::Model(name, parent), size(QSize(48,48)) {
-    setIconSize(size);
-    setMinimumSize(size);
+      Q::Model(name, parent) {
 };
 
 void Q::DashButton::load(KConfigGroup *grp) {
-    setIcon(QIcon::fromTheme(grp->readEntry("Icon", "kde")));
-    int s = grp->readEntry("Size", 48);
-    size = QSize(s, s);
-    setIconSize(size);
-    setMinimumSize(size);
+    const QString &icon = grp->readEntry("Icon", "kde");
+    if(!icon.isEmpty())
+        setIcon(QIcon::fromTheme(icon));
+    const QString &text = grp->readEntry("Text", "");
+    if(!text.isEmpty())
+        setText(text);
+    const int s = grp->readEntry("Size", 0);
+    if(s) {
+        size = QSize(s, s);
+        setIconSize(size);
+        setMinimumSize(size);
+    }
 };
 
 void Q::DashButton::mouseReleaseEvent(QMouseEvent *mouseEvent) {

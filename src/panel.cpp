@@ -6,6 +6,7 @@
 #include <QScreen>
 #include <QPainter>
 #include <QColor>
+#include <cstring>
 
 #include <KF5/KWindowSystem/KWindowSystem>
 
@@ -76,7 +77,10 @@ void Q::Panel::load(KConfigGroup *grp) {
     foreach (const QString &w, widgets)
         if(w == "stretch")
             addStretch();
-        else {
+        else if(w.startsWith("stretch=")) {
+            const int ratio = w.mid(strlen("stretch=")).toInt();
+            addStretch(ratio);
+        } else {
             Model *m = shell()->getModelByName(w);
             if(m) {
                 QWidget *g = dynamic_cast<QWidget*>(m);

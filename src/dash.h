@@ -61,7 +61,10 @@ public:
     inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
+    QWidget *searchBarContainer() const { return mySearchBarContainer; }
+    QWidget *searchBar() const { return mySearchBar; }
 protected:
+    void activeWindowChanged(WId wid);
     void showEvent(QShowEvent *);
 private slots:
     void setSearch(const QString &s);
@@ -69,9 +72,9 @@ private slots:
 private:
     int iconSize;
     QList<DashItem *> items;
-    QWidget *searchBarContainer;
     QString search;
-    QLineEdit *searchBar;
+    QWidget *mySearchBarContainer;
+    QLineEdit *mySearchBar;
     QWidget *appsContainer;
     inline QLayout *appsLayout() const { return static_cast<QLayout*>(appsContainer->layout()); };
     bool repopulate(KServiceGroup::Ptr group, QLayout *layout = 0, const QString &filter = 0);

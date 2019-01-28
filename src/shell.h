@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QApplication>
 #include <QWidget>
 #include <QList>
 #include <QMap>
@@ -10,8 +9,7 @@
 
 #include "panel.h"
 
-namespace Q
-{
+namespace Q {
 
 class ShellApplication;
 class Desktop;
@@ -19,6 +17,7 @@ class Model;
 class Dash;
 class Shell : public QWidget
 {
+    Q_OBJECT
 public:
     Shell();
     virtual ~Shell() {}
@@ -36,6 +35,8 @@ public:
     void repaintPanels();
     void kcmshell5(const QString &arg);
     void reloadAll();
+public slots:
+    void activateLauncherMenu();
 private slots:
     void calculateStruts();
 private:
@@ -58,15 +59,6 @@ private:
     QString styleSheet;
     QProcess myProcess;
     QTimer *myOneSecond;
-};
-
-class ShellApplication : public QApplication
-{
-public:
-    ShellApplication(int argc, char **argv);
-    ~ShellApplication() {}
-private:
-    Shell *myShell;
 };
 
 }

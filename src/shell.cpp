@@ -8,6 +8,7 @@
 #include <QWindow>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QtDBus>
 
 #include <KF5/KConfigCore/KConfigGroup>
 #include <KF5/KConfigCore/KSharedConfig>
@@ -15,7 +16,7 @@
 
 #include <signal.h>
 
-#include "shell.h"
+#include "shellapplication.h"
 #include "desktop.h"
 #include "panel.h"
 #include "tasks.h"
@@ -37,6 +38,10 @@ Q::ShellApplication::ShellApplication(int argc, char **argv) : QApplication(argc
     QGuiApplication::setApplicationDisplayName("Q::Shell Desktop");
     QCoreApplication::setApplicationVersion("0.1");
     myShell = new Shell();
+
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    bus.interface()->registerService("org.qshell");
+    bus.registerObject("/org/qshell/qshell", myShell, QDBusConnection::ExportAllSlots);
 };
 
 // ----------
@@ -63,8 +68,7 @@ Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint )
 };
 
 // Configurations
-void Q::Shell::saveAll()
-{
+void Q::Shell::saveAll() {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
 
     // models
@@ -85,8 +89,7 @@ void Q::Shell::saveAll()
     shGroup.writeEntry("Panels", list.join(","));
 };
 
-void Q::Shell::save(Model *m)
-{
+void Q::Shell::save(Model *m) {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     KConfigGroup grp = sharedConfig->group(m->name());
     m->save(&grp);
@@ -105,6 +108,7 @@ void Q::Shell::loadAll() {
     // desktop
     grp = sharedConfig->group("Q::Desktop");
     myDesktop->load(&grp);
+    myDesktop->repaint();
 
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
@@ -147,6 +151,10 @@ void Q::Shell::reloadAll() {
         p->deleteLater();
     myModels.clear();
     myPanels.clear();
+    //delete myDesktop;
+    //myDesktop = new Desktop(this);
+    delete myDash;
+    myDash = new Dash(this);
     loadAll();
 };
 
@@ -156,8 +164,7 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     if(myModels.contains(name))
         return myModels.value(name);
-    else if(sharedConfig->hasGroup(name))
-    {
+    else if(sharedConfig->hasGroup(name)) {
         Model *m;
         KConfigGroup group = sharedConfig->group(name);
         QString type = group.readEntry("Type", "");
@@ -189,21 +196,17 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
         COND_LOAD_MODEL("Battery", Battery)
         COND_LOAD_MODEL("MediaPlayer", MediaPlayer)
         COND_LOAD_MODEL("Button", Button)
-        else
-            return 0;
+        else return 0;
 
         myModels.insert(name, m);
         return m;
-    }
-    else
-        return 0;
+    } else return 0;
 };
 
 #undef COND_LOAD_MODEL
 
 // Panels
-void Q::Shell::addPanel(Q::Panel *panel)
-{
+void Q::Shell::addPanel(Q::Panel *panel) {
     qDebug() << "add panel" << panel->name();
     myPanels.append(panel);
     panel->show();
@@ -214,6 +217,15 @@ void Q::Shell::repaintPanels() {
         panel->repaint();
     }
 };
+
+// slot
+void Q::Shell::activateLauncherMenu() {
+    myDash->setVisible(!myDash->isVisible());
+    if(myDash->isVisible()) {
+        KWindowSystem::forceActiveWindow(myDesktop->winId());
+        myDash->searchBar()->setFocus();
+    }
+}
 
 // Struts
 void Q::Shell::calculateStruts() {
@@ -237,8 +249,7 @@ void Q::Shell::calculateStruts() {
 };
 
 // Kcmshell5
-void Q::Shell::kcmshell5(const QString &arg)
-{
+void Q::Shell::kcmshell5(const QString &arg) {
     QStringList argument;
     argument.append(arg);
     myProcess.startDetached("kcmshell5", argument);
@@ -246,14 +257,12 @@ void Q::Shell::kcmshell5(const QString &arg)
 
 // ----------
 
-void signalHandler(int signal)
-{
+static void signalHandler(int signal) {
     if (signal == SIGTERM || signal == SIGQUIT || signal == SIGINT)
         QApplication::quit();
 }
 
-int main (int argc, char *argv[])
-{
+int main (int argc, char *argv[]) {
     signal(SIGTERM, signalHandler);
     signal(SIGQUIT, signalHandler);
     signal(SIGINT, signalHandler);

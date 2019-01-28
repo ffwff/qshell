@@ -3,23 +3,33 @@ QPushButton {
 }
 
 /* top panel */
-#TopPanel QWidget {
+#TopPanel QWidget, #TopPanel .Q--Systray {
     height: 100%;
+    background:red;
+    /*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                                stop: 0 #ffffff, stop: 1 #e7e8eb);*/
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                                stop: 0 #3c404f, stop: 1 #383c4a);
-    color: white;
+                                stop: 0 rgba(0,0,0,30%), stop: 1 rgba(0,0,0,40%));
+    padding: 0 3px;
 }
 
 #TopPanel QLabel {
+    /*color: #000000;*/
+    color: #ffffff;
     padding: 0 5px;
 }
 
 #TopPanel QPushButton:hover, #TopPanel QLabel:hover {
     background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                                 stop: 0 #5ca8ff, stop: 1 #61a0ff);
+    /*color: white;*/
 }
 
 /* Window Controls */
+.Q--WinCtrl .Q--WinTitle {
+    font-weight: bold;
+}
+
 .Q--WinCtrl QPushButton {
     qproperty-iconSize: 24px;
     width: 24px;
@@ -33,16 +43,15 @@ QPushButton {
 
 /* Bottom panel */
 #BottomPanel * {
-    background: red;
     width: 60px;
     max-width: 60px;
     background-color: rgba(0,0,0,30%);
 }
 
+
+
 /* Dash button */
 .Q--DashButton {
-    qproperty-icon: url("/usr/share/icons/Papirus/22x22/places/org.kde.plasma.kickoff.svg");
-    qproperty-iconSize: 50px;
     padding-top: 5px;
     width: 60px;
 }
@@ -80,6 +89,18 @@ QPushButton {
     font-size: 16px;
 }
 
+.Q--DashItem {
+    min-height: 55px;
+}
+
+.Q--DashItem .descLabel {
+    color: #ccc;
+}
+
+.Q--DashItem:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
 /* Tasks */
 .Q--Task {
     padding: 10px 0;
@@ -89,4 +110,10 @@ QPushButton {
 .Q--Trash {
     width: 64px;
     height: 64px;
+}
+
+/* Dialog */
+.Q--VolumeDialog QWidget {
+    background-color: rgba(0,0,0,30%);
+    padding: 6px;
 }
