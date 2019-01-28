@@ -16,6 +16,7 @@ public:
     static void hideAll();
 public slots:
     void toggle();
+    void hideFrame(WId wid);
 protected:
     Frame *frame;
     virtual void showEvent(QShowEvent *) { updateDialog(); };

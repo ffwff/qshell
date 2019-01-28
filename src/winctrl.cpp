@@ -83,8 +83,7 @@ void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button() == Qt::RightButton)
         click();
-    else if(!isDoubleClick)
-    {
+    else if(!isDoubleClick) {
         timer = new QTimer();
         timer->setInterval(QApplication::doubleClickInterval() * 0.5);
         timer->setSingleShot(true);
@@ -98,10 +97,10 @@ void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event)
     {
         doubleClick();
     }
-    
+
     if(timer)
         timer->stop();
-    
+
 };
 
 // Context Menu
@@ -112,9 +111,9 @@ void Q::WinTitle::populateContextMenu()
     myContextMenu.clear();
 
     QAction *act;
-    
+
     QMenu *menu = myContextMenu.addMenu("Move to desktop");
-    
+
     act = new QAction("All desktops");
     act->setCheckable(true);
     act->setChecked(info.onAllDesktops());
@@ -122,9 +121,9 @@ void Q::WinTitle::populateContextMenu()
         KWindowSystem::setOnAllDesktops(KWindowSystem::activeWindow(), true);
     });
     menu->addAction(act);
-    
+
     menu->addSeparator();
-    
+
     for(int i = 1; i <= KWindowSystem::numberOfDesktops(); i++)
     {
         act = new QAction(KWindowSystem::desktopName(i));
@@ -135,7 +134,7 @@ void Q::WinTitle::populateContextMenu()
         });
         menu->addAction(act);
     }
-    
+
     myContextMenu.addSeparator();
 
     act = new QAction(QIcon::fromTheme("up"), "Keep above others");
@@ -162,24 +161,24 @@ void Q::WinTitle::populateContextMenu()
 
     myContextMenu.addSeparator();
 
-    act = new QAction(QIcon::fromTheme("window-minimize"), "Maximize");
+    act = new QAction(QIcon::fromTheme("window-minimize-symbolic"), "Maximize");
     connect(act, &QAction::triggered, [](){ minimize(); });
     myContextMenu.addAction(act);
 
     if(info.state() & NET::Max)
     {
-        act = new QAction(QIcon::fromTheme("window-restore"), "Unmaximize");
+        act = new QAction(QIcon::fromTheme("window-restore-symbolic"), "Unmaximize");
         connect(act, &QAction::triggered, [](){ toggleMaximize(); });
         myContextMenu.addAction(act);
     }
     else
     {
-        act = new QAction(QIcon::fromTheme("window-maximize"), "Maximize");
+        act = new QAction(QIcon::fromTheme("window-maximize-symbolic"), "Maximize");
         connect(act, &QAction::triggered, [](){ toggleMaximize(); });
         myContextMenu.addAction(act);
     }
 
-    act = new QAction(QIcon::fromTheme("window-close"), "Close");
+    act = new QAction(QIcon::fromTheme("window-close-symbolic"), "Close");
     act->setShortcut(QKeySequence("Alt+F4"));
     connect(act, &QAction::triggered, [](){ closeWindow(); });
     myContextMenu.addAction(act);
@@ -196,15 +195,15 @@ Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, 
     setLayout(layout);
 
     closeBtn = new QPushButton();
-    closeBtn->setIcon(QIcon::fromTheme("window-close"));
+    closeBtn->setIcon(QIcon::fromTheme("window-close-symbolic"));
     boxLayout()->addWidget(closeBtn);
 
     minimizeBtn = new QPushButton();
-    minimizeBtn->setIcon(QIcon::fromTheme("window-minimize"));
+    minimizeBtn->setIcon(QIcon::fromTheme("window-minimize-symbolic"));
     boxLayout()->addWidget(minimizeBtn);
-    
+
     maximizeBtn = new QPushButton();
-    maximizeBtn->setIcon(QIcon::fromTheme("window-restore"));
+    maximizeBtn->setIcon(QIcon::fromTheme("window-restore-symbolic"));
     boxLayout()->addWidget(maximizeBtn);
 
     label = new WinTitle(this);

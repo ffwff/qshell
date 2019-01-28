@@ -8,15 +8,14 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QPushButton>
+#include <QScopedPointer>
 
 #include "model.h"
 #include "shell.h"
 
-namespace Q
-{
+namespace Q {
 
-class DesktopIcon : public QPushButton, public Model
-{
+class DesktopIcon : public QPushButton, public Model {
     Q_OBJECT
 public:
     DesktopIcon(const QString& name, Shell *shell);
@@ -38,8 +37,7 @@ private:
 };
 
 class Desktop;
-class DesktopWallpaperDialog : public QFileDialog
-{
+class DesktopWallpaperDialog : public QFileDialog {
     Q_OBJECT
 public:
     DesktopWallpaperDialog(Desktop *parent);
@@ -49,8 +47,17 @@ private:
     Desktop *myParent;
 };
 
-class Desktop : public QLabel, public Model
-{
+class DesktopShadow : public QWidget {
+    Q_OBJECT
+public:
+    DesktopShadow(Desktop *desktop);
+protected:
+    void paintEvent(QPaintEvent *);
+private:
+    Desktop *myDesktop;
+};
+
+class Desktop : public QWidget, public Model {
     Q_OBJECT
 public:
     Desktop(Shell *shell);
@@ -64,6 +71,7 @@ protected:
     void paintEvent(QPaintEvent *);
     void mouseReleaseEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *we);
+    void showEvent(QShowEvent *);
 public slots:
     void geometryChanged();
 private:
@@ -76,6 +84,7 @@ private:
     bool showIcons;
     QList<DesktopIcon*> myIcons;
     int myIconSize;
+    QScopedPointer<DesktopShadow> myShadows;
 };
 
 };

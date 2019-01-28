@@ -2,12 +2,11 @@
 #include "model.h"
 #include "shell.h"
 
-Q::Button::Button(const QString &name, Shell *shell) : QPushButton(), Model(name, shell), timer(new QTimer(this))
-{
+Q::Button::Button(const QString &name, Shell *shell)
+    : QPushButton(), Model(name, shell), timer(new QTimer(this)) {
 };
 
-void Q::Button::load(KConfigGroup *grp)
-{
+void Q::Button::load(KConfigGroup *grp) {
     setIcon(QIcon::fromTheme(grp->readEntry("Icon")));
     setIconSize(QSize(24,24));
     procName = grp->readEntry("LabelScript", QString());
@@ -24,10 +23,8 @@ void Q::Button::load(KConfigGroup *grp)
     timer->start();
 };
 
-void Q::Button::update()
-{
-    if(!procName.isEmpty())
-    {
+void Q::Button::update() {
+    if(!procName.isEmpty()) {
         process.start(procName);
         process.waitForFinished();
         QString output(process.readAllStandardOutput());

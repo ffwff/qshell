@@ -24,17 +24,17 @@ class Task;
 class TaskPreview;
 class Tasks;
 
-class Task : public QPushButton, public Model
-{
+class Task : public QPushButton, public Model {
     Q_OBJECT
 public:
-    Task(Tasks *tasks, const QString &name);
+    Task(Tasks *tasks, const QString &name, const QString &classClass="");
     inline Tasks *tasks() { return myParent; };
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
     // Command
     inline const QString& command() const {return myCommand; };
     void setCommand(QString command);
+    inline const QString& classClass() const {return myClassClass; };
     // windows
     void addWindow(WId wid);
     void removeWindow(WId wid);
@@ -61,11 +61,11 @@ protected:
     void leaveEvent(QEvent *) override;
 private:
     Tasks* myParent;
-    QString myName, myCommand;
+    QString myName, myCommand = "", myClassClass = "";
     QStringList myArguments;
     QSize mySize;
     QList<WId> myWindows;
-    bool pinned;
+    bool pinned = false;
     QProcess myProcess;
     QMenu myContextMenu, myWindowsContextMenu;
     void populateWindowsContextMenu();
@@ -73,8 +73,7 @@ private:
 };
 
 class WindowPreview;
-class TaskPreview : public Frame
-{
+class TaskPreview : public Frame {
     Q_OBJECT
 public:
     TaskPreview(Task *task);
@@ -89,8 +88,7 @@ private:
     QList<WId> wids;
 };
 
-class WindowPreview : public QWidget
-{
+class WindowPreview : public QWidget {
     Q_OBJECT
 public:
     WindowPreview(WId id);
@@ -108,10 +106,10 @@ private:
     QLabel *title;
     QLabel *window;
     QPixmap mPixmap;
+    QVBoxLayout *layout;
 };
 
-class Tasks : public QWidget, public Model
-{
+class Tasks : public QWidget, public Model {
     Q_OBJECT
 public:
     Tasks(const QString& name, Shell *parent);
@@ -133,7 +131,7 @@ private slots:
     void populateWindows();
 private:
     QList<Task*> myTasks;
-    Task *getTaskByCommand(const QString &command);
+    Task *getTask(const QString &classClass) const;
     QList<WId> myWindows;
     QString getCmdline(WId wid);
     int mySize;

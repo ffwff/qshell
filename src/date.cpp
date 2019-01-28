@@ -40,12 +40,13 @@ void Q::Date::mouseReleaseEvent(QMouseEvent *)
 
 // ----------
 
-Q::DateDialog::DateDialog(Q::Date *date) : NotificationsDialog(date), myDate(date)
-{
-    setLayout(new QHBoxLayout(this));
+Q::DateDialog::DateDialog(Q::Date *date) : NotificationsDialog(date), myDate(date) {
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    setLayout(layout);
+    layout->setMargin(20);
 
     calendar = new QCalendarWidget(this);
-    boxLayout()->addWidget(calendar);
+    layout->addWidget(calendar);
 
     frame->resize(500,300);
 };

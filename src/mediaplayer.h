@@ -12,13 +12,11 @@
 #include "model.h"
 #include "notificationsdialog.h"
 
-namespace Q
-{
+namespace Q {
 
 class Shell;
 class MediaPlayer;
-class MediaPlayerDialog : public NotificationsDialog
-{
+class MediaPlayerDialog : public NotificationsDialog {
     Q_OBJECT
 public:
     MediaPlayerDialog(MediaPlayer *media);
@@ -30,7 +28,7 @@ private slots:
     void nextTrack();
 private:
     MediaPlayer *myMedia;
-    QDBusInterface *myPropertyInterface, *myCtrlInterface;
+    QDBusInterface *myPropertyInterface = nullptr, *myCtrlInterface = nullptr;
     QString myPlayer;
     QLabel *title;
     QLabel *artist;
@@ -38,8 +36,7 @@ private:
     QPushButton *next, *previous, *play;
 };
 
-class MediaPlayer : public QPushButton, public Model
-{
+class MediaPlayer : public QPushButton, public Model {
     Q_OBJECT
 public:
     MediaPlayer(const QString &name, Shell *shell);

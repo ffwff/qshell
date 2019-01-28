@@ -30,57 +30,55 @@ void Q::MediaPlayer::load(KConfigGroup *grp)
 
 // ----------
 
-Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media) :
-NotificationsDialog(media), myMedia(media), myPropertyInterface(0), myCtrlInterface(0)
+Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media)
+    : NotificationsDialog(media), myMedia(media)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     setLayout(layout);
-    
+
     layout->addStretch(1);
-    
+
     title = new QLabel("(Not playing)");
     title->setWordWrap(true);
     title->setStyleSheet("font-size: 24px; padding-left: 10px;");
     layout->addWidget(title);
-    
+
     artist = new QLabel("");
     artist->setStyleSheet("padding-left: 15px;");
     layout->addWidget(artist);
-    
+
     layout->addStretch(1);
-    
+
     slider = new QSlider(Qt::Horizontal, this);
     slider->setMinimum(0);
     slider->setMaximum(1);
     slider->setTracking(true);
     layout->addWidget(slider);
-    
+
     QHBoxLayout *hlayout = new QHBoxLayout();
     layout->addLayout(hlayout);
-    
+
     hlayout->addStretch(1);
-    
+
     previous = new QPushButton(QIcon::fromTheme("media-skip-backward"), "");
     connect(previous, SIGNAL(clicked()), this, SLOT(previousTrack()));
     hlayout->addWidget(previous);
-    
+
     play = new QPushButton(QIcon::fromTheme("media-playback-start"), "");
     connect(play, SIGNAL(clicked()), this, SLOT(playPause()));
     hlayout->addWidget(play);
-    
+
     next = new QPushButton(QIcon::fromTheme("media-skip-forward"), "");
     connect(next, SIGNAL(clicked()), this, SLOT(nextTrack()));
     hlayout->addWidget(next);
-    
+
     hlayout->addStretch(1);
-    
+
     frame->resize(QSize(550,350));
 };
 
-void Q::MediaPlayerDialog::update()
-{
-    if(myPropertyInterface == 0 || !myPropertyInterface->isValid())
-    {
+void Q::MediaPlayerDialog::update() {
+    if(!myPropertyInterface || !myPropertyInterface->isValid()) {
         // TODO implement MORE INTERFACES
         myPropertyInterface = new QDBusInterface("org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties");
         myCtrlInterface = new QDBusInterface("org.mpris.MediaPlayer2.vlc", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player");
@@ -97,9 +95,8 @@ void Q::MediaPlayerDialog::update()
             myPlayer = "";
         }
     }
-    
-    if(myPlayer == "mpris" || myPlayer == "clementine")
-    {
+
+    if(myPlayer == "mpris" || myPlayer == "clementine") {
         QDBusMessage reply = myPropertyInterface->call("Get", "org.mpris.MediaPlayer2.Player", "Metadata");
         QVariant v = reply.arguments().first();
         QDBusVariant dbusVariant = qvariant_cast<QDBusVariant>(v);
@@ -121,21 +118,18 @@ void Q::MediaPlayerDialog::update()
             return;
         }
     }
-    
+
     title->setText("(Not playing)");
     artist->setText("");
     slider->setValue(0);
     if(myMedia->showLabel()) myMedia->setText("");
 };
 
-void Q::MediaPlayerDialog::playPause()
-{
-    if(myPlayer == "mpris")
-    {
+void Q::MediaPlayerDialog::playPause() {
+    if(myPlayer == "mpris") {
         myCtrlInterface->call("PlayPause");
         QDBusReply<QDBusVariant> reply = myPropertyInterface->call("Get", "org.mpris.MediaPlayer2.Player", "PlaybackStatus");
-        if(reply.isValid())
-        {
+        if(reply.isValid()) {
             if(reply.value().variant().toString() == "Paused")
                 play->setIcon(QIcon::fromTheme("media-playback-start"));
             else
@@ -144,19 +138,15 @@ void Q::MediaPlayerDialog::playPause()
     }
 };
 
-void Q::MediaPlayerDialog::nextTrack()
-{
-    if(myPlayer == "mpris")
-    {
+void Q::MediaPlayerDialog::nextTrack() {
+    if(myPlayer == "mpris") {
         myCtrlInterface->call("Next");
     }
     update();
 };
 
-void Q::MediaPlayerDialog::previousTrack()
-{
-    if(myPlayer == "mpris")
-    {
+void Q::MediaPlayerDialog::previousTrack() {
+    if(myPlayer == "mpris") {
         myCtrlInterface->call("Previous");
     }
     update();

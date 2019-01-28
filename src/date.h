@@ -10,13 +10,11 @@
 #include "panel.h"
 #include "notificationsdialog.h"
 
-namespace Q
-{
+namespace Q {
 
 class Shell;
 class Date;
-class DateDialog : public NotificationsDialog
-{
+class DateDialog : public NotificationsDialog {
 public:
     DateDialog(Date *date);
     inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
@@ -25,8 +23,7 @@ private:
     QCalendarWidget *calendar;
 };
 
-class Date : public QLabel, public Model
-{
+class Date : public QLabel, public Model {
     Q_OBJECT
 public:
     Date(const QString &name, Shell *shell);

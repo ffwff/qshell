@@ -1,5 +1,7 @@
-
 PROJECT( qshell )
+
+set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 set(QT_MIN_VERSION "5.3.0")
@@ -31,7 +33,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif()
 endif()
 
-SET(CMAKE_CXX_FLAGS "-std=c++0x")
+SET(CMAKE_CXX_FLAGS "-std=c++14")
 
 # required frameworks by Core
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
@@ -92,34 +94,16 @@ set(CONFIG_INSTALL_DIR "/usr/share/qshell")
 set(XSESSION_INSTALL_DIR "/usr/share/xsessions")
 
 # ----
-set(shell_SRCS
-    shell.cpp
-    desktop.cpp
-    panel.cpp
-    model.cpp
-    tasks.cpp
-    dash.cpp
-    volume.cpp
-    network.cpp
-    date.cpp
-    frame.cpp
-    notificationsdialog.cpp
-    logout.cpp
-    winctrl.cpp
-    trash.cpp
-    battery.cpp
-    mediaplayer.cpp
-    button.cpp
-)
+file(GLOB shell_SRCS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
 
 set(pamixer_SRCS
     pamixer/callbacks.cc
     pamixer/device.cc
     pamixer/pulseaudio.cc
 )
-    
 
-set(shell_MOC_HDRS shell.h)
+
+set(shell_MOC_HDRS src/shell.h)
 qt5_wrap_cpp(shell_MOC_SRCS ${shell_MOC_HDRS})
 
 add_executable(qshell ${shell_SRCS} ${pamixer_SRCS} ${shell_MOC_HDRS})
@@ -148,6 +132,6 @@ target_link_libraries(qshell
     )
 
 install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR})
-install(PROGRAMS "qshell-session" DESTINATION ${BIN_INSTALL_DIR})
+#install(PROGRAMS "qshell-session" DESTINATION ${BIN_INSTALL_DIR})
 install(DIRECTORY "theme" DESTINATION ${CONFIG_INSTALL_DIR})
 install(FILES "qshell.desktop" DESTINATION ${XSESSION_INSTALL_DIR})

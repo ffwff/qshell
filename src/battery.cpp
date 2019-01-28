@@ -10,19 +10,17 @@
 #include "model.h"
 #include "shell.h"
 
-Q::Battery::Battery(const QString &name, Shell *shell) : QPushButton(), Q::Model(name, shell)
-{
+Q::Battery::Battery(const QString &name, Shell *shell) : QPushButton(), Q::Model(name, shell) {
     connect(Solid::DeviceNotifier::instance(), SIGNAL(deviceAdded(QString)),
             this,                              SLOT(deviceAdded(QString)));
     connect(Solid::DeviceNotifier::instance(), SIGNAL(deviceRemoved(QString)),
             this,                              SLOT(deviceRemoved(QString)));
-    
+
     connect(shell->oneSecond(), SIGNAL(timeout()), this, SLOT(update()));
     QTimer::singleShot(0, [this](){ hide(); });
 };
 
-void Q::Battery::update()
-{
+void Q::Battery::update() {
     int charge = countCharge();
     if (charge >= 67) {
         if(isCharging())
@@ -45,16 +43,14 @@ void Q::Battery::update()
     }
 };
 
-void Q::Battery::load(KConfigGroup *grp)
-{
+void Q::Battery::load(KConfigGroup *grp) {
     int size = grp->readEntry("Size", 24);
     setIconSize(QSize(size, size));
     setMinimumSize(QSize(size, size));
 };
 
 // device events
-void Q::Battery::deviceAdded( const QString &udi )
-{
+void Q::Battery::deviceAdded(const QString &udi) {
     Solid::Device device(udi);
     if (Solid::Battery* battery = device.as<Solid::Battery>()) {
         connect(battery, SIGNAL(chargePercentChanged(int,QString)), this,
@@ -63,14 +59,12 @@ void Q::Battery::deviceAdded( const QString &udi )
     }
 };
 
-void Q::Battery::deviceRemoved( const QString &udi )
-{
+void Q::Battery::deviceRemoved(const QString &udi) {
     batteries.remove(udi);
 };
 
 
-int Q::Battery::countCharge()
-{
+int Q::Battery::countCharge() {
     if (!batteries.count())
         return -1;
     int charge = 0;
@@ -87,8 +81,7 @@ int Q::Battery::countCharge()
     return charge;
 };
 
-bool Q::Battery::isCharging()
-{
+bool Q::Battery::isCharging() {
     for (QMap<QString, Solid::Battery*>::const_iterator it = batteries.constBegin(),
                                             end = batteries.constEnd(); it != end; ++it)
         if((*it)->chargeState() == Solid::Battery::Charging)

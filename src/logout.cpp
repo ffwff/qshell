@@ -9,11 +9,10 @@
 #include "panel.h"
 #include "frame.h"
 
-Q::Logout::Logout(const QString &name, Q::Shell *shell) :
-QPushButton(), Model(name, shell)
-{
+Q::Logout::Logout(const QString &name, Q::Shell *shell)
+    : QPushButton(), Model(name, shell) {
     setIcon(QIcon::fromTheme("system-shutdown"));
-    
+
     interface = new QDBusInterface("org.kde.ksmserver", "/KSMServer", "org.kde.KSMServerInterface");
 };
 

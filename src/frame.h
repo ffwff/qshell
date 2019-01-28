@@ -4,8 +4,7 @@
 namespace Q
 {
 
-class Frame : public QWidget
-{
+class Frame : public QWidget {
     Q_OBJECT
 public:
     Frame(QWidget *parent = 0);

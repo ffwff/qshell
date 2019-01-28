@@ -57,6 +57,9 @@ public:
         myPulse.set_volume(myDevice, round((double)value * (double)PA_VOLUME_NORM / 100.0));
         myDevice = myPulse.get_default_sink();
     };
+public slots:
+    void update();
+    void wheelEvent(QWheelEvent *we);
 private:
     Pulseaudio myPulse;
     Device myDevice;

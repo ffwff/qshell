@@ -14,12 +14,10 @@
 
 #include "model.h"
 
-namespace Q
-{
+namespace Q {
 
 class Panel;
-class PanelContainer : public QWidget
-{
+class PanelContainer : public QWidget {
     Q_OBJECT
 public:
     PanelContainer(Panel *panel);
@@ -33,8 +31,7 @@ private:
 enum PanelPosition { Left = 0, Top, Right, Bottom };
 
 class Shell;
-class Panel : public QWidget, public Model
-{
+class Panel : public QWidget, public Model {
     Q_OBJECT
 public:
     Panel(const QString& name, Shell *shell);
@@ -49,7 +46,7 @@ public:
     void load(KConfigGroup *grp) override;
 protected:
     virtual void showEvent(QShowEvent *);
-    virtual void paintEvent(QPaintEvent *);
+    //virtual void paintEvent(QPaintEvent *);
 public slots:
     void geometryChanged();
 private:
@@ -60,6 +57,7 @@ private:
     QPoint myPoint;
     bool setStruts;
     int blurRadius;
+    bool transparent;
     bool displayShadow;
     int myIconSize;
     float offsetTop, offsetLeft, offsetRight, offsetBottom;

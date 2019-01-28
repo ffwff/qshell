@@ -31,39 +31,33 @@
 #include "mediaplayer.h"
 #include "button.h"
 
-Q::ShellApplication::ShellApplication(int &argc, char **argv) : QApplication(argc, argv)
-{
-     QCoreApplication::setApplicationName("qshell");
-     QGuiApplication::setApplicationDisplayName("Q::Shell Desktop");
-     QCoreApplication::setApplicationVersion("0.1");
-     Shell *myShell = new Shell();
+Q::ShellApplication::ShellApplication(int argc, char **argv) : QApplication(argc, argv) {
+    QCoreApplication::setApplicationName("qshell");
+    QGuiApplication::setApplicationDisplayName("Q::Shell Desktop");
+    QCoreApplication::setApplicationVersion("0.1");
+    myShell = new Shell();
 };
 
 // ----------
 
-Q::Shell::Shell() :
-QWidget( 0, Qt::Window | Qt::FramelessWindowHint ),
-strut_left(0),
-strut_right(0),
-strut_top(0),
-strut_bottom(0)
+Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint )
 {
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     KWindowSystem::setOnAllDesktops( winId(), true );
     setMask( QRegion(-1,-1,1,1) );
     show();
-    
+
     myDesktop = new Desktop(this);
     myDesktop->show();
-    
+
     myDash = new Dash(this);
-    
+
     myOneSecond = new QTimer(this);
     myOneSecond->setInterval(1000);
-    
+
     loadAll();
-    
+
     connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(calculateStruts()) );
 };
 
@@ -71,17 +65,17 @@ strut_bottom(0)
 void Q::Shell::saveAll()
 {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
-    
+
     // models
     foreach (Model *m, myModels) {
         KConfigGroup grp = sharedConfig->group(m->name());
         m->save(&grp);
     }
-    
+
     // desktop
     KConfigGroup desktopGroup = sharedConfig->group("Q::Desktop");
     myDesktop->save(&desktopGroup);
-    
+
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
     QStringList list;
@@ -98,33 +92,23 @@ void Q::Shell::save(Model *m)
     sharedConfig->sync();
 };
 
-void Q::Shell::loadAll()
-{
-    if(!QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc")))
-    {
+void Q::Shell::loadAll() {
+    if(!QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc"))) {
         QFile::copy("/usr/share/qshell/qshellrc", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshellrc");
         QFile::copy("/usr/share/qshell/qshell.css", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshell.css");
     }
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
-    
-    // models
-    QStringList groups = sharedConfig->groupList();
-    foreach (const QString &group, groups)
-    {
-        Model *m = getModelByName(group);
-    }
-    
+
     KConfigGroup grp;
-    
+
     // desktop
     grp = sharedConfig->group("Q::Desktop");
     myDesktop->load(&grp);
-    
+
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
     QStringList panels = shGroup.readEntry("Panels", QStringList());
-    foreach (const QString &panel, panels)
-    {
+    foreach (const QString &panel, panels) {
         Panel *m = static_cast<Panel *>(getModelByName(panel));
         if(m)
             addPanel(m);
@@ -132,15 +116,13 @@ void Q::Shell::loadAll()
     calculateStruts();
     myDesktop->geometryChanged();
     QString styleSheetLocation = shGroup.readEntry("Stylesheet", QString());
-    if(!styleSheetLocation.isEmpty())
-    {
+    if(!styleSheetLocation.isEmpty()) {
         QFile *file = 0;
         if(QFile::exists(styleSheetLocation))
             file = new QFile(styleSheetLocation);
         else if(!QStandardPaths::locate(QStandardPaths::ConfigLocation, styleSheetLocation).isEmpty())
             file = new QFile(QStandardPaths::locate(QStandardPaths::ConfigLocation, styleSheetLocation));
-        if (file && file->open(QIODevice::ReadOnly | QIODevice::Text))
-        {
+        if (file && file->open(QIODevice::ReadOnly | QIODevice::Text)) {
             styleSheet = QString::fromUtf8(file->readAll());
             setStyleSheet(styleSheet);
         }
@@ -149,16 +131,14 @@ void Q::Shell::loadAll()
     // dash
     grp = sharedConfig->group("Q::Dash");
     myDash->load(&grp);
-    
+
     myOneSecond->start();
 };
 
-void Q::Shell::reloadAll()
-{
+void Q::Shell::reloadAll() {
     myOneSecond->stop();
     myOneSecond->disconnect();
-    foreach(Model *m, myModels)
-    {
+    foreach(Model *m, myModels) {
         QWidget *w = dynamic_cast<QWidget*>(m);
         if(w) w->deleteLater();
     }
@@ -171,8 +151,7 @@ void Q::Shell::reloadAll()
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }
 
-Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
-{
+Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     if(myModels.contains(name))
         return myModels.value(name);
@@ -190,7 +169,15 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
             static_cast<Task *>(m)->load(&group);
         }
         COND_LOAD_MODEL("DashButton", DashButton)
-        COND_LOAD_MODEL("Volume", Volume)
+        else if(type == "Volume") {
+            try {
+                m = new Volume(name, this);
+                static_cast<Volume*>(m)->load(&group);
+            } catch(const char *s) {
+                qDebug() << s;
+                return 0;
+            }
+        }
         COND_LOAD_MODEL("Network", Network)
         COND_LOAD_MODEL("Date", Date)
         COND_LOAD_MODEL("Logout", Logout)
@@ -202,13 +189,15 @@ Q::Model *Q::Shell::getModelByName(const QString& name, Model *parent)
         COND_LOAD_MODEL("Button", Button)
         else
             return 0;
-        
+
         myModels.insert(name, m);
         return m;
     }
     else
         return 0;
 };
+
+#undef COND_LOAD_MODEL
 
 // Panels
 void Q::Shell::addPanel(Q::Panel *panel)
@@ -218,22 +207,20 @@ void Q::Shell::addPanel(Q::Panel *panel)
     panel->show();
 };
 
-void Q::Shell::repaintPanels()
-{
+void Q::Shell::repaintPanels() {
     foreach (Q::Panel *panel, myPanels) {
         panel->repaint();
     }
 };
 
 // Struts
-void Q::Shell::calculateStruts()
-{
+void Q::Shell::calculateStruts() {
     strut_left   = 0;
     strut_right  = 0;
     strut_top    = 0;
     strut_bottom = 0;
-    foreach (Q::Panel *panel, myPanels)
-        if(panel->struts())
+    foreach (Q::Panel *panel, myPanels) {
+        if(panel->struts()) {
             if(panel->position() == Q::PanelPosition::Left)
                 strut_left += panel->width();
             else if(panel->position() == Q::PanelPosition::Right)
@@ -242,6 +229,8 @@ void Q::Shell::calculateStruts()
                 strut_top += panel->height();
             else
                 strut_bottom += panel->height();
+        }
+    }
     KWindowSystem::setStrut(winId(),strut_left,strut_right,strut_top,strut_bottom);
 };
 
@@ -263,9 +252,9 @@ void signalHandler(int signal)
 
 int main (int argc, char *argv[])
 {
-     signal(SIGTERM, signalHandler);
-     signal(SIGQUIT, signalHandler);
-     signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGQUIT, signalHandler);
+    signal(SIGINT, signalHandler);
     // SIGSEG by KCrash
 
     Q::ShellApplication app(argc, argv);

@@ -7,41 +7,44 @@
 #include <QBoxLayout>
 #include <QPushButton>
 #include <QProcess>
+#include <QLabel>
 
 #include <KF5/KService/KServiceGroup>
 
 #include "model.h"
 #include "frame.h"
 
-namespace Q
-{
-    
-class DashLabelContainer : public QWidget
-{
+namespace Q {
+
+class DashLabelContainer : public QWidget {
     Q_OBJECT
 public:
     DashLabelContainer(QWidget *parent = 0);
 };
 
-class DashAppsContainer : public QWidget
-{
+class DashAppsContainer : public QWidget {
     Q_OBJECT
 public:
     DashAppsContainer(QWidget *parent = 0);
 };
 
 class Dash;
-class DashItem : public QPushButton
-{
+class DashItem : public QPushButton {
     Q_OBJECT
 public:
-    DashItem(QWidget *parent, QString name, QIcon icon, QString command, QString tooltip, bool isTerminal, Dash *dash);
+    DashItem(QWidget *parent, const QString &name, const QIcon &icon,
+             const QString &command, const QString &tooltip,
+             const bool isTerminal, Dash* dash);
     void load(KConfigGroup *grp);
     void runCommand();
+    inline const QSize& size() const { return mySize; };
     void setSize(int size);
 protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 private:
+    void updatePixmapLabels();
+    QIcon icon;
+    QLabel *iconLabel;
     QString myCommand;
     QStringList myArguments;
     QSize mySize;
@@ -51,8 +54,7 @@ private:
 
 class Shell;
 enum DashPosition { TopLeft = 0, TopRight, BottomLeft, BottomRight };
-class Dash : public Frame, public Model
-{
+class Dash : public Frame, public Model {
     Q_OBJECT
 public:
     Dash(Shell *parent);
@@ -62,7 +64,7 @@ public:
 protected:
     void showEvent(QShowEvent *);
 private slots:
-    void setSearch(QString s);
+    void setSearch(const QString &s);
     void slotRepopulate();
 private:
     int iconSize;
@@ -71,8 +73,8 @@ private:
     QString search;
     QLineEdit *searchBar;
     QWidget *appsContainer;
-    inline QBoxLayout *appsLayout() { return static_cast<QBoxLayout*>(appsContainer->layout()); };
-    bool repopulate(KServiceGroup::Ptr group, QHBoxLayout *layout = 0, const QString &filter = 0);
+    inline QLayout *appsLayout() const { return static_cast<QLayout*>(appsContainer->layout()); };
+    bool repopulate(KServiceGroup::Ptr group, QLayout *layout = 0, const QString &filter = 0);
     DashPosition myPosition;
     QPixmap pixmap;
     float myWidth, myHeight;
@@ -88,7 +90,7 @@ public:
 protected:
     void mouseReleaseEvent(QMouseEvent *mouseEvent);
 private:
-    QSize mySize;
+    QSize size;
 };
 
 }

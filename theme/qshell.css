@@ -12,6 +12,7 @@ QPushButton {
 
 #TopPanel QLabel {
     padding: 0 5px;
+    color: #000000;
 }
 
 #TopPanel QPushButton:hover, #TopPanel QLabel:hover {
