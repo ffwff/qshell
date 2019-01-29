@@ -28,14 +28,14 @@ class Systray : public QWidget, public Model
     Q_OBJECT
 public:
     Systray(const QString& name, Shell *shell);
+    ~Systray();
     QWidget *widget() const { return myWidget; }
     WId wid() const { return myWid; }
-//     void load(KConfigGroup *);
+    void load(KConfigGroup *) override;
 private slots:
     void systrayResized(const QRect &rect);
     void windowAdded(WId wid);
     void windowRemoved(WId wid);
-    //void windowChanged(WId wid, NET::Properties properties, NET::Properties2 properties2);
 private:
     QProcess stalonetray;
     QWidget *myWidget;

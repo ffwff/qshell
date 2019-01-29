@@ -102,6 +102,7 @@ void Q::Shell::loadAll() {
         QFile::copy("/usr/share/qshell/qshell.css", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshell.css");
     }
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
+    sharedConfig->reparseConfiguration();
 
     KConfigGroup grp;
 
@@ -151,11 +152,10 @@ void Q::Shell::reloadAll() {
         p->deleteLater();
     myModels.clear();
     myPanels.clear();
-    //delete myDesktop;
-    //myDesktop = new Desktop(this);
-    delete myDash;
+    myDash->deleteLater();
     myDash = new Dash(this);
     loadAll();
+    myDesktop->repaint();
 };
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }

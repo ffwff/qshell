@@ -108,25 +108,25 @@ void Q::DesktopShadow::paintEvent(QPaintEvent *) {
         // HACK way to make shadows under windows but on top of desktop
         if(p->displaysShadow()) {
             if(p->position() == Q::PanelPosition::Top) {
-                QLinearGradient gradient(0, p->y(), 0, p->y() + p->height() + 15);
+                QLinearGradient gradient(0, p->y(), 0, p->y() + p->height() + 20);
                 gradient.setColorAt(0, QColor(0,0,0,64));
                 gradient.setColorAt(1, Qt::transparent);
-                painter.fillRect(p->x(), p->y() + p->height(), p->width(), p->height(), gradient);
+                painter.fillRect(p->x(), p->y() + p->height(), p->width(), p->y() + p->height() + 20, gradient);
             } else if(p->position() == Q::PanelPosition::Bottom) {
                 QLinearGradient gradient(0, p->y() , 0, p->y() - p->height());
                 gradient.setColorAt(0, QColor(0,0,0,64));
                 gradient.setColorAt(1, Qt::transparent);
-                painter.fillRect(p->x(), p->y() - p->height(), p->width(), p->height(), gradient);
+                painter.fillRect(p->x(), p->y() - p->height(), p->width(), p->y() + p->height(), gradient);
             } else if(p->position() == Q::PanelPosition::Left) {
                 QLinearGradient gradient(p->x() + p->width() + 10, 0, p->x() + p->width(), 0);
                 gradient.setColorAt(0, Qt::transparent);
                 gradient.setColorAt(1, QColor(0,0,0,64));
                 painter.fillRect(p->x() + p->width(),p->y(), p->width(), p->height(), gradient);
             } else {
-                QLinearGradient gradient(p->x() - p->width(), 0, p->x() - p->width(), 0);
+                QLinearGradient gradient(p->x() - p->width(), 0, p->x() - p->y() + p->width(), 0);
                 gradient.setColorAt(0, Qt::transparent);
                 gradient.setColorAt(1, QColor(0,0,0,64));
-                painter.fillRect(p->x() - p->width(),p->y(), p->width(), p->height(), gradient);
+                painter.fillRect(p->x() - p->width(),p->y(), p->width(), p->y() + p->height(), gradient);
             }
         }
     }
@@ -162,7 +162,6 @@ void Q::Desktop::geometryChanged() {
     myShadows->setFixedSize(size);
     shell()->repaintPanels();
     repaint();
-    qDebug() << shell()->getStrutLeft();
     iconContainer->move(shell()->getStrutLeft() + 5, shell()->getStrutTop() + 5);
     iconContainer->resize(width() - shell()->getStrutLeft() - shell()->getStrutRight() - 5,
                          height() - shell()->getStrutRight() - shell()->getStrutBottom() - 5);
@@ -175,7 +174,11 @@ void Q::Desktop::showEvent(QShowEvent*) {
 
 void Q::Desktop::paintEvent(QPaintEvent*) {
     QPainter painter(this);
-    painter.drawImage(QGuiApplication::primaryScreen()->geometry(), myImage);
+    const auto &size = QGuiApplication::primaryScreen()->geometry();
+    const auto &image = myImage.scaled(size.width(), size.height(),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
+    qDebug() << "image:" << image.width() << image.height();
+    painter.drawImage(0, 0, image);
+    myShadows->repaint();
 }
 
 // configurations

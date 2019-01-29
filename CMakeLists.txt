@@ -130,5 +130,5 @@ target_link_libraries(qshell
 
 install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR})
 #install(PROGRAMS "qshell-session" DESTINATION ${BIN_INSTALL_DIR})
-install(DIRECTORY "theme" DESTINATION ${CONFIG_INSTALL_DIR})
+install(DIRECTORY "themes" DESTINATION ${CONFIG_INSTALL_DIR})
 install(FILES "qshell.desktop" DESTINATION ${XSESSION_INSTALL_DIR})

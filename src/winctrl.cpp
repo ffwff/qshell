@@ -21,8 +21,7 @@
 #include "model.h"
 #include "shell.h"
 
-void toggleMaximize()
-{
+static void toggleMaximize() {
     NETWinInfo info(QX11Info::connection(), KWindowSystem::activeWindow(), QX11Info::appRootWindow(), NET::WMState, 0);
     if(info.state() & NET::Max)
         KWindowSystem::clearState(KWindowSystem::activeWindow(), NET::Max);
@@ -30,31 +29,26 @@ void toggleMaximize()
         KWindowSystem::setState(KWindowSystem::activeWindow(), NET::Max);
 };
 
-void closeWindow()
-{
+static void closeWindow() {
     NETRootInfo(QX11Info::connection(), NET::CloseWindow).closeWindowRequest(KWindowSystem::activeWindow());
 };
 
-void minimize()
-{
+static void minimize() {
     KWindowSystem::minimizeWindow(KWindowSystem::activeWindow());
 };
 
 // ----------
 
-Q::WinTitle::WinTitle(QWidget *parent) : QLabel(parent), timer(0)
-{
+Q::WinTitle::WinTitle(QWidget *parent) : QLabel(parent), timer(0) {
     populateContextMenu();
 };
 
 // Clicks
-void Q::WinTitle::doubleClick()
-{
+void Q::WinTitle::doubleClick() {
     toggleMaximize();
 };
 
-void Q::WinTitle::click()
-{
+void Q::WinTitle::click() {
     KWindowInfo info(KWindowSystem::activeWindow(), NET::WMState);
     if(info.state() & NET::SkipTaskbar)
         return;
@@ -68,19 +62,16 @@ void Q::WinTitle::click()
 };
 
 // Mouse Events
-void Q::WinTitle::mousePressEvent(QMouseEvent *event)
-{
+void Q::WinTitle::mousePressEvent(QMouseEvent *event) {
     isDoubleClick = false;
 };
 
-void Q::WinTitle::mouseDoubleClickEvent(QMouseEvent *event)
-{
+void Q::WinTitle::mouseDoubleClickEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton)
         isDoubleClick = true;
 };
 
-void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event)
-{
+void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton)
         click();
     else if(!isDoubleClick) {
@@ -92,9 +83,7 @@ void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event)
         });
         timer->start();
         return;
-    }
-    else
-    {
+    } else {
         doubleClick();
     }
 
@@ -104,8 +93,7 @@ void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event)
 };
 
 // Context Menu
-void Q::WinTitle::populateContextMenu()
-{
+void Q::WinTitle::populateContextMenu() {
     KWindowInfo info(KWindowSystem::activeWindow(), NET::WMName|NET::WMState|NET::WMDesktop);
 
     myContextMenu.clear();
@@ -124,8 +112,7 @@ void Q::WinTitle::populateContextMenu()
 
     menu->addSeparator();
 
-    for(int i = 1; i <= KWindowSystem::numberOfDesktops(); i++)
-    {
+    for(int i = 1; i <= KWindowSystem::numberOfDesktops(); i++) {
         act = new QAction(KWindowSystem::desktopName(i));
         act->setCheckable(true);
         act->setChecked(info.isOnDesktop(i));
@@ -165,14 +152,11 @@ void Q::WinTitle::populateContextMenu()
     connect(act, &QAction::triggered, [](){ minimize(); });
     myContextMenu.addAction(act);
 
-    if(info.state() & NET::Max)
-    {
+    if(info.state() & NET::Max) {
         act = new QAction(QIcon::fromTheme("window-restore-symbolic"), "Unmaximize");
         connect(act, &QAction::triggered, [](){ toggleMaximize(); });
         myContextMenu.addAction(act);
-    }
-    else
-    {
+    } else {
         act = new QAction(QIcon::fromTheme("window-maximize-symbolic"), "Maximize");
         connect(act, &QAction::triggered, [](){ toggleMaximize(); });
         myContextMenu.addAction(act);
@@ -186,8 +170,8 @@ void Q::WinTitle::populateContextMenu()
 
 // ----------
 
-Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, shell)
-{
+Q::WinCtrl::WinCtrl(const QString& name, Shell* shell)
+    : QWidget(), Model(name, shell) {
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setMargin(0);
@@ -196,18 +180,12 @@ Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, 
 
     closeBtn = new QPushButton();
     closeBtn->setIcon(QIcon::fromTheme("window-close-symbolic"));
-    boxLayout()->addWidget(closeBtn);
-
     minimizeBtn = new QPushButton();
     minimizeBtn->setIcon(QIcon::fromTheme("window-minimize-symbolic"));
-    boxLayout()->addWidget(minimizeBtn);
-
     maximizeBtn = new QPushButton();
     maximizeBtn->setIcon(QIcon::fromTheme("window-restore-symbolic"));
-    boxLayout()->addWidget(maximizeBtn);
 
     label = new WinTitle(this);
-    boxLayout()->addWidget(label);
     update();
 
     connect(KWindowSystem::self(), SIGNAL(activeWindowChanged(WId)), this, SLOT(update(WId)));
@@ -222,22 +200,29 @@ Q::WinCtrl::WinCtrl(const QString& name, Shell* shell) : QWidget(), Model(name, 
     connect(maximizeBtn, &QPushButton::clicked, []() {
         toggleMaximize();
     });
-};
+}
 
-void Q::WinCtrl::update(WId wid)
-{
+void Q::WinCtrl::load(KConfigGroup *grp) {
+    const QString &controls = grp->readEntry("Controls", "XMmt");
+    for(int i = 0; i < controls.size(); i++) {
+        const QChar &c = controls[i];
+        if(c == 'X') boxLayout()->addWidget(closeBtn);
+        else if(c == 'M') boxLayout()->addWidget(maximizeBtn);
+        else if(c == 'm') boxLayout()->addWidget(minimizeBtn);
+        else if(c == 't') boxLayout()->addWidget(label);
+    }
+}
+
+void Q::WinCtrl::update(WId wid) {
     KWindowInfo info(wid, NET::WMName|NET::WMState);
     label->setText(info.name());
-    if(info.state() & NET::Max)
-    {
+    if(info.state() & NET::Max) {
         closeBtn->show();
         minimizeBtn->show();
         maximizeBtn->show();
-    }
-    else
-    {
+    } else {
         closeBtn->hide();
         minimizeBtn->hide();
         maximizeBtn->hide();
     }
-};
+}

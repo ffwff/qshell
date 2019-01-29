@@ -39,6 +39,7 @@ class WinCtrl : public QWidget, public Model
 public:
     WinCtrl(const QString& name, Shell* shell);
     inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
+    void load(KConfigGroup *grp) override;
 private slots:
     void update(WId wid = KWindowSystem::activeWindow());
 private:

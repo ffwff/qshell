@@ -46,6 +46,15 @@ Q::Systray::Systray(const QString &name, Q::Shell *shell)
     connect(KWindowSystem::self(), SIGNAL(windowRemoved(WId)), this, SLOT(windowRemoved(WId)));
 }
 
+Q::Systray::~Systray() {
+    stalonetray.close();
+}
+
+void Q::Systray::load(KConfigGroup *grp) {
+    //const QString args = grp->readEntry("StalonetrayArguments", "-t -p --window-layer top --dockapp-mode simple");
+    //stalonetray.start("stalonetray " + args);
+}
+
 void Q::Systray::windowAdded(WId wid) {
     if(myWid) return;
     NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMIcon|NET::WMState, NET::WM2WindowClass);
