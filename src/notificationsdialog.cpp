@@ -15,7 +15,7 @@
 
 QList<Q::Frame*> notificationFrames;
 
-Q::NotificationsDialog::NotificationsDialog(QWidget *button)
+Q::NotificationsDialog::NotificationsDialog(QPushButton *button)
     : QWidget(), myButton(button) {
     Model *m = dynamic_cast<Model*>(button);
     if(m)
@@ -23,13 +23,13 @@ Q::NotificationsDialog::NotificationsDialog(QWidget *button)
     else
         frame = new Q::Frame();
     frame->setCentralWidget(this);
-    frame->setWindowFlags(Qt::ToolTip);
+    //frame->setWindowFlags(Qt::ToolTip);
     move(0, 0);
     notificationFrames.append(frame);
 
     connect(button, SIGNAL(clicked()), this, SLOT(toggle()));
-    connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged, this, &Q::NotificationsDialog::hideFrame);
-};
+    connect(KWindowSystem::self(), SIGNAL(activeWindowChanged(WId)), this, SLOT(hideFrame(WId)));
+}
 
 void Q::NotificationsDialog::hideFrame(WId wid) {
     if(frame->winId() != wid)
@@ -67,9 +67,13 @@ void Q::NotificationsDialog::updateDialog() {
 
 
 void Q::NotificationsDialog::toggle() {
-    Q::NotificationsDialog::hideAll();
-    frame->setVisible(!frame->isVisible());
-    KWindowSystem::setState(frame->winId(), NET::SkipTaskbar);
+    if(!frame->isVisible()) {
+        Q::NotificationsDialog::hideAll();
+        frame->show();
+        KWindowSystem::setState(frame->winId(), NET::SkipTaskbar);
+    } else {
+        frame->hide();
+    }
 };
 
 void Q::NotificationsDialog::hideAll() {

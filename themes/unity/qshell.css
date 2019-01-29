@@ -112,8 +112,16 @@ QPushButton {
     height: 64px;
 }
 
-/* Dialog */
+/* volume */
 .Q--VolumeDialog QWidget {
     background-color: rgba(0,0,0,30%);
-    padding: 6px;
+}
+
+/* media player */
+.Q--MediaPlayerDialog > QWidget {
+    background-color: rgba(0,0,0,30%);
+}
+
+.Q--MediaPlayerDialog QLabel {
+    text-align: center;
 }

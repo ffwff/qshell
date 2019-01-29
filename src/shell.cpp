@@ -9,6 +9,7 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QtDBus>
+#include <QCommandLineParser>
 
 #include <KF5/KConfigCore/KConfigGroup>
 #include <KF5/KConfigCore/KSharedConfig>
@@ -33,10 +34,12 @@
 #include "button.h"
 #include "systray.h"
 
-Q::ShellApplication::ShellApplication(int argc, char **argv) : QApplication(argc, argv) {
+Q::ShellApplication::ShellApplication(int argc, char **argv)
+    : QApplication(argc, argv) {
     QCoreApplication::setApplicationName("qshell");
     QGuiApplication::setApplicationDisplayName("Q::Shell Desktop");
     QCoreApplication::setApplicationVersion("0.1");
+
     myShell = new Shell();
 
     QDBusConnection bus = QDBusConnection::sessionBus();
@@ -96,12 +99,13 @@ void Q::Shell::save(Model *m) {
     sharedConfig->sync();
 };
 
-void Q::Shell::loadAll() {
-    if(!QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc"))) {
+void Q::Shell::loadAll(const QString &file) {
+    if( file == "qshellrc" &&
+        !QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc"))) {
         QFile::copy("/usr/share/qshell/qshellrc", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshellrc");
         QFile::copy("/usr/share/qshell/qshell.css", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshell.css");
     }
-    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
+    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig(file);
     sharedConfig->reparseConfiguration();
 
     KConfigGroup grp;
@@ -141,7 +145,7 @@ void Q::Shell::loadAll() {
     myOneSecond->start();
 };
 
-void Q::Shell::reloadAll() {
+void Q::Shell::reloadAll(const QString &file) {
     myOneSecond->stop();
     myOneSecond->disconnect();
     foreach(Model *m, myModels) {
@@ -154,7 +158,7 @@ void Q::Shell::reloadAll() {
     myPanels.clear();
     myDash->deleteLater();
     myDash = new Dash(this);
-    loadAll();
+    loadAll(file);
     myDesktop->repaint();
 };
 

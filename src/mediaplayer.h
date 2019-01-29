@@ -29,7 +29,6 @@ private slots:
 private:
     MediaPlayer *myMedia;
     QDBusInterface *myPropertyInterface = nullptr, *myCtrlInterface = nullptr;
-    QString myPlayer;
     QLabel *title;
     QLabel *artist;
     QSlider *slider;

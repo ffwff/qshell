@@ -4,11 +4,9 @@
 
 #include "shell.h"
 
-namespace Q
-{
+namespace Q {
 
-class ShellApplication : public QApplication
-{
+class ShellApplication : public QApplication {
 public:
     ShellApplication(int argc, char **argv);
     ~ShellApplication() {}

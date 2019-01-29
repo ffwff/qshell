@@ -1,7 +1,7 @@
 #ifndef DATE_H
 #define DATE_H
 
-#include <QLabel>
+#include <QPushButton>
 #include <QCalendarWidget>
 
 #include <KF5/KConfigCore/KConfigGroup>
@@ -23,14 +23,12 @@ private:
     QCalendarWidget *calendar;
 };
 
-class Date : public QLabel, public Model {
+class Date : public QPushButton, public Model {
     Q_OBJECT
 public:
     Date(const QString &name, Shell *shell);
     ~Date() { myDateDialog->deleteLater(); };
     void load(KConfigGroup *grp) override;
-protected:
-    void mouseReleaseEvent(QMouseEvent *);
 private slots:
     void update();
 private:

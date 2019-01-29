@@ -27,7 +27,7 @@ Q::Volume::Volume(const QString &name, Q::Shell *shell) :
     setIcon(QIcon::fromTheme("audio-volume-high"));
 
     connect(shell->oneSecond(), &QTimer::timeout, this, &Q::Volume::update);
-};
+}
 
 void Q::Volume::update() {
     myDevice = myPulse.get_default_sink();
@@ -63,27 +63,29 @@ void Q::Volume::wheelEvent(QWheelEvent *we) {
 Q::VolumeDialog::VolumeDialog(Volume *volume) :
     Q::NotificationsDialog(volume),
     myVolume(volume) {
+    frame->resize(QSize(280,40));
+
     QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setContentsMargins(20, 0, 20, 0);
     layout->setSpacing(0);
     setLayout(layout);
 
     muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute", this);
+    muteButton->setFixedSize(100, muteButton->height());
     layout->addWidget(muteButton);
     connect(muteButton, &QPushButton::clicked, [this]() {
         myVolume->mute();
         update();
     });
 
-    frame->resize(QSize(280,70));
 
     slider = new QSlider(Qt::Horizontal, this);
     slider->setMinimum(0);
     slider->setMaximum(200);
     slider->setTracking(true);
     layout->addWidget(slider, 1);
+    slider->setMinimumSize(slider->width(), muteButton->height());
     connect(slider, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-};
+}
 
 void Q::VolumeDialog::update() {
     if(myVolume->isMute()) {
@@ -92,13 +94,13 @@ void Q::VolumeDialog::update() {
         muteButton->setText("Mute");
     }
     slider->setValue(myVolume->volumePercent());
-};
+}
 
 void Q::VolumeDialog::showEvent(QShowEvent *) {
     updateDialog();
     update();
-};
+}
 
 void Q::VolumeDialog::valueChanged(int value) {
     myVolume->setVolume(value);
-};
+}

@@ -34,15 +34,15 @@ public:
     void save(Model *m);
     void repaintPanels();
     void kcmshell5(const QString &arg);
-    void reloadAll();
 public slots:
     void activateLauncherMenu();
+    void loadAll(const QString &file="qshellrc");
+    void reloadAll(const QString &file="qshellrc");
 private slots:
     void calculateStruts();
 private:
     // Configurations
     void saveAll();
-    void loadAll();
     QMap<QString,Model *> myModels;
     // Items
     Desktop *myDesktop;
