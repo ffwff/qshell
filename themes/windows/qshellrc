@@ -2,8 +2,7 @@
 Type=Battery
 
 [DashButton]
-Icon=
-Text=Activities
+Text=Start
 Type=DashButton
 
 [Date]

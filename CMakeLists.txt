@@ -11,13 +11,11 @@ find_package(ECM 0.0.11 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
-    Concurrent
     Core
     DBus
     UiTools
     Widgets
     X11Extras
-    Xml
 )
 
 include(KDEInstallDirs)
@@ -33,20 +31,15 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     endif()
 endif()
 
-SET(CMAKE_CXX_FLAGS "-std=c++14")
-
 # required frameworks by Core
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
     Config
     CoreAddons
     Crash
-    GlobalAccel
-    I18n
     KIO
     Service
     WindowSystem
 )
-
 find_package(KF5Solid NO_MODULE)
 
 find_package(X11)
@@ -55,35 +48,9 @@ set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
                         TYPE REQUIRED
                     )
 
-find_package(XCB COMPONENTS XFIXES IMAGE UTIL)
-set(XCB_COMPONENTS_ERRORS FALSE)
-if (XCB_FOUND)
-	find_package(Qt5X11Extras ${QT_MIN_VERSION} REQUIRED)
-endif()
-set(XCB_COMPONENTS_FOUND TRUE)
-if(NOT XCB_XFIXES_FOUND)
-	set(XCB_COMPONENTS_ERRORS "${XCB_COMPONENTS_ERRORS} XCB-XFIXES ")
-	set(XCB_COMPONENTS_FOUND FALSE)
-endif()
-if(NOT XCB_IMAGE_FOUND)
-	set(XCB_COMPONENTS_ERRORS "${XCB_COMPONENTS_ERRORS} XCB-IMAGE ")
-	set(XCB_COMPONENTS_FOUND FALSE)
-endif()
-if(NOT XCB_UTIL_FOUND)
-	set(XCB_COMPONENTS_ERRORS "${XCB_COMPONENTS_ERRORS} XCB-UTIL ")
-	set(XCB_COMPONENTS_FOUND FALSE)
-endif()
+find_package(XCB COMPONENTS)
 
-INCLUDE_DIRECTORIES(BEFORE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-    ${CMAKE_CURRENT_BINARY_DIR}
-    )
-
-# fail build if none of the platform backends can be found
-if (NOT XCB_FOUND OR NOT XCB_COMPONENTS_FOUND)
-    message(FATAL_ERROR "No suitable backend platform was found. Currenty supported platforms are: XCB Components Required: ${XCB_COMPONENTS_ERRORS}")
-endif()
-
+add_definitions("-fexceptions")
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_definitions("-Wno-mismatched-tags")
@@ -109,16 +76,13 @@ target_link_libraries(qshell
     Qt5::Concurrent
     Qt5::DBus
     Qt5::X11Extras
-    Qt5::Xml
     KF5::ConfigCore
     KF5::CoreAddons
     KF5::Crash
-    KF5::GlobalAccel
     KF5::KIOCore
     KF5::KIOFileWidgets
     KF5::KIOWidgets
     KF5::KIONTLM
-    KF5::I18n
     KF5::Service
     KF5::Solid
 #     KF5::kcmutils
@@ -129,6 +93,6 @@ target_link_libraries(qshell
     )
 
 install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR})
-#install(PROGRAMS "qshell-session" DESTINATION ${BIN_INSTALL_DIR})
+install(PROGRAMS "qshellctl" DESTINATION ${BIN_INSTALL_DIR})
 install(DIRECTORY "themes" DESTINATION ${CONFIG_INSTALL_DIR})
 install(FILES "qshell.desktop" DESTINATION ${XSESSION_INSTALL_DIR})

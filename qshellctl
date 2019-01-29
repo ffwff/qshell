@@ -1,0 +1,33 @@
+#!/bin/bash
+
+bname=`basename "$0"`
+fn="$1"
+
+check_pidof() {
+    [[ ! $(pidof qshell) ]] && echo "$bname: qshell isn't running" && exit 1
+}
+
+case "$fn" in
+    activateLauncherMenu)
+        check_pidof
+        qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.activateLauncherMenu
+        exit $?
+        ;;
+    reload)
+        check_pidof
+        qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.reloadAll "$2"
+        exit $?
+        ;;
+    *)
+        echo "Usage:"
+        echo " $bname fn [arg]"
+        echo
+        echo "Controls a currently running instance of Q::Shell."
+        echo
+        echo "Available commands:"
+        echo " activateLauncherMenu: activates dash menu"
+        echo " reload [file]: reloads with configuration from [file]"
+        echo "                ~/.config/qshellrc will be used if [file] isn't specified"
+        exit 0
+        ;;
+esac

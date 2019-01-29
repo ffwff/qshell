@@ -12,7 +12,6 @@
 #include <QCommandLineParser>
 
 #include <KF5/KConfigCore/KConfigGroup>
-#include <KF5/KConfigCore/KSharedConfig>
 #include <KF5/KWindowSystem/KWindowSystem>
 
 #include <signal.h>
@@ -65,6 +64,7 @@ Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint )
     myOneSecond = new QTimer(this);
     myOneSecond->setInterval(1000);
 
+    sharedConfig = KSharedConfig::openConfig("qshellrc");
     loadAll();
 
     connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(calculateStruts()) );
@@ -72,8 +72,6 @@ Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint )
 
 // Configurations
 void Q::Shell::saveAll() {
-    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
-
     // models
     foreach (Model *m, myModels) {
         KConfigGroup grp = sharedConfig->group(m->name());
@@ -105,7 +103,7 @@ void Q::Shell::loadAll(const QString &file) {
         QFile::copy("/usr/share/qshell/qshellrc", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshellrc");
         QFile::copy("/usr/share/qshell/qshell.css", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshell.css");
     }
-    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig(file);
+    sharedConfig = KSharedConfig::openConfig(file);
     sharedConfig->reparseConfiguration();
 
     KConfigGroup grp;
@@ -165,7 +163,6 @@ void Q::Shell::reloadAll(const QString &file) {
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }
 
 Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
-    KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     if(myModels.contains(name))
         return myModels.value(name);
     else if(sharedConfig->hasGroup(name)) {

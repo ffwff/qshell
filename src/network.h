@@ -2,7 +2,7 @@
 #define NETWORK_H
 
 #include <QPushButton>
-#include <QNetworkAccessManager>
+#include <QDBusInterface>
 
 #include <KF5/KConfigCore/KConfigGroup>
 
@@ -19,8 +19,10 @@ class Network : public QPushButton, public Model
 public:
     Network(const QString &name, Shell *shell);
     void load(KConfigGroup *grp) override;
+public slots:
+    void update();
 private:
-    QNetworkAccessManager *manager;
+    QDBusInterface *interface;
 };
 
 };

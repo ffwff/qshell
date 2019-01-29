@@ -110,8 +110,7 @@ void Q::MediaPlayerDialog::update() {
         }
     } else {
         QDBusMessage reply = myPropertyInterface->call("Get", "org.mpris.MediaPlayer2.Player", "Metadata");
-        QVariant v = reply.arguments().first();
-        QDBusVariant dbusVariant = qvariant_cast<QDBusVariant>(v);
+        QDBusVariant dbusVariant = qvariant_cast<QDBusVariant>(reply.arguments().first());
         QVariantMap elems = qdbus_cast<QVariantMap>(dbusVariant.variant().value<QDBusArgument>() );
         if(!elems.isEmpty()) {
             QString _t = elems["xesam:title"].toString();

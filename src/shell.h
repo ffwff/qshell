@@ -7,6 +7,8 @@
 #include <QProcess>
 #include <QTimer>
 
+#include <KF5/KConfigCore/KSharedConfig>
+
 #include "panel.h"
 
 namespace Q {
@@ -42,6 +44,7 @@ private slots:
     void calculateStruts();
 private:
     // Configurations
+    KSharedConfig::Ptr sharedConfig;
     void saveAll();
     QMap<QString,Model *> myModels;
     // Items
