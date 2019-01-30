@@ -331,7 +331,7 @@ Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
 void Q::WindowPreview::updatePixmap() {
     if(!isVisible()) return;
     QPixmap pixmap = grabWindow();
-    window->setPixmap(pixmap.scaledToWidth(220));
+    window->setPixmap(pixmap);
 }
 
 // events
@@ -404,7 +404,7 @@ QPixmap Q::WindowPreview::grabWindow() {
         image.setColor(1, QColor(Qt::black).rgb());
     }
 
-    QPixmap pixmap = QPixmap::fromImage(image).copy();
+    QPixmap pixmap = QPixmap::fromImage(image).scaledToWidth(220, Qt::SmoothTransformation);
     XDestroyImage(ximage);
     return pixmap;
 
