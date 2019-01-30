@@ -61,7 +61,7 @@ void Q::DesktopIcon::load(KConfigGroup *grp) {
 
 // Events
 
-void Q::DesktopIcon::mousePressEvent(QMouseEvent *event) {
+void Q::DesktopIcon::mousePressEvent(QMouseEvent *) {
 
 };
 

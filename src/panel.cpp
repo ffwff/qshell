@@ -130,7 +130,7 @@ void Q::Panel::addWidget(QWidget *widget) {
 void Q::Panel::addStretch(int stretch) {
     QWidget *w = new QWidget(container);
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    static_cast<QBoxLayout*>(container->layout())->addWidget(w);
+    static_cast<QBoxLayout*>(container->layout())->addWidget(w, stretch);
 };
 
 // Rendering

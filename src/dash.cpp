@@ -32,13 +32,13 @@
 
 Q::DashLabelContainer::DashLabelContainer(QWidget *parent) : QWidget(parent) {
     setLayout(new QHBoxLayout(this));
-};
+}
 
 // ----------
 Q::DashAppsContainer::DashAppsContainer(QWidget *parent) : QWidget(parent) {
     auto layout = new QVBoxLayout(this);
     setLayout(layout);
-};
+}
 
 // ----------
 
@@ -140,7 +140,7 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent) {
 
     connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged,
             this, &Q::Dash::activeWindowChanged);
-};
+}
 
 // Misc
 static QString &normalize(QString cmd) {
@@ -151,7 +151,7 @@ static QString &normalize(QString cmd) {
         .replace("%n", "", Qt::CaseInsensitive)
         .replace("%k", "")
         .replace("%v", "");
-};
+}
 
 // Events
 void Q::Dash::activeWindowChanged(WId id) {
@@ -193,7 +193,7 @@ void Q::Dash::showEvent(QShowEvent *) {
              reinterpret_cast<unsigned char *>(data.data()), data.size());
 
     mySearchBar->setFocus();
-};
+}
 
 // Configurations
 void Q::Dash::load( KConfigGroup *grp ) {
@@ -217,10 +217,10 @@ void Q::Dash::load( KConfigGroup *grp ) {
     connect ( KSycoca::self(), SIGNAL(databaseChanged(const QStringList&)), this, SLOT(slotRepopulate()));
 
     slotRepopulate();
-};
+}
 
-void Q::Dash::save( KConfigGroup *grp ) {
-};
+void Q::Dash::save(KConfigGroup *) {
+}
 
 // Populate apps
 void Q::Dash::slotRepopulate() {
@@ -236,7 +236,7 @@ void Q::Dash::slotRepopulate() {
     else
         repopulate(KServiceGroup::root(), 0, search);
     static_cast<QBoxLayout*>(appsLayout())->addStretch(1);
-};
+}
 
 bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QString &filter ) {
     if (!group || !group->isValid())
@@ -309,20 +309,20 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
             qDebug() << "Dunno" << p->entryPath();
     }
     return ret;
-};
+}
 
 // Search
 void Q::Dash::setSearch(const QString &s) {
     search = s;
     slotRepopulate();
-};
+}
 
 // ----------
 
 Q::DashButton::DashButton(const QString &name, Shell *parent)
     : QPushButton(static_cast<QWidget *>(parent)),
       Q::Model(name, parent) {
-};
+}
 
 void Q::DashButton::load(KConfigGroup *grp) {
     const QString &icon = grp->readEntry("Icon", "kde");
@@ -337,8 +337,8 @@ void Q::DashButton::load(KConfigGroup *grp) {
         setIconSize(size);
         setMinimumSize(size);
     }
-};
+}
 
-void Q::DashButton::mouseReleaseEvent(QMouseEvent *mouseEvent) {
+void Q::DashButton::mouseReleaseEvent(QMouseEvent *) {
     shell()->dash()->setVisible(!shell()->dash()->isVisible());
-};
+}

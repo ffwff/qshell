@@ -50,7 +50,7 @@ Q::Systray::~Systray() {
     stalonetray.close();
 }
 
-void Q::Systray::load(KConfigGroup *grp) {
+void Q::Systray::load(KConfigGroup *) {
     //const QString args = grp->readEntry("StalonetrayArguments", "-t -p --window-layer top --dockapp-mode simple");
     //stalonetray.start("stalonetray " + args);
 }
@@ -76,7 +76,7 @@ void Q::Systray::systrayResized(const QRect &rect) {
     setMinimumSize(rect.width(), rect.height());
 }
 
-void Q::Systray::windowRemoved(WId wid) {
+void Q::Systray::windowRemoved(WId) {
     /*if(myWid == myWidget->winId()) {
         myWid = 0;
         myWidget = nullptr;
