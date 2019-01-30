@@ -1,5 +1,4 @@
-#ifndef LOGOUT_H
-#define LOGOUT_H
+#pragma once
 
 #include <QPushButton>
 #include <QBoxLayout>
@@ -28,5 +27,3 @@ private:
 };
 
 };
-
-#endif

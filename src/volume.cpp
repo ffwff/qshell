@@ -19,8 +19,8 @@
 #include "panel.h"
 #include "frame.h"
 
-Q::Volume::Volume(const QString &name, Q::Shell *shell) :
-    QPushButton(), Model(name, shell),
+Q::Volume::Volume(const QString &name, Q::Shell *shell)
+    : QPushButton(), Model(name, shell),
     myPulse(Pulseaudio("qshell")),
     myDevice(myPulse.get_default_sink()),
     dialog(new Q::VolumeDialog(this)) {

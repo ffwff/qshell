@@ -1,5 +1,4 @@
-#ifndef DESKTOP_H
-#define DESKTOP_H
+#pragma once
 
 #include <QLabel>
 #include <QWidget>
@@ -19,8 +18,8 @@ class DesktopIcon : public QPushButton, public Model {
     Q_OBJECT
 public:
     DesktopIcon(const QString& name, Shell *shell);
-    inline const int left() const { return myLeft; };
-    inline const int top() const { return myTop; };
+    inline int left() const { return myLeft; };
+    inline int top() const { return myTop; };
     void save(KConfigGroup *grp);
     void load(KConfigGroup *grp);
     void runCommand();
@@ -64,7 +63,7 @@ public:
     bool setBackground(const QString &fileName);
     inline const QString& fileName() const { return myFileName; };
     inline const QImage& image() const { return myImage; };
-    inline const int iconSize() const {  return myIconSize; };
+    inline int iconSize() const {  return myIconSize; };
     void load(KConfigGroup *group) override;
     void save(KConfigGroup *group) override;
 protected:
@@ -88,5 +87,3 @@ private:
 };
 
 };
-
-#endif

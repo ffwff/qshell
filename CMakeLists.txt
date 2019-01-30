@@ -1,5 +1,6 @@
 PROJECT( qshell )
 
+set(CMAKE_CXX_FLAGS "-Wno-reorder")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 

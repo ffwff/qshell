@@ -1,5 +1,4 @@
-#ifndef BATTERY_H
-#define BATTERY_H
+#pragma once
 
 #include <QMap>
 #include <QPushButton>
@@ -24,7 +23,5 @@ private:
     int countCharge();
     bool isCharging();
 };
-    
-};
 
-#endif
+};

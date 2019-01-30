@@ -1,5 +1,4 @@
-#ifndef FRAME_H
-#define FRAME_H
+#pragma once
 
 namespace Q
 {
@@ -14,5 +13,3 @@ private:
 };
 
 };
-
-#endif

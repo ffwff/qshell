@@ -1,5 +1,4 @@
-#ifndef TRASH_H
-#define TRASH_H
+#pragma once
 
 #include <QLabel>
 #include <QMenu>
@@ -30,5 +29,3 @@ private:
 };
 
 };
-
-#endif

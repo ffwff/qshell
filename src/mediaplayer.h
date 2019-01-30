@@ -1,5 +1,4 @@
-#ifndef MEDIAPLAYER_H
-#define MEDIAPLAYER_H
+#pragma once
 
 #include <QPushButton>
 #include <QBoxLayout>
@@ -48,5 +47,3 @@ private:
 };
 
 };
-
-#endif

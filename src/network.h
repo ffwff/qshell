@@ -1,5 +1,4 @@
-#ifndef NETWORK_H
-#define NETWORK_H
+#pragma once
 
 #include <QPushButton>
 #include <QDBusInterface>
@@ -9,12 +8,10 @@
 #include "model.h"
 #include "panel.h"
 
-namespace Q
-{
+namespace Q {
 
 class Shell;
-class Network : public QPushButton, public Model
-{
+class Network : public QPushButton, public Model {
     Q_OBJECT
 public:
     Network(const QString &name, Shell *shell);
@@ -26,5 +23,3 @@ private:
 };
 
 };
-
-#endif

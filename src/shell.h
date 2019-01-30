@@ -17,8 +17,7 @@ class ShellApplication;
 class Desktop;
 class Model;
 class Dash;
-class Shell : public QWidget
-{
+class Shell : public QWidget {
     Q_OBJECT
 public:
     Shell();

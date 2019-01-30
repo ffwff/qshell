@@ -1,5 +1,4 @@
-#ifndef SYSTRAY_H
-#define SYSTRAY_H
+#pragma once
 
 #include <QThread>
 #include <QProcess>
@@ -23,8 +22,7 @@ private:
     WId wid;
 };
 
-class Systray : public QWidget, public Model
-{
+class Systray : public QWidget, public Model {
     Q_OBJECT
 public:
     Systray(const QString& name, Shell *shell);
@@ -44,6 +42,4 @@ private:
     bool should_check = false;
 };
 
-};
-
-#endif
+}

@@ -1,5 +1,4 @@
-#ifndef DATE_H
-#define DATE_H
+#pragma once
 
 #include <QPushButton>
 #include <QCalendarWidget>
@@ -37,5 +36,3 @@ private:
 };
 
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef PANEL_H
-#define PANEL_H
+#pragma once
 
 #include <QWidget>
 #include <QBoxLayout>
@@ -39,9 +38,9 @@ public:
     void addStretch(int stretch = 0);
     inline PanelPosition position() const { return myPosition; };
     inline const QPoint& point() const { return myPoint; };
-    inline const bool struts() const { return setStruts; };
+    inline bool struts() const { return setStruts; };
     inline const QString& name() const { return myName; };
-    inline const bool displaysShadow() const { return displayShadow; };
+    inline bool displaysShadow() const { return displayShadow; };
     inline int iconSize() { return myIconSize; };
     void load(KConfigGroup *grp) override;
 protected:
@@ -65,5 +64,3 @@ private:
 };
 
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef TASKS_H
-#define TASKS_H
+#pragma once
 
 #include <QWidget>
 #include <QList>
@@ -32,22 +31,22 @@ public:
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
     // Command
-    inline const QString& command() const {return myCommand; };
+    inline const QString &command() const {return myCommand; };
     void setCommand(QString command);
-    inline const QString& classClass() const {return myClassClass; };
+    inline const QString &classClass() const {return myClassClass; };
     // windows
     void addWindow(WId wid);
     void removeWindow(WId wid);
     void removeAllWindows();
     // size
-    inline const QSize& size() const { return mySize; };
+    inline const QSize &size() const { return mySize; };
     // pinned
     inline bool isPinned() const { return pinned; };
     inline void setPinned(bool in) { pinned = in; };
     // Ctx menu
     void populateContextMenu();
     // previews
-    inline TaskPreview *taskPreview() { return myTaskPreview; };
+    inline TaskPreview *taskPreview() const { return myTaskPreview; };
     QPoint getContextMenuPos(QWidget *widget);
 public slots:
     void runCommand();
@@ -92,7 +91,7 @@ class WindowPreview : public QWidget {
     Q_OBJECT
 public:
     WindowPreview(WId id);
-    inline const WId wid() const { return myWid; };
+    inline WId wid() const { return myWid; };
     void grabWindow();
 signals:
     void pixmapChanged(QPixmap);
@@ -112,7 +111,7 @@ private:
 class Tasks : public QWidget, public Model {
     Q_OBJECT
 public:
-    Tasks(const QString& name, Shell *parent);
+    Tasks(const QString &name, Shell *parent);
     inline QBoxLayout *boxLayout() const { return static_cast<QBoxLayout*>(layout()); };
     void addTask(Task *t);
     void removeTask(Task *t);
@@ -140,5 +139,3 @@ private:
 };
 
 }
-
-#endif

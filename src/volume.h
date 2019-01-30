@@ -1,5 +1,4 @@
-#ifndef VOLUME_H
-#define VOLUME_H
+#pragma once
 
 #include <QPushButton>
 #include <QBoxLayout>
@@ -66,6 +65,4 @@ private:
     VolumeDialog *dialog;
 };
 
-};
-
-#endif
+}

@@ -1,5 +1,4 @@
-#ifndef WINCTRL_H
-#define WINCTRL_H
+#pragma once
 
 #include <QWidget>
 #include <QBoxLayout>
@@ -11,11 +10,9 @@
 
 #include "model.h"
 
-namespace Q
-{
+namespace Q {
 
-class WinTitle : public QLabel
-{
+class WinTitle : public QLabel {
     Q_OBJECT
 public:
     WinTitle(QWidget *parent = 0);
@@ -33,8 +30,7 @@ private:
 };
 
 class Shell;
-class WinCtrl : public QWidget, public Model
-{
+class WinCtrl : public QWidget, public Model {
     Q_OBJECT
 public:
     WinCtrl(const QString& name, Shell* shell);
@@ -47,6 +43,4 @@ private:
     QLabel *label;
 };
 
-};
-
-#endif
+}

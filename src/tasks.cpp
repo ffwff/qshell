@@ -50,7 +50,7 @@ struct ScopedPointerXcbImageDeleter
 };
 }
 
-static const bool isKWinAvailable() {
+static bool isKWinAvailable() {
     if (QDBusConnection::sessionBus().interface()->isServiceRegistered(QStringLiteral("org.kde.KWin"))) {
         QDBusInterface interface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Effects"), QStringLiteral("org.kde.kwin.Effects"));
         QDBusReply<bool> reply = interface.call(QStringLiteral("isEffectLoaded"), "screenshot");
@@ -145,7 +145,7 @@ void Q::Task::closeAllWindows() {
 };
 
 // Mouse
-void Q::Task::mousePressEvent(QMouseEvent *event) {
+void Q::Task::mousePressEvent(QMouseEvent *) {
 
 };
 
@@ -348,7 +348,6 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid) {
     effect->setOffset(0, 0);
     title->setGraphicsEffect(effect);
 
-    QScreen *screen = QGuiApplication::primaryScreen();
     window = new QLabel();
     window->setStyleSheet("margin: 0 10px; margin-bottom: 10px;");
     //window->resize(250,250);
@@ -380,7 +379,7 @@ void Q::WindowPreview::showEvent(QShowEvent*) {
     grabWindow();
 };
 
-void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *event) {
+void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *) {
     KWindowSystem::forceActiveWindow(myWid);
 };
 

@@ -1,5 +1,4 @@
-#ifndef NOTIFICATIONS_DIALOG_H
-#define NOTIFICATIONS_DIALOG_H
+#pragma once
 
 #include <QWidget>
 #include <QPushButton>
@@ -18,7 +17,6 @@ public:
 public slots:
     void toggle();
     void hideFrame(WId wid);
-//     void hideFrame();
 protected:
     Frame *frame;
     virtual void showEvent(QShowEvent *) { updateDialog(); };
@@ -26,6 +24,4 @@ private:
     QPushButton *myButton;
 };
 
-};
-
-#endif
+}

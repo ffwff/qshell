@@ -1,5 +1,4 @@
-#ifndef DASH_H
-#define DASH_H
+#pragma once
 
 #include <QLineEdit>
 #include <QWidget>
@@ -97,5 +96,3 @@ private:
 };
 
 }
-
-#endif

@@ -1,5 +1,5 @@
-#ifndef BUTTON_H
-#define BUTTON_H
+#pragma once
+
 #include <QPushButton>
 #include <QProcess>
 
@@ -7,12 +7,10 @@
 
 #include "model.h"
 
-namespace Q
-{
+namespace Q {
 
 class Shell;
-class Button : public QPushButton, public Model
-{
+class Button : public QPushButton, public Model {
 public:
     Button(const QString &name, Shell *shell);
     void load(KConfigGroup *grp);
@@ -25,5 +23,3 @@ private:
 };
 
 };
-
-#endif
