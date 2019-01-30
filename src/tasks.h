@@ -76,6 +76,7 @@ class TaskPreview : public Frame {
     Q_OBJECT
 public:
     TaskPreview(Task *task);
+    inline Task *task() const { return myTask; }
     void addWindow(WId wid);
     void removeWindow(WId wid);
 protected:
@@ -90,17 +91,16 @@ private:
 class WindowPreview : public QWidget {
     Q_OBJECT
 public:
-    WindowPreview(WId id);
+    WindowPreview(WId id, TaskPreview *);
     inline WId wid() const { return myWid; };
-    void grabWindow();
-signals:
-    void pixmapChanged(QPixmap);
+    QPixmap grabWindow();
+public slots:
+    void updatePixmap();
 protected:
     void showEvent(QShowEvent*);
     void mouseReleaseEvent(QMouseEvent *event);
-private slots:
-    void KWinDBusScreenshotHelper(quint64 pixmapId);
 private:
+    TaskPreview *myTaskPreview;
     WId myWid;
     QLabel *title;
     QLabel *window;

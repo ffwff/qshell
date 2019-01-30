@@ -22,11 +22,7 @@
 #include <QDBusReply>
 #include <QPainter>
 
-#include <xcb/xproto.h>
-#include <xcb/xcb.h>
-#include <xcb/xcb_image.h>
-#include <xcb/xcb_util.h>
-#include <xcb/xfixes.h>
+#include <X11/Xutil.h>
 
 #include <algorithm>
 
@@ -37,29 +33,6 @@
 #include "shell.h"
 #include "tasks.h"
 #include "frame.h"
-
-namespace {
-template <typename T> using CScopedPointer = QScopedPointer<T, QScopedPointerPodDeleter>;
-struct ScopedPointerXcbImageDeleter
-{
-    static inline void cleanup(xcb_image_t *xcbImage) {
-        if (xcbImage) {
-            xcb_image_destroy(xcbImage);
-        }
-    }
-};
-}
-
-static bool isKWinAvailable() {
-    if (QDBusConnection::sessionBus().interface()->isServiceRegistered(QStringLiteral("org.kde.KWin"))) {
-        QDBusInterface interface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Effects"), QStringLiteral("org.kde.kwin.Effects"));
-        QDBusReply<bool> reply = interface.call(QStringLiteral("isEffectLoaded"), "screenshot");
-
-        return reply.value();
-    }
-
-    return false;
-};
 
 // ----------
 
@@ -76,11 +49,10 @@ Q::Task::Task(Q::Tasks *tasks, const QString &name, const QString &classClass)
 
     if(myParent->previewTasks())
         myTaskPreview = new TaskPreview(this);
-};
+}
 
 // Configurations
-void Q::Task::save(KConfigGroup *grp)
-{
+void Q::Task::save(KConfigGroup *grp) {
     if(!pinned)
         grp->deleteGroup();
     else if(!grp->exists())
@@ -90,10 +62,9 @@ void Q::Task::save(KConfigGroup *grp)
         grp->writeEntry("Class", myClassClass);
         grp->writeEntry("Icon", myName);
     }
-};
+}
 
-void Q::Task::load(KConfigGroup *grp)
-{
+void Q::Task::load(KConfigGroup *grp) {
     myCommand = grp->readEntry("Command", "");
     myClassClass = grp->readEntry("Class", "");
 
@@ -104,12 +75,12 @@ void Q::Task::load(KConfigGroup *grp)
     mySize = QSize(size, size);
     setIconSize(mySize);
     setMinimumSize(mySize);
-};
+}
 
 // Commands
 void Q::Task::runCommand() {
     myProcess.startDetached(myCommand, myArguments);
-};
+}
 
 void Q::Task::setCommand(QString command) {
     QStringList args = command.split(" ");
@@ -117,7 +88,7 @@ void Q::Task::setCommand(QString command) {
     QStringList arguments(args);
     arguments.removeFirst();
     myArguments = arguments;
-};
+}
 
 // Windows
 void Q::Task::addWindow(WId wid) {
@@ -125,7 +96,7 @@ void Q::Task::addWindow(WId wid) {
         myWindows.append(wid);
     if(myParent->previewTasks())
         myTaskPreview->addWindow(wid);
-};
+}
 
 void Q::Task::removeWindow(WId wid) {
     myWindows.removeAll(wid);
@@ -133,21 +104,21 @@ void Q::Task::removeWindow(WId wid) {
         myParent->removeTask(this);
     if(myParent->previewTasks())
         myTaskPreview->removeWindow(wid);
-};
+}
 
 void Q::Task::removeAllWindows() {
     myWindows.clear();
-};
+}
 
 void Q::Task::closeAllWindows() {
     foreach(WId wid, myWindows)
         NETRootInfo(QX11Info::connection(), NET::CloseWindow).closeWindowRequest(wid);
-};
+}
 
 // Mouse
 void Q::Task::mousePressEvent(QMouseEvent *) {
 
-};
+}
 
 void Q::Task::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) {
@@ -164,7 +135,7 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event) {
         populateContextMenu();
         myContextMenu.popup(getContextMenuPos(&myContextMenu));
     }
-};
+}
 
 void Q::Task::enterEvent(QEvent *) {
     if(myParent->previewTasks())
@@ -183,11 +154,11 @@ void Q::Task::enterEvent(QEvent *) {
             myWindowsContextMenu.popup(getContextMenuPos(&myWindowsContextMenu));
         }
     }
-};
+}
 
 void Q::Task::leaveEvent(QEvent *) {
     myWindowsContextMenu.hide();
-};
+}
 
 QPoint Q::Task::getContextMenuPos(QWidget *widget) {
     widget->setAttribute(Qt::WA_DontShowOnScreen, true);
@@ -208,7 +179,7 @@ QPoint Q::Task::getContextMenuPos(QWidget *widget) {
         p.setY(p.y());
     }
     return p;
-};
+}
 
 // Context Menu
 void Q::Task::populateContextMenu() {
@@ -234,7 +205,7 @@ void Q::Task::populateContextMenu() {
         connect(act, SIGNAL(triggered()), this, SLOT(closeAllWindows()));
         myContextMenu.addAction(act);
     }
-};
+}
 
 void Q::Task::populateWindowsContextMenu() {
     myWindowsContextMenu.clear();
@@ -252,21 +223,21 @@ void Q::Task::populateWindowsContextMenu() {
         });
         myWindowsContextMenu.addAction(act);
     }
-};
+}
 
 // pinned
 void Q::Task::pin() {
     pinned = true;
     myParent->shell()->save(this);
     myParent->shell()->save(myParent);
-};
+}
 
 void Q::Task::unpin() {
     if(myWindows.isEmpty()) myParent->removeTask(this);
     else pinned = false;
     myParent->shell()->save(this);
     myParent->shell()->save(myParent);
-};
+}
 
 // ----------
 
@@ -275,7 +246,7 @@ Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task) {
     setLayout(new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction()));
     layout()->setSizeConstraint(QLayout::SetFixedSize);
     resize(0, 0);
-};
+}
 
 // events
 void Q::TaskPreview::showEvent(QShowEvent*) {
@@ -303,11 +274,11 @@ void Q::TaskPreview::showEvent(QShowEvent*) {
             reinterpret_cast<unsigned char *>(data.data()), data.size());
 
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
-};
+}
 
 void Q::TaskPreview::leaveEvent(QEvent *) {
     hide();
-};
+}
 
 // slots
 void Q::TaskPreview::addWindow(WId wid) {
@@ -315,10 +286,10 @@ void Q::TaskPreview::addWindow(WId wid) {
         return;
 
     wids.append(wid);
-    WindowPreview *preview = new WindowPreview(wid);
+    WindowPreview *preview = new WindowPreview(wid, this);
     myPreviews.append(preview);
     layout()->addWidget(preview);
-};
+}
 
 void Q::TaskPreview::removeWindow(WId wid) {
     foreach(WindowPreview *preview, myPreviews) {
@@ -330,10 +301,11 @@ void Q::TaskPreview::removeWindow(WId wid) {
             return;
         }
     }
-};
+}
 
 // ----------
-Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid) {
+Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
+    : QWidget(taskPreview), myWid(wid), myTaskPreview(taskPreview) {
     layout = new QVBoxLayout(this);
     setLayout(layout);
 
@@ -354,13 +326,13 @@ Q::WindowPreview::WindowPreview(WId wid) : QWidget(), myWid(wid) {
     layout->addWidget(window);
 
     layout->addStretch();
-
-    grabWindow();
-
-    connect(this, &Q::WindowPreview::pixmapChanged, [this](QPixmap pixmap){
-        window->setPixmap(pixmap.scaledToWidth(220));
-    });
 };
+
+void Q::WindowPreview::updatePixmap() {
+    if(!isVisible()) return;
+    QPixmap pixmap = grabWindow();
+    window->setPixmap(pixmap.scaledToWidth(220));
+}
 
 // events
 void Q::WindowPreview::showEvent(QShowEvent*) {
@@ -376,19 +348,24 @@ void Q::WindowPreview::showEvent(QShowEvent*) {
         title->show();
         title->setText(name);
     }
-    grabWindow();
-};
+    updatePixmap();
+    connect(myTaskPreview->task()->shell()->oneSecond(),
+            SIGNAL(timeout()), this, SLOT(updatePixmap()));
+}
 
 void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *) {
     KWindowSystem::forceActiveWindow(myWid);
-};
+}
 
-// Code from KDE's spectacle
-// TODO might need to move this to another file
-static QPixmap convertFromNative(xcb_image_t *xcbImage) {
+QPixmap Q::WindowPreview::grabWindow() {
+    XWindowAttributes wa;
+    XGetWindowAttributes(QX11Info::display(), myWid, &wa);
+    XImage *ximage = XGetImage(QX11Info::display(), myWid, 0, 0,
+                              wa.width, wa.height, AllPlanes, ZPixmap);
+
+    // get format
     QImage::Format format = QImage::Format_Invalid;
-
-    switch (xcbImage->depth) {
+    switch (ximage->depth) {
     case 1:
         format = QImage::Format_MonoLSB;
         break;
@@ -405,95 +382,33 @@ static QPixmap convertFromNative(xcb_image_t *xcbImage) {
         format = QImage::Format_ARGB32_Premultiplied;
         break;
     default:
+        XDestroyImage(ximage);
         return QPixmap(); // we don't know
     }
 
     // The RGB32 format requires data format 0xffRRGGBB, ensure that this fourth byte really is 0xff
     if (format == QImage::Format_RGB32) {
-        quint32 *data = reinterpret_cast<quint32 *>(xcbImage->data);
-        for (int i = 0; i < xcbImage->width * xcbImage->height; i++) {
+        quint32 *data = reinterpret_cast<quint32 *>(ximage->data);
+        for (int i = 0; i < ximage->width * ximage->height; i++) {
             data[i] |= 0xff000000;
         }
     }
 
-    QImage image(xcbImage->data, xcbImage->width, xcbImage->height, format);
-
-    if (image.isNull()) {
-        return QPixmap();
-    }
+    QImage image(reinterpret_cast<uchar*>(ximage->data),
+                 ximage->width, ximage->height, format);
 
     // work around an abort in QImage::color
-
     if (image.format() == QImage::Format_MonoLSB) {
         image.setColorCount(2);
         image.setColor(0, QColor(Qt::white).rgb());
         image.setColor(1, QColor(Qt::black).rgb());
     }
 
-    // Image is ready. Since the backing data from xcbImage could be freed
-    // before the QPixmap goes away, a deep copy is necessary.
-    return QPixmap::fromImage(image).copy();
-};
+    QPixmap pixmap = QPixmap::fromImage(image).copy();
+    XDestroyImage(ximage);
+    return pixmap;
 
-static QPixmap getPixmapFromDrawable(xcb_drawable_t drawableId, const QRect &rect) {
-    xcb_connection_t *xcbConn = QX11Info::connection();
-
-    // proceed to get an image based on the geometry (in device pixels)
-
-    QScopedPointer<xcb_image_t, ScopedPointerXcbImageDeleter> xcbImage(
-        xcb_image_get(
-            xcbConn,
-            drawableId,
-            rect.x(),
-            rect.y(),
-            rect.width(),
-            rect.height(),
-            ~0,
-            XCB_IMAGE_FORMAT_Z_PIXMAP
-        )
-    );
-
-    // too bad, the capture failed.
-    if (xcbImage.isNull()) {
-        return QPixmap();
-    }
-
-    // now process the image
-
-    QPixmap nativePixmap = convertFromNative(xcbImage.data());
-    return nativePixmap;
-};
-
-static QRect getDrawableGeometry(xcb_drawable_t drawable) {
-    xcb_connection_t *xcbConn = QX11Info::connection();
-
-    xcb_get_geometry_cookie_t geomCookie = xcb_get_geometry_unchecked(xcbConn, drawable);
-    CScopedPointer<xcb_get_geometry_reply_t> geomReply(xcb_get_geometry_reply(xcbConn, geomCookie, NULL));
-
-    return QRect(geomReply->x, geomReply->y, geomReply->width, geomReply->height);
-};
-
-void Q::WindowPreview::grabWindow() {
-    if(isKWinAvailable()) {
-        QDBusConnection bus = QDBusConnection::sessionBus();
-        bus.connect(QStringLiteral("org.kde.KWin"),
-                    QStringLiteral("/Screenshot"),
-                    QStringLiteral("org.kde.kwin.Screenshot"),
-                    QStringLiteral("screenshotCreated"),
-                    this, SLOT(KWinDBusScreenshotHelper(quint64)));
-        QDBusInterface interface(QStringLiteral("org.kde.KWin"), QStringLiteral("/Screenshot"), QStringLiteral("org.kde.kwin.Screenshot"));
-
-        interface.call(QStringLiteral("screenshotForWindow"), (quint64)myWid, 0);
-    }
-};
-
-void Q::WindowPreview::KWinDBusScreenshotHelper(quint64 pixmapId) {
-    QRect rect = getDrawableGeometry((xcb_drawable_t)pixmapId);
-    mPixmap = getPixmapFromDrawable((xcb_drawable_t)pixmapId, rect);
-    if (!mPixmap.isNull()) {
-        emit pixmapChanged(mPixmap);
-    }
-};
+}
 
 // ----------
 
@@ -506,7 +421,7 @@ Q::Tasks::Tasks(const QString& name, Q::Shell *parent) : QWidget(), Q::Model(nam
 
     myTimer = new QTimer(this);
     myTimer->setInterval(300);
-};
+}
 
 // configurations
 void Q::Tasks::save(KConfigGroup *grp) {
@@ -515,7 +430,7 @@ void Q::Tasks::save(KConfigGroup *grp) {
         if(t->isPinned())
             pinned.append(t->name());
     grp->writeEntry("Pinned", pinned);
-};
+}
 
 void Q::Tasks::load(KConfigGroup *grp) {
     myPreviewTasks = grp->readEntry("PreviewTasks", true);
@@ -539,7 +454,7 @@ void Q::Tasks::load(KConfigGroup *grp) {
 
     connect(KWindowSystem::self(), SIGNAL(windowAdded(WId)), this, SLOT(windowAdded(WId)));
     connect(KWindowSystem::self(), SIGNAL(windowRemoved(WId)), this, SLOT(windowRemoved(WId)));
-};
+}
 
 // slots
 void Q::Tasks::windowAdded(WId wid) {
@@ -566,28 +481,28 @@ void Q::Tasks::windowAdded(WId wid) {
         task->addWindow(wid);
         addTask(task);
     }
-};
+}
 
 void Q::Tasks::windowRemoved(WId wid) {
     foreach (Task *task, myTasks)
         task->removeWindow(wid);
     myWindows.removeAll(wid);
-};
+}
 
 void Q::Tasks::populateWindows() {
     myWindows = QList<WId>(KWindowSystem::windows());
     foreach (WId wid, myWindows)
         windowAdded(wid);
-};
+}
 
 void Q::Tasks::enterEvent(QEvent *) {
     myTimer->start();
-};
+}
 
 void Q::Tasks::leaveEvent(QEvent *) {
     myTimer->disconnect();
     myTimer->stop();
-};
+}
 
 // tasks
 Q::Task *Q::Tasks::getTask(const QString &classClass) const {
@@ -595,14 +510,14 @@ Q::Task *Q::Tasks::getTask(const QString &classClass) const {
         if(task->classClass() == classClass)
             return task;
     return 0;
-};
+}
 
 void Q::Tasks::addTask(Task *t) {
     t->setIconSize(QSize(mySize,mySize));
     t->setMinimumSize(QSize(mySize,mySize));
     boxLayout()->addWidget(t);
     myTasks << t;
-};
+}
 
 void Q::Tasks::removeTask(Task *t) {
     if(myTasks.contains(t)) {
@@ -610,7 +525,7 @@ void Q::Tasks::removeTask(Task *t) {
         myTasks.removeAll(t);
         t->deleteLater();
     }
-};
+}
 
 // utilities
 static QString whichCmd(const QString &cmd) { // emulated the which command for programs started in cmd
@@ -634,7 +549,7 @@ static QString whichCmd(const QString &cmd) { // emulated the which command for 
         }
     }
     return bin;
-};
+}
 
 QString Q::Tasks::getCmdline(WId wid) {
     NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMPid, 0);
@@ -642,7 +557,7 @@ QString Q::Tasks::getCmdline(WId wid) {
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return QString();
     return whichCmd(QString::fromUtf8(file.readAll()));
-};
+}
 
 void Q::Tasks::hideAllPreviews() {
     foreach(Task *task, myTasks) {
@@ -651,4 +566,4 @@ void Q::Tasks::hideAllPreviews() {
             preview->hide();
         }
     }
-};
+}

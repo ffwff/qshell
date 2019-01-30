@@ -2,7 +2,7 @@ PROJECT( qshell )
 
 set(CMAKE_CXX_FLAGS "-Wno-reorder")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 set(QT_MIN_VERSION "5.3.0")
@@ -49,8 +49,6 @@ set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
                         TYPE REQUIRED
                     )
 
-find_package(XCB COMPONENTS)
-
 add_definitions("-fexceptions")
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -89,7 +87,6 @@ target_link_libraries(qshell
 #     KF5::kcmutils
     KF5::WindowSystem
     ${X11_X11_LIB}
-    ${XCB_LIBRARIES}
     pulse
     )
 

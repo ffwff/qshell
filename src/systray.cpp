@@ -6,7 +6,6 @@
 
 #include <QX11Info>
 #include <X11/Xlib.h>
-#include <xcb/xcb.h>
 #include <fixx11h.h>
 
 #include <KF5/KWindowSystem/KWindowSystem>
