@@ -111,7 +111,7 @@ void Q::DesktopShadow::paintEvent(QPaintEvent *) {
                 QLinearGradient gradient(0, p->y(), 0, p->y() + p->height() + 20);
                 gradient.setColorAt(0, QColor(0,0,0,64));
                 gradient.setColorAt(1, Qt::transparent);
-                painter.fillRect(p->x(), p->y() + p->height(), p->width(), p->y() + p->height() + 20, gradient);
+                painter.fillRect(p->x(), p->y() + p->height(), p->width(), p->height() + 20, gradient);
             } else if(p->position() == Q::PanelPosition::Bottom) {
                 QLinearGradient gradient(0, p->y() , 0, p->y() - p->height());
                 gradient.setColorAt(0, QColor(0,0,0,64));

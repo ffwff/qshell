@@ -131,6 +131,7 @@ private slots:
 private:
     QList<Task*> myTasks;
     Task *getTask(const QString &classClass) const;
+    bool byDesktop;
     QList<WId> myWindows;
     QString getCmdline(WId wid);
     int mySize;

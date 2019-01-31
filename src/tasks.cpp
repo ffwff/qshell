@@ -15,7 +15,6 @@
 #include <QApplication>
 #include <QGraphicsDropShadowEffect>
 
-#include <QX11Info>
 #include <QDBusConnection>
 #include <QDBusInterface>
 #include <QDBusConnectionInterface>
@@ -23,12 +22,18 @@
 #include <QPainter>
 
 #include <X11/Xutil.h>
+#include <QX11Info>
+#include <fixx11h.h>
 
 #include <algorithm>
 
+#include <KF5/KConfigCore/KConfigGroup>
+#include <KF5/KConfigCore/KDesktopFile>
+#include <KF5/KService/KService>
+#include <KF5/KService/KSycoca>
+#include <KF5/KService/KSycocaEntry>
 #include <KF5/KWindowSystem/KWindowSystem>
 #include <KF5/KWindowSystem/NETWM>
-#include <KF5/KConfigCore/KConfigGroup>
 
 #include "shell.h"
 #include "tasks.h"
@@ -55,8 +60,7 @@ Q::Task::Task(Q::Tasks *tasks, const QString &name, const QString &classClass)
 void Q::Task::save(KConfigGroup *grp) {
     if(!pinned)
         grp->deleteGroup();
-    else if(!grp->exists())
-    {
+    else if(!grp->exists()) {
         grp->writeEntry("Type", "Task");
         grp->writeEntry("Command", myCommand);
         grp->writeEntry("Class", myClassClass);
@@ -133,6 +137,7 @@ void Q::Task::mouseReleaseEvent(QMouseEvent *event) {
             KWindowSystem::forceActiveWindow(myWindows.first());
     } else if(event->button() == Qt::RightButton) {
         populateContextMenu();
+        myParent->hideAllPreviews();
         myContextMenu.popup(getContextMenuPos(&myContextMenu));
     }
 }
@@ -435,6 +440,7 @@ void Q::Tasks::save(KConfigGroup *grp) {
 void Q::Tasks::load(KConfigGroup *grp) {
     myPreviewTasks = grp->readEntry("PreviewTasks", true);
     mySize = grp->readEntry("Size", 48);
+    byDesktop = grp->readEntry("ByDesktop", false);
     static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
 
     QStringList pinned = grp->readEntry("Pinned", QStringList());
@@ -454,6 +460,21 @@ void Q::Tasks::load(KConfigGroup *grp) {
 
     connect(KWindowSystem::self(), SIGNAL(windowAdded(WId)), this, SLOT(windowAdded(WId)));
     connect(KWindowSystem::self(), SIGNAL(windowRemoved(WId)), this, SLOT(windowRemoved(WId)));
+    if(byDesktop) {
+        connect(KWindowSystem::self(), &KWindowSystem::currentDesktopChanged, [this](int desktop) {
+            myWindows.clear();
+            foreach (Task *task, myTasks)
+                task->deleteLater();
+            myTasks.clear();
+            const QList<WId> windows(KWindowSystem::windows());
+            foreach(WId wid, windows) {
+                NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMDesktop, 0);
+                if(info.desktop() == desktop) {
+                    windowAdded(wid);
+                }
+            }
+        });
+    }
 }
 
 // slots
@@ -552,7 +573,14 @@ static QString whichCmd(const QString &cmd) { // emulated the which command for 
 }
 
 QString Q::Tasks::getCmdline(WId wid) {
-    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMPid, 0);
+    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMPid, NET::WM2DesktopFileName);
+    const char *desktopFile = info.desktopFileName();
+    if(desktopFile != nullptr) {
+        // some Qt applications provide _KDE_NET_WM_DESKTOP_FILE atom
+        KDesktopFile file(desktopFile);
+        KService service(&file);
+        return service.exec();
+    }
     QFile file(QString("/proc/") + QString::number(info.pid()) + QString("/cmdline"));
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return QString();

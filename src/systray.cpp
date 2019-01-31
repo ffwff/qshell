@@ -27,31 +27,34 @@ void Q::SystrayThread::run() {
     XEvent ev;
     while(true) {
         XNextEvent(d, &ev);
-        KWindowInfo info(wid, NET::WMGeometry);
-        const QRect &rect = info.geometry();
-        emit resize(rect);
+        if(ev.type == DestroyNotify) {
+            emit windowRemoved();
+            return;
+        } else {
+            KWindowInfo info(wid, NET::WMGeometry);
+            const QRect &rect = info.geometry();
+            emit resize(rect);
+        }
     }
 }
 
 // systray
 Q::Systray::Systray(const QString &name, Q::Shell *shell)
 : QWidget(), Model(name, shell) {
-    stalonetray.start("stalonetray -t -p --window-layer top --dockapp-mode simple");
     auto layout = new QHBoxLayout();
     layout->setSpacing(0);
     layout->setMargin(0);
     setLayout(layout);
-    connect(KWindowSystem::self(), SIGNAL(windowAdded(WId)), this, SLOT(windowAdded(WId)));
-    connect(KWindowSystem::self(), SIGNAL(windowRemoved(WId)), this, SLOT(windowRemoved(WId)));
 }
 
 Q::Systray::~Systray() {
-    stalonetray.close();
+    stalonetray.kill();
 }
 
-void Q::Systray::load(KConfigGroup *) {
-    //const QString args = grp->readEntry("StalonetrayArguments", "-t -p --window-layer top --dockapp-mode simple");
-    //stalonetray.start("stalonetray " + args);
+void Q::Systray::load(KConfigGroup *grp) {
+    const QString args = grp->readEntry("StalonetrayArguments", "-t --window-layer top --dockapp-mode simple");
+    stalonetray.start("stalonetray " + args);
+    connect(KWindowSystem::self(), SIGNAL(windowAdded(WId)), this, SLOT(windowAdded(WId)));
 }
 
 void Q::Systray::windowAdded(WId wid) {
@@ -67,6 +70,7 @@ void Q::Systray::windowAdded(WId wid) {
         thread = new SystrayThread(wid);
         connect(thread, &SystrayThread::finished, thread, &QObject::deleteLater);
         connect(thread, &SystrayThread::resize, this, &Q::Systray::systrayResized);
+        connect(thread, &SystrayThread::windowRemoved, this, &Q::Systray::windowRemoved);
         thread->start();
     }
 }
@@ -75,11 +79,10 @@ void Q::Systray::systrayResized(const QRect &rect) {
     setMinimumSize(rect.width(), rect.height());
 }
 
-void Q::Systray::windowRemoved(WId) {
-    /*if(myWid == myWidget->winId()) {
-        myWid = 0;
-        myWidget = nullptr;
-        thread->exit();
-        thread = nullptr;
-    }*/
+void Q::Systray::windowRemoved() {
+    myWid = 0;
+    myWidget->deleteLater();
+    myWidget = nullptr;
+    thread->deleteLater();
+    thread = nullptr;
 }

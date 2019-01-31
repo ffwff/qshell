@@ -17,6 +17,7 @@ public:
     SystrayThread(WId wid);
     void run() override;
 signals:
+    void windowRemoved();
     void resize(const QRect &rect);
 private:
     WId wid;
@@ -33,7 +34,7 @@ public:
 private slots:
     void systrayResized(const QRect &rect);
     void windowAdded(WId wid);
-    void windowRemoved(WId wid);
+    void windowRemoved();
 private:
     QProcess stalonetray;
     QWidget *myWidget;
