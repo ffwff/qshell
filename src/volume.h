@@ -63,6 +63,7 @@ private:
     Pulseaudio myPulse;
     Device myDevice;
     VolumeDialog *dialog;
+    QIcon iconMuted, iconHigh, iconMedium, iconLow;
 };
 
 }

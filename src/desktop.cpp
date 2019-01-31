@@ -27,12 +27,12 @@
 
 Q::DesktopIcon::DesktopIcon(const QString& name, Shell *shell)
     : QPushButton(), Q::Model(name, shell) {
-};
+}
 
 // Commands
 void Q::DesktopIcon::runCommand() {
     myProcess.startDetached(myCommand, myArguments);
-};
+}
 
 // Configurations
 void Q::DesktopIcon::save(KConfigGroup *grp) {
@@ -42,7 +42,7 @@ void Q::DesktopIcon::save(KConfigGroup *grp) {
         grp->writeEntry("Type", "DesktopIcon");
         grp->writeEntry("Command", myCommand);
     }
-};
+}
 
 void Q::DesktopIcon::load(KConfigGroup *grp) {
     myCommand = grp->readEntry("Command", "");
@@ -57,13 +57,13 @@ void Q::DesktopIcon::load(KConfigGroup *grp) {
 
     myLeft = grp->readEntry("Left", 0);
     myTop = grp->readEntry("Top", 0);
-};
+}
 
 // Events
 
 void Q::DesktopIcon::mousePressEvent(QMouseEvent *) {
 
-};
+}
 
 void Q::DesktopIcon::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) {
@@ -72,19 +72,19 @@ void Q::DesktopIcon::mouseReleaseEvent(QMouseEvent *event) {
 //         populateContextMenu();
 //         myContextMenu.popup(getContextMenuPos());
     }
-};
+}
 
 // ----------
 
 Q::DesktopWallpaperDialog::DesktopWallpaperDialog(Desktop *parent) :
     QFileDialog(parent, "Set desktop background", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)), myParent(parent) {
     connect(this, SIGNAL(fileSelected(const QString &)), this, SLOT(fileSelected(const QString &)));
-};
+}
 
 void Q::DesktopWallpaperDialog::fileSelected(const QString &file) {
     myParent->setBackground(file);
     myParent->shell()->save(myParent);
-};
+}
 
 // ----------
 
@@ -130,7 +130,7 @@ void Q::DesktopShadow::paintEvent(QPaintEvent *) {
             }
         }
     }
-};
+}
 
 
 // ----------
@@ -153,7 +153,7 @@ Q::Desktop::Desktop(Shell *shell)
     myShadows->resize(QGuiApplication::primaryScreen()->size());
 
     connect(QGuiApplication::primaryScreen(), SIGNAL(geometryChanged(QRect)), this, SLOT(geometryChanged()));
-};
+}
 
 // slots
 void Q::Desktop::geometryChanged() {
@@ -165,7 +165,7 @@ void Q::Desktop::geometryChanged() {
     iconContainer->move(shell()->getStrutLeft() + 5, shell()->getStrutTop() + 5);
     iconContainer->resize(width() - shell()->getStrutLeft() - shell()->getStrutRight() - 5,
                          height() - shell()->getStrutRight() - shell()->getStrutBottom() - 5);
-};
+}
 
 void Q::Desktop::showEvent(QShowEvent*) {
     KWindowSystem::setState(myShadows->winId(), NET::SkipTaskbar);
@@ -176,7 +176,6 @@ void Q::Desktop::paintEvent(QPaintEvent*) {
     QPainter painter(this);
     const auto &size = QGuiApplication::primaryScreen()->geometry();
     const auto &image = myImage.scaled(size.width(), size.height(),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
-    qDebug() << "image:" << image.width() << image.height();
     painter.drawImage(0, 0, image);
     myShadows->repaint();
 }
@@ -201,11 +200,11 @@ void Q::Desktop::load(KConfigGroup *group) {
             myIcons << icon;
         }
     }
-};
+}
 
 void Q::Desktop::save(KConfigGroup *group) {
     group->writeEntry("Background", myFileName);
-};
+}
 
 // set background
 bool Q::Desktop::setBackground(const QString &fileName) {
@@ -225,14 +224,14 @@ bool Q::Desktop::setBackground(const QString &fileName) {
     repaint();
     shell()->repaintPanels();
     return true;
-};
+}
 
 // events
 void Q::Desktop::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton) {
         myContextMenu.popup(event->pos());
     }
-};
+}
 
 void Q::Desktop::wheelEvent(QWheelEvent *we) {
     if (KWindowSystem::numberOfDesktops() < 2)
@@ -248,7 +247,7 @@ void Q::Desktop::wheelEvent(QWheelEvent *we) {
     if (next > available)
         next -= available;
     KWindowSystem::setCurrentDesktop(next);
-};
+}
 
 // ctx menu
 void Q::Desktop::populateContextMenu() {
@@ -269,4 +268,4 @@ void Q::Desktop::populateContextMenu() {
     act = new QAction(QIcon::fromTheme("preferences-desktop-wallpaper"), "Personalize", this);
     connect(act, SIGNAL(triggered()), myDialog, SLOT(show()));
     myContextMenu.addAction(act);
-};
+}

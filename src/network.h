@@ -20,6 +20,7 @@ public slots:
     void update();
 private:
     QDBusInterface *interface;
+    QIcon iconConnect, iconDisconnect;
 };
 
 };

@@ -14,19 +14,20 @@
 #include "shell.h"
 #include "panel.h"
 #include "frame.h"
+#include "icon.h"
 
 static const int DBUS_TIMEOUT = 25;
 static const QDBusMessage findPlayerMsg = QDBusMessage::createMethodCall("org.freedesktop.DBus", "/", "org.freedesktop.DBus", "ListNames");
 
 Q::MediaPlayer::MediaPlayer(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell), dialog(new MediaPlayerDialog(this)) {
-    setIcon(QIcon::fromTheme("media-playback-start"));
     connect(shell->oneSecond(), &QTimer::timeout, [this](){ dialog->update(); });
-};
+}
 
 void Q::MediaPlayer::load(KConfigGroup *grp) {
     myShowLabel = grp->readEntry("ShowLabel", false);
-};
+    setIcon(iconFromSetting(grp->readEntry("Icon", "media-playback-start")));
+}
 
 // ----------
 
@@ -83,7 +84,7 @@ Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media)
 
     hlayout->addStretch(1);
 
-};
+}
 
 void Q::MediaPlayerDialog::update() {
     if(!myPropertyInterface || !myPropertyInterface->isValid()) {
@@ -99,8 +100,9 @@ void Q::MediaPlayerDialog::update() {
                         QStringList busids;
                         for (QString& id: runningBusEndpoints) {
                             if (id.startsWith("org.mpris.MediaPlayer2.")) {
-                                myPropertyInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties");
-                                myCtrlInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player");
+                                if(myCtrlInterface) delete myCtrlInterface;
+                                myPropertyInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", QDBusConnection::sessionBus(), this);
+                                myCtrlInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", QDBusConnection::sessionBus(), this);
                                 break;
                             }
                         }
@@ -133,7 +135,7 @@ void Q::MediaPlayerDialog::update() {
     artist->setText("");
     slider->setValue(0);
     if(myMedia->showLabel()) myMedia->setText("");
-};
+}
 
 void Q::MediaPlayerDialog::playPause() {
     if(myPropertyInterface && myPropertyInterface->isValid()) {
@@ -146,18 +148,18 @@ void Q::MediaPlayerDialog::playPause() {
                 play->setIcon(QIcon::fromTheme("media-playback-pause"));
         }
     }
-};
+}
 
 void Q::MediaPlayerDialog::nextTrack() {
     if(myPropertyInterface && myPropertyInterface->isValid()) {
         myCtrlInterface->call("Next");
     }
     update();
-};
+}
 
 void Q::MediaPlayerDialog::previousTrack() {
     if(myPropertyInterface && myPropertyInterface->isValid()) {
         myCtrlInterface->call("Previous");
     }
     update();
-};
+}

@@ -8,10 +8,10 @@
 #include "model.h"
 #include "shell.h"
 #include "panel.h"
+#include "icon.h"
 
 Q::Network::Network(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell) {
-    setIcon(QIcon::fromTheme("network-connect"));
 
     interface = new QDBusInterface("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager", "org.freedesktop.NetworkManager", QDBusConnection::systemBus());
     qDebug() << interface->isValid();
@@ -25,10 +25,10 @@ void Q::Network::update() {
     if(connectivityReply.isValid()) {
         const int connectivity = connectivityReply.value();
         if(connectivity == 4) {
-            setIcon(QIcon::fromTheme("network-connect"));
+            setIcon(iconConnect);
             setToolTip("Internet connected.");
         } else {
-            setIcon(QIcon::fromTheme("network-disconnect"));
+            setIcon(iconDisconnect);
             setToolTip("Internet disconnected.");
         }
     }
@@ -38,4 +38,7 @@ void Q::Network::load(KConfigGroup *grp) {
     int size = grp->readEntry("Size", 24);
     setIconSize(QSize(size, size));
     setMinimumSize(QSize(size, size));
+    iconConnect = iconFromSetting(grp->readEntry("IconConnect", "network-connect"));
+    iconDisconnect = iconFromSetting(grp->readEntry("IconDisconnect", "network-disconnect"));
+    update();
 }

@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QThread>
 #include <QProcess>
-#include <QLabel>
+#include <QMap>
+#include <QPushButton>
+#include <QDBusInterface>
 #include <X11/Xatom.h>
 #include <KF5/KWindowSystem/NETWM>
 #include "model.h"
@@ -11,36 +12,33 @@ namespace Q
 {
 
 class Systray;
-class SystrayThread : public QThread {
+class SystrayItem : public QPushButton {
     Q_OBJECT
 public:
-    SystrayThread(WId wid);
-    void run() override;
-signals:
-    void windowRemoved();
-    void resize(const QRect &rect);
+    SystrayItem(const QString &name, Systray *systray);
+    void mouseReleaseEvent(QMouseEvent *) override;
+public slots:
+    void update();
 private:
-    WId wid;
+    QDBusInterface *interface, *itemInterface;
+    Systray *systray;
 };
 
 class Systray : public QWidget, public Model {
     Q_OBJECT
 public:
     Systray(const QString& name, Shell *shell);
-    ~Systray();
-    QWidget *widget() const { return myWidget; }
-    WId wid() const { return myWid; }
     void load(KConfigGroup *) override;
+    inline int iconSize() const {return myIconSize;}
 private slots:
-    void systrayResized(const QRect &rect);
-    void windowAdded(WId wid);
-    void windowRemoved();
+    void itemRegistered(QString str);
+    void itemUnregistered(QString str);
 private:
-    QProcess stalonetray;
-    QWidget *myWidget;
-    SystrayThread *thread;
-    WId myWid = 0;
-    bool should_check = false;
+    void update();
+    QProcess xembedsniproxy;
+    QDBusInterface *statusNotifierWatcher, *statusNotifierGetter;
+    QMap<QString, SystrayItem*> items;
+    int myIconSize;
 };
 
 }

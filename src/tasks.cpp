@@ -38,6 +38,7 @@
 #include "shell.h"
 #include "tasks.h"
 #include "frame.h"
+#include "icon.h"
 
 // ----------
 
@@ -71,10 +72,7 @@ void Q::Task::save(KConfigGroup *grp) {
 void Q::Task::load(KConfigGroup *grp) {
     myCommand = grp->readEntry("Command", "");
     myClassClass = grp->readEntry("Class", "");
-
-    QString iconName = grp->readEntry("Icon", myName);
-    setIcon(QIcon::fromTheme(iconName));
-
+    setIcon(iconFromSetting(grp->readEntry("Icon", myName)));
     int size = grp->readEntry("Size", myParent->size());
     mySize = QSize(size, size);
     setIconSize(mySize);
@@ -461,19 +459,7 @@ void Q::Tasks::load(KConfigGroup *grp) {
     connect(KWindowSystem::self(), SIGNAL(windowAdded(WId)), this, SLOT(windowAdded(WId)));
     connect(KWindowSystem::self(), SIGNAL(windowRemoved(WId)), this, SLOT(windowRemoved(WId)));
     if(byDesktop) {
-        connect(KWindowSystem::self(), &KWindowSystem::currentDesktopChanged, [this](int desktop) {
-            myWindows.clear();
-            foreach (Task *task, myTasks)
-                task->deleteLater();
-            myTasks.clear();
-            const QList<WId> windows(KWindowSystem::windows());
-            foreach(WId wid, windows) {
-                NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMDesktop, 0);
-                if(info.desktop() == desktop) {
-                    windowAdded(wid);
-                }
-            }
-        });
+        connect(KWindowSystem::self(), &KWindowSystem::currentDesktopChanged, this, &Q::Tasks::currentDesktopChanged);
     }
 }
 
@@ -514,6 +500,27 @@ void Q::Tasks::populateWindows() {
     myWindows = QList<WId>(KWindowSystem::windows());
     foreach (WId wid, myWindows)
         windowAdded(wid);
+}
+
+void Q::Tasks::currentDesktopChanged(int desktop) {
+    myWindows.clear();
+    QList<Task *> newTasks;
+    foreach (Task *task, myTasks) {
+        if(task->isPinned()) {
+            task->removeAllWindows();
+            newTasks.push_back(task);
+        } else {
+            task->deleteLater();
+        }
+    }
+    myTasks = newTasks;
+    const QList<WId> windows(KWindowSystem::windows());
+    foreach(WId wid, windows) {
+        NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMDesktop, 0);
+        if(info.desktop() == desktop) {
+            windowAdded(wid);
+        }
+    }
 }
 
 void Q::Tasks::enterEvent(QEvent *) {

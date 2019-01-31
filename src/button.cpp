@@ -8,7 +8,9 @@ Q::Button::Button(const QString &name, Shell *shell)
 
 void Q::Button::load(KConfigGroup *grp) {
     setIcon(QIcon::fromTheme(grp->readEntry("Icon")));
-    setIconSize(QSize(24,24));
+    const int size = grp->readEntry("Size", 24);
+    setIconSize(QSize(size, size));
+    setMinimumSize(QSize(size, size));
     procName = grp->readEntry("LabelScript", QString());
     if(procName.isEmpty())
         setText(grp->readEntry("Label"));
@@ -18,9 +20,12 @@ void Q::Button::load(KConfigGroup *grp) {
             clickProcess.startDetached(clickName);
         });
     update();
-    timer->setInterval(grp->readEntry("Interval", 1000));
-    connect(timer, &QTimer::timeout, [this](){ update(); });
-    timer->start();
+    const int interval = grp->readEntry("Interval", 0);
+    if(interval) {
+        timer->setInterval(interval);
+        connect(timer, &QTimer::timeout, [this](){ update(); });
+        timer->start();
+    }
 };
 
 void Q::Button::update() {

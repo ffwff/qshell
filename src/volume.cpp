@@ -18,29 +18,28 @@
 #include "shell.h"
 #include "panel.h"
 #include "frame.h"
+#include "icon.h"
 
 Q::Volume::Volume(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell),
     myPulse(Pulseaudio("qshell")),
     myDevice(myPulse.get_default_sink()),
     dialog(new Q::VolumeDialog(this)) {
-    setIcon(QIcon::fromTheme("audio-volume-high"));
-
     connect(shell->oneSecond(), &QTimer::timeout, this, &Q::Volume::update);
 }
 
 void Q::Volume::update() {
     myDevice = myPulse.get_default_sink();
     if(isMute()) {
-        setIcon(QIcon::fromTheme("audio-volume-muted"));
+        setIcon(iconMuted);
         setToolTip("Muted");
     } else {
         if(volumePercent() > 60)
-            setIcon(QIcon::fromTheme("audio-volume-high"));
+            setIcon(iconHigh);
         else if(volumePercent() > 25)
-            setIcon(QIcon::fromTheme("audio-volume-medium"));
+            setIcon(iconMedium);
         else
-            setIcon(QIcon::fromTheme("audio-volume-low"));
+            setIcon(iconLow);
         setToolTip(QString::number(volumePercent()) + "%");
     }
     if(dialog->isVisible())
@@ -51,6 +50,11 @@ void Q::Volume::load(KConfigGroup *grp) {
     int size = grp->readEntry("Size", 24);
     setIconSize(QSize(size, size));
     setMinimumSize(QSize(size, size));
+    iconMuted  = iconFromSetting(grp->readEntry("IconMuted", "audio-volume-muted"));
+    iconHigh   = iconFromSetting(grp->readEntry("IconHigh", "audio-volume-high"));
+    iconMedium = iconFromSetting(grp->readEntry("IconMedium", "audio-volume-medium"));
+    iconLow    = iconFromSetting(grp->readEntry("IconLow", "audio-volume-low"));
+    update();
 }
 
 void Q::Volume::wheelEvent(QWheelEvent *we) {
