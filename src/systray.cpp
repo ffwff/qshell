@@ -62,8 +62,7 @@ void Q::Systray::windowAdded(WId wid) {
     NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMIcon|NET::WMState, NET::WM2WindowClass);
     if(strcmp(info.windowClassClass(), "stalonetray") == 0) {
         KWindowInfo info(wid, NET::WMGeometry);
-        const QRect &rect = info.geometry();
-        setMinimumSize(rect.width(), rect.height());
+        systrayResized(info.geometry());
         myWidget = QWidget::createWindowContainer(QWindow::fromWinId(wid), this);
         static_cast<QHBoxLayout*>(layout())->addWidget(myWidget);
         myWid = wid;
@@ -76,7 +75,7 @@ void Q::Systray::windowAdded(WId wid) {
 }
 
 void Q::Systray::systrayResized(const QRect &rect) {
-    setMinimumSize(rect.width(), rect.height());
+    setFixedSize(rect.width(), rect.height());
 }
 
 void Q::Systray::windowRemoved() {
