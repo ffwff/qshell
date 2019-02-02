@@ -47,7 +47,6 @@ Although there is an xsession file, it currently doesn't work. To run the shell 
 
 ## Credits
 
- * Qt and KF5 for glorious framework
- * BE::Shell for inspiration and some code
+ * Qt and KF5
+ * [BE::Shell](https://sourceforge.net/projects/be-shell/)
  * [pamixer](https://github.com/cdemoulins/pamixer/)
- * a
