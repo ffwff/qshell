@@ -1,6 +1,6 @@
 # Q::Shell
 
-![Screenshot](/screenshots/2.png)
+![Screenshot](/screenshots/3.png)
 
 a simple desktop shell based on KF5 and QT5, inspired by plasmashell and BE::Shell.
 
