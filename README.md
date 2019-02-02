@@ -39,6 +39,14 @@ make
 sudo make install
 ```
 
+## Run
+
+To replace plasmashell with qshell, run the command:
+
+```
+kquitapp plasmashell; sleep 2; qshell
+```
+
 ## Install
 
 Although there is an xsession file, it currently doesn't work. To run the shell on startup, you should hijack Plasma's `.desktop` files. To do this, replace `/etc/xdg/autostart/org.kde.plasmashell.desktop` with `org.kde.plasmashell.desktop` in this repository. You can then log in to Q::Shell in your display manager by choosing the KDE Plasma session.
