@@ -1,0 +1,140 @@
+QPushButton {
+    border: 0 none;
+}
+
+/* top panel */
+#TopPanel QWidget {
+height: 100%;
+background:red;
+/*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+ *                                stop: 0 #ffffff, stop: 1 #e7e8eb);*/
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                            stop: 0 rgba(0,0,0,30%), stop: 1 rgba(0,0,0,40%));
+padding: 0 3px;
+}
+
+#TopPanel QLabel {
+/*color: #000000;*/
+color: #ffffff;
+padding: 0 5px;
+}
+
+#TopPanel QPushButton:hover, #TopPanel QLabel:hover {
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                            stop: 0 #5ca8ff, stop: 1 #61a0ff);
+/*color: white;*/
+}
+
+#TopPanel .Q--Systray:hover {
+background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                            stop: 0 rgba(0,0,0,30%), stop: 1 rgba(0,0,0,40%));
+}
+
+/* Window Controls */
+.Q--WinCtrl .Q--WinTitle {
+    font-weight: bold;
+}
+
+.Q--WinCtrl QPushButton {
+    qproperty-iconSize: 16px;
+    width: 24px;
+    height: 2.5%;
+}
+
+/* Bottom panel */
+#BottomPanel * {
+width: 60px;
+max-width: 60px;
+background-color: rgba(0,0,0,30%);
+}
+
+
+
+/* Dash button */
+.Q--DashButton {
+    padding-top: 5px;
+    width: 60px;
+    font-weight: bold;
+}
+
+/* Dash */
+#Q--Dash-Apps
+{
+    width:100%;
+    height: 100px;
+}
+
+#Q--Dash-Search, #Q--Dash-Apps {
+background-color: rgba(0,0,0,60%);
+}
+
+.Q--Dash QLineEdit {
+    margin: 10px;
+    margin-bottom: 0;
+    border-radius: 5px;
+    padding: 5px;
+    color: #000;
+    background-color: #fff;
+    min-height: 18px;
+    max-height: 18px;
+}
+
+.Q--Dash QScrollArea
+{
+    background: transparent;
+    border: 0 none;
+}
+
+.Q--DashLabelContainer {
+    text-align: left;
+}
+
+.Q--DashLabelContainer QLabel {
+    color: white;
+    font-size: 16px;
+}
+
+.Q--DashItem {
+    min-height: 55px;
+}
+
+.Q--DashItem .descLabel {
+    color: #ccc;
+}
+
+.Q--DashItem:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Tasks */
+.Q--Task {
+    padding: 10px 0;
+
+}
+
+/* Trash */
+.Q--Trash {
+    width: 64px;
+    height: 64px;
+}
+
+/* volume */
+.Q--VolumeDialog QWidget {
+    background-color: rgba(0,0,0,30%);
+}
+
+/* media player */
+.Q--MediaPlayerDialog > QWidget {
+    background-color: rgba(0,0,0,30%);
+}
+
+.Q--MediaPlayerDialog QLabel {
+    text-align: center;
+}
+
+/* info center */
+#InfoPanel QWidget {
+    padding-top: 30px;
+    padding-left:-1px;
+    background:rgba(0,0,0,60%);
+}
