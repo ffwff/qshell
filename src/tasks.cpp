@@ -465,7 +465,9 @@ void Q::Tasks::load(KConfigGroup *grp) {
 
 // slots
 void Q::Tasks::windowAdded(WId wid) {
-    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMIcon|NET::WMState, NET::WM2WindowClass);
+    NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMDesktop|NET::WMIcon|NET::WMState, NET::WM2WindowClass);
+    if(byDesktop && info.desktop() != KWindowSystem::currentDesktop())
+        return;
     if(info.state() & NET::SkipTaskbar)
         return;
     const QString cmdline = getCmdline(wid);
@@ -516,10 +518,7 @@ void Q::Tasks::currentDesktopChanged(int desktop) {
     myTasks = newTasks;
     const QList<WId> windows(KWindowSystem::windows());
     foreach(WId wid, windows) {
-        NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMDesktop, 0);
-        if(info.desktop() == desktop) {
-            windowAdded(wid);
-        }
+        windowAdded(wid);
     }
 }
 
