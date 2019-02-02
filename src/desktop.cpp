@@ -106,7 +106,7 @@ void Q::DesktopShadow::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     foreach (auto p, myDesktop->shell()->panels()) {
         // HACK way to make shadows under windows but on top of desktop
-        if(p->displaysShadow()) {
+        if(p->displaysShadow() && p->isVisible()) {
             if(p->position() == Q::PanelPosition::Top) {
                 QLinearGradient gradient(0, p->y() + p->height(), 0, p->y() + p->height() + 20);
                 gradient.setColorAt(0, QColor(0,0,0,64));

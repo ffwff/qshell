@@ -30,8 +30,21 @@
 #include "desktop.h"
 #include "frame.h"
 
-Q::DashLabelContainer::DashLabelContainer(QWidget *parent) : QWidget(parent) {
-    setLayout(new QHBoxLayout(this));
+Q::DashLabelContainer::DashLabelContainer(const QString &iconName, const QString &caption,
+                                        DashAppsContainer *appsContainer, QWidget *parent)
+    : QWidget(parent), appsContainer(appsContainer) {
+    QHBoxLayout *layout = new QHBoxLayout(this);
+    setLayout(layout);
+
+    icon.setPixmap(QIcon::fromTheme(iconName).pixmap(24));
+    layout->addWidget(&icon);
+    item.setText(caption);
+    layout->addWidget(&item);
+    layout->addStretch();
+}
+
+void Q::DashLabelContainer::mouseReleaseEvent(QMouseEvent *) {
+    appsContainer->setVisible(!appsContainer->isVisible());
 }
 
 // ----------
@@ -242,9 +255,8 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
     if (!group || !group->isValid())
         return 0;
 
-    bool ret = false;
     KServiceGroup::List list = group->entries(true /* sorted */, true /* excludeNoDisplay */,
-            true /* allowSeparators */, false /* sortByGenericName */);
+            false /* allowSeparators */, false /* sortByGenericName */);
 
     for (KServiceGroup::List::ConstIterator it = list.constBegin(); it != list.constEnd(); it++) {
         const KSycocaEntry::Ptr p = (*it);
@@ -270,7 +282,6 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
                 item->setSize(iconSize);
                 layout->addWidget(item);
                 items << item;
-                ret = true;
             }
             else
                 qDebug() << "Dunno here" << p->entryPath();
@@ -278,28 +289,19 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
             KServiceGroup::Ptr g(static_cast<KServiceGroup*>(p.data()));
             g->setShowEmptyMenu(false);
             if( g->entries(true,true).count() != 0 ) {
-                DashLabelContainer *container = new DashLabelContainer(appsLayout()->parentWidget());
-                appsLayout()->addWidget(container);
-
-                QLabel *icon = new QLabel(container);
-                icon->setPixmap(QIcon::fromTheme(g->icon()).pixmap(24));
-                container->layout()->addWidget(icon);
-                container->layout()->setAlignment(icon, Qt::AlignVCenter);
-                QLabel *item = new QLabel(g->caption(), container);
-                container->layout()->addWidget(item);
-                container->layout()->setAlignment(item, Qt::AlignVCenter);
-                static_cast<QHBoxLayout*>(container->layout())->addStretch(1);
-
                 DashAppsContainer *widget;
                 if(layout)
                     widget = new DashAppsContainer(layout->parentWidget());
                 else
                     widget = new DashAppsContainer(appsLayout()->parentWidget());
 
+                DashLabelContainer *container = new DashLabelContainer(
+                    g->icon(), g->caption(),
+                    widget, appsLayout()->parentWidget());
+                appsLayout()->addWidget(container);
+
                 appsLayout()->addWidget(widget);
-                if (repopulate(g, static_cast<QLayout*>(widget->layout()), search))
-                    ret = true;
-                else {
+                if (!repopulate(g, static_cast<QLayout*>(widget->layout()), search)) {
                     delete container;
                     delete widget;
                 }
@@ -308,7 +310,9 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
         else
             qDebug() << "Dunno" << p->entryPath();
     }
-    return ret;
+    if(layout && !layout->count())
+        return false;
+    return true;
 }
 
 // Search

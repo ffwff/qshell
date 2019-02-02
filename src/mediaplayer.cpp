@@ -25,6 +25,9 @@ Q::MediaPlayer::MediaPlayer(const QString &name, Q::Shell *shell)
 }
 
 void Q::MediaPlayer::load(KConfigGroup *grp) {
+    int size = grp->readEntry("Size", 24);
+    setIconSize(QSize(size, size));
+    setMinimumSize(QSize(size, size));
     myShowLabel = grp->readEntry("ShowLabel", false);
     setIcon(iconFromSetting(grp->readEntry("Icon", "media-playback-start")));
 }

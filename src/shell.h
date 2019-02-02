@@ -39,6 +39,9 @@ public slots:
     void activateLauncherMenu();
     void loadAll(const QString &file="qshellrc");
     void reloadAll(const QString &file="qshellrc");
+    void showWidget(const QString &model);
+    void hideWidget(const QString &model);
+    void toggleWidget(const QString &model);
 private slots:
     void calculateStruts();
 private:

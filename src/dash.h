@@ -15,10 +15,16 @@
 
 namespace Q {
 
+class DashAppsContainer;
 class DashLabelContainer : public QWidget {
     Q_OBJECT
 public:
-    DashLabelContainer(QWidget *parent = 0);
+    DashLabelContainer(const QString &iconName, const QString &caption,
+                       DashAppsContainer *appsContainer, QWidget *parent);
+    void mouseReleaseEvent(QMouseEvent *) override;
+private:
+    DashAppsContainer *appsContainer;
+    QLabel icon, item;
 };
 
 class DashAppsContainer : public QWidget {

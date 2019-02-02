@@ -4,19 +4,22 @@ bname=`basename "$0"`
 fn="$1"
 
 check_pidof() {
-    [[ ! $(pidof qshell) ]] && echo "$bname: qshell isn't running" && exit 1
+    [[ ! $(pidof qshell) ]] && echo "$bname: Q::Shell isn't running" && exit 1
+    return 0
 }
 
 case "$fn" in
     activateLauncherMenu)
-        check_pidof
-        qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.activateLauncherMenu
-        exit $?
+        check_pidof && qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.activateLauncherMenu && exit $?
         ;;
     reload)
-        check_pidof
-        qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.reloadAll "$2"
-        exit $?
+        check_pidof && qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.reloadAll "$2" && exit $?
+        ;;
+    showWidget) check_pidof && qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.showWidget "$2" && exit $?
+        ;;
+    hideWidget) check_pidof && qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.hideWidget "$2" && exit $?
+        ;;
+    toggleWidget) check_pidof && qdbus org.qshell /org/qshell/qshell local.qshell.Q.Shell.toggleWidget "$2" && exit $?
         ;;
     *)
         echo "Usage:"
@@ -28,6 +31,9 @@ case "$fn" in
         echo " activateLauncherMenu: activates dash menu"
         echo " reload [file]: reloads with configuration from [file]"
         echo "                ~/.config/qshellrc will be used if [file] isn't specified"
+        echo " showWidget [widget]: shows widget with name [widget]"
+        echo " hideWidget [widget]: hides widget with name [widget]"
+        echo " toggleWidget [widget]: toggle visibility of widget with name [widget]"
         exit 0
         ;;
 esac

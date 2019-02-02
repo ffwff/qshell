@@ -32,6 +32,7 @@
 #include "mediaplayer.h"
 #include "button.h"
 #include "systray.h"
+#include "label.h"
 
 Q::ShellApplication::ShellApplication(int argc, char **argv)
     : QApplication(argc, argv) {
@@ -197,6 +198,7 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
         COND_LOAD_MODEL("Battery", Battery)
         COND_LOAD_MODEL("MediaPlayer", MediaPlayer)
         COND_LOAD_MODEL("Button", Button)
+        COND_LOAD_MODEL("Label", Label)
         else return 0;
 
         myModels.insert(name, m);
@@ -210,7 +212,6 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
 void Q::Shell::addPanel(Q::Panel *panel) {
     qDebug() << "add panel" << panel->name();
     myPanels.append(panel);
-    panel->show();
 };
 
 void Q::Shell::repaintPanels() {
@@ -226,6 +227,22 @@ void Q::Shell::activateLauncherMenu() {
         KWindowSystem::forceActiveWindow(myDesktop->winId());
         myDash->searchBar()->setFocus();
     }
+}
+
+void Q::Shell::showWidget(const QString &model) {
+    QWidget *widget = dynamic_cast<QWidget*>(myModels[model]);
+    if(widget != nullptr)
+        widget->show();
+}
+void Q::Shell::hideWidget(const QString &model) {
+    QWidget *widget = dynamic_cast<QWidget*>(myModels[model]);
+    if(widget != nullptr)
+        widget->hide();
+}
+void Q::Shell::toggleWidget(const QString &model) {
+    QWidget *widget = dynamic_cast<QWidget*>(myModels[model]);
+    if(widget != nullptr)
+        widget->setVisible(!widget->isVisible());
 }
 
 // Struts

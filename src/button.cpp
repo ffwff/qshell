@@ -4,7 +4,7 @@
 
 Q::Button::Button(const QString &name, Shell *shell)
     : QPushButton(), Model(name, shell), timer(new QTimer(this)) {
-};
+}
 
 void Q::Button::load(KConfigGroup *grp) {
     setIcon(QIcon::fromTheme(grp->readEntry("Icon")));
@@ -23,10 +23,10 @@ void Q::Button::load(KConfigGroup *grp) {
     const int interval = grp->readEntry("Interval", 0);
     if(interval) {
         timer->setInterval(interval);
-        connect(timer, &QTimer::timeout, [this](){ update(); });
+        connect(timer, &QTimer::timeout, [this](){ if(isVisible()) update(); });
         timer->start();
     }
-};
+}
 
 void Q::Button::update() {
     if(!procName.isEmpty()) {
@@ -35,4 +35,4 @@ void Q::Button::update() {
         QString output(process.readAllStandardOutput());
         setText(output.trimmed());
     }
-};
+}

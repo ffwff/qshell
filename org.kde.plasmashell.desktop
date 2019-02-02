@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=/usr/bin/bash -c "sleep 5s; qshell & disown"
+Exec=/usr/bin/bash -c "sleep 2s; qshell & disown"
 X-DBUS-StartupType=Unique
 Name=Plasma Desktop Workspace
 Name[ar]=مساحة عمل سطح مكتب بلازما

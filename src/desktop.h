@@ -7,7 +7,6 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QPushButton>
-#include <QScopedPointer>
 
 #include "model.h"
 #include "shell.h"
@@ -60,10 +59,15 @@ class Desktop : public QWidget, public Model {
     Q_OBJECT
 public:
     Desktop(Shell *shell);
+    ~Desktop() { delete myShadows; }
     bool setBackground(const QString &fileName);
     inline const QString& fileName() const { return myFileName; };
     inline const QImage& image() const { return myImage; };
     inline int iconSize() const {  return myIconSize; };
+    inline void repaintShadows() {
+        if(myShadows != nullptr)
+            myShadows->repaint();
+    };
     void load(KConfigGroup *group) override;
     void save(KConfigGroup *group) override;
 protected:
@@ -83,7 +87,7 @@ private:
     bool showIcons;
     QList<DesktopIcon*> myIcons;
     int myIconSize;
-    QScopedPointer<DesktopShadow> myShadows;
+    DesktopShadow *myShadows = nullptr;
 };
 
 };

@@ -14,7 +14,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_D
 find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     Core
     DBus
-    UiTools
     Widgets
     X11Extras
 )
@@ -35,10 +34,7 @@ endif()
 # required frameworks by Core
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
     Config
-    CoreAddons
-    Crash
     KIO
-    Service
     WindowSystem
 )
 find_package(KF5Solid NO_MODULE)
@@ -76,15 +72,9 @@ target_link_libraries(qshell
     Qt5::DBus
     Qt5::X11Extras
     KF5::ConfigCore
-    KF5::CoreAddons
-    KF5::Crash
     KF5::KIOCore
     KF5::KIOFileWidgets
-    KF5::KIOWidgets
-    KF5::KIONTLM
-    KF5::Service
     KF5::Solid
-#     KF5::kcmutils
     KF5::WindowSystem
     ${X11_X11_LIB}
     pulse

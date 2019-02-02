@@ -10,9 +10,7 @@ namespace Q {
 class Shell;
 class Model {
 public:
-    Model(const QString& name, Shell *shell = 0) : myName(name), myShell(shell) {
-        qDebug()<<"MODEL"<<name;
-    }
+    Model(const QString& name, Shell *shell) : myName(name), myShell(shell) {}
     virtual ~Model() {}
     virtual void save(KConfigGroup *) {}
     virtual void load(KConfigGroup *) {}

@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include <QMenu>
+#include <QIcon>
 #include "model.h"
 
 namespace Q
@@ -24,8 +25,9 @@ private slots:
     void updateStatus();
 private:
     int mySize;
+    QIcon iconFull, iconEmpty;
     QMenu myContextMenu;
     QPoint getContextMenuPos();
 };
 
-};
+}

@@ -31,6 +31,9 @@ void Q::Network::update() {
             setIcon(iconDisconnect);
             setToolTip("Internet disconnected.");
         }
+    } else { // TODO fallback
+        setIcon(iconConnect);
+        setToolTip("Internet connected.");
     }
 }
 

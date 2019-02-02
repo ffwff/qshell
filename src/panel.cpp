@@ -51,7 +51,6 @@ void Q::Panel::load(KConfigGroup *grp) {
     myWidth = grp->readEntry("Width", "100");
     myHeight = grp->readEntry("Height", "2");
     myPosition = (Q::PanelPosition)grp->readEntry("Position", 0);
-    //blurRadius = grp->readEntry("BlurRadius", 0);
     transparent = grp->readEntry("Transparent", false);
     displayShadow = grp->readEntry("DisplayShadow", true);
     myIconSize = grp->readEntry("IconSize", 24);
@@ -90,6 +89,10 @@ void Q::Panel::load(KConfigGroup *grp) {
                 }
             }
         }
+
+    visibleByDefault = grp->readEntry("Visible", true);
+    if(visibleByDefault) show();
+    else hide();
 };
 
 // Slots
@@ -146,6 +149,7 @@ void Q::Panel::addStretch(int stretch) {
 };*/
 
 void Q::Panel::showEvent(QShowEvent *) {
+    KWindowSystem::setState(winId(), NET::SkipTaskbar);
     Display *display = QX11Info::display();
     Atom atom = XInternAtom(display, "_KDE_SLIDE", false);
 
@@ -165,4 +169,7 @@ void Q::Panel::showEvent(QShowEvent *) {
 
     XChangeProperty(display, winId(), atom, atom, 32, PropModeReplace,
             reinterpret_cast<unsigned char *>(data.data()), data.size());
+
+    if(displayShadow && !visibleByDefault)
+        myShell->desktop()->repaintShadows();
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QPushButton>
+#include <QLabel>
 #include <QProcess>
 
 #include <KF5/KConfigCore/KConfigGroup>
@@ -10,15 +10,16 @@
 namespace Q {
 
 class Shell;
-class Button : public QPushButton, public Model {
+class Label : public QLabel, public Model {
 public:
-    Button(const QString &name, Shell *shell);
+    Label(const QString &name, Shell *shell);
     void load(KConfigGroup *grp);
+    void showEvent(QShowEvent *) override;
 private slots:
     void update();
 private:
     QProcess process, clickProcess;
-    QString procName, clickName;
+    QString procName;
     QTimer *timer;
 };
 

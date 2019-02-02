@@ -54,6 +54,7 @@ private:
     QString myWidth, myHeight;
     PanelPosition myPosition;
     QPoint myPoint;
+    bool visibleByDefault;
     bool setStruts;
     int blurRadius;
     bool transparent;
