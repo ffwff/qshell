@@ -21,7 +21,7 @@ static const QDBusMessage findPlayerMsg = QDBusMessage::createMethodCall("org.fr
 
 Q::MediaPlayer::MediaPlayer(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell), dialog(new MediaPlayerDialog(this)) {
-    connect(shell->oneSecond(), &QTimer::timeout, [this](){ dialog->update(); });
+    connect(shell->oneSecond(), &QTimer::timeout, dialog, &MediaPlayerDialog::update);
 }
 
 void Q::MediaPlayer::load(KConfigGroup *grp) {

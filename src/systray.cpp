@@ -136,7 +136,4 @@ void Q::Systray::update() {
             }
         }
     }
-    /*if(list.isValid()) {
-        qDebug() << "valid";
-    }*/
 }

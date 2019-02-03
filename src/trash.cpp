@@ -23,7 +23,8 @@
 
 static KDirLister *trash = 0;
 
-Q::Trash::Trash(const QString &name, Shell *shell) : QLabel(), Q::Model(name, shell) {
+Q::Trash::Trash(const QString &name, Shell *shell)
+    : QLabel(), Q::Model(name, shell) {
     setAcceptDrops(true);
     setAlignment(Qt::AlignCenter);
 
@@ -48,9 +49,9 @@ Q::Trash::Trash(const QString &name, Shell *shell) : QLabel(), Q::Model(name, sh
 // configs
 void Q::Trash::load(KConfigGroup *grp) {
     mySize = grp->readEntry("Size", 48);
-    updateStatus();
     iconFull = iconFromSetting(grp->readEntry("IconFull", "user-trash-full"));
     iconEmpty = iconFromSetting(grp->readEntry("IconEmpty", "user-trash"));
+    updateStatus();
 }
 
 // events
