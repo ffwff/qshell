@@ -36,7 +36,6 @@ public:
     void addWidget(QWidget *widget);
     void addStretch(int stretch = 0);
     inline Position position() const { return myPosition; };
-    inline const QPoint &point() const { return myPoint; };
     inline bool struts() const { return setStruts; };
     inline const QString &name() const { return myName; };
     inline bool displaysShadow() const { return displayShadow; };
@@ -53,14 +52,15 @@ private:
     QString myWidth, myHeight;
     Position myPosition, mySlidePosition;
     int slideDuration;
-    QPoint myPoint;
     bool visibleByDefault;
     bool setStruts;
+    int borderRadius;
+    void roundCorners();
     int blurRadius;
     bool transparent;
     bool displayShadow;
     int myIconSize;
-    float offsetTop, offsetLeft, offsetRight, offsetBottom;
+    QString offsetTop, offsetLeft, offsetRight, offsetBottom;
     PanelContainer *container;
 };
 

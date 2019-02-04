@@ -19,7 +19,7 @@
 #include "panel.h"
 #include "trash.h"
 #include "model.h"
-#include "icon.h"
+#include "utils.h"
 
 static KDirLister *trash = 0;
 

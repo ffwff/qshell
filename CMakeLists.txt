@@ -39,11 +39,7 @@ find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
 )
 find_package(KF5Solid NO_MODULE)
 
-find_package(X11)
-set_package_properties(X11 PROPERTIES DESCRIPTION "X11 libraries"
-                        URL "http://www.x.org"
-                        TYPE REQUIRED
-                    )
+find_package(X11 REQUIRED COMPONENTS Xext)
 
 add_definitions("-fexceptions")
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
@@ -77,6 +73,7 @@ target_link_libraries(qshell
     KF5::Solid
     KF5::WindowSystem
     ${X11_X11_LIB}
+    ${X11_Xext_LIB}
     pulse
     )
 

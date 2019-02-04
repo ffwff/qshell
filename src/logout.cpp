@@ -8,7 +8,7 @@
 #include "shell.h"
 #include "panel.h"
 #include "frame.h"
-#include "icon.h"
+#include "utils.h"
 
 Q::Logout::Logout(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell) {

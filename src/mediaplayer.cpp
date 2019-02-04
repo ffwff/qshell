@@ -14,7 +14,7 @@
 #include "shell.h"
 #include "panel.h"
 #include "frame.h"
-#include "icon.h"
+#include "utils.h"
 
 static const int DBUS_TIMEOUT = 25;
 static const QDBusMessage findPlayerMsg = QDBusMessage::createMethodCall("org.freedesktop.DBus", "/", "org.freedesktop.DBus", "ListNames");

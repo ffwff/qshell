@@ -18,7 +18,7 @@
 #include "shell.h"
 #include "panel.h"
 #include "frame.h"
-#include "icon.h"
+#include "utils.h"
 
 Q::Volume::Volume(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell),

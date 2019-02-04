@@ -10,10 +10,14 @@
 
 #include <KF5/KWindowSystem/KWindowSystem>
 
+#include <X11/extensions/shape.h>
+
 #include "model.h"
 #include "shell.h"
 #include "panel.h"
 #include "desktop.h"
+#include "utils.h"
+
 
 Q::PanelContainer::PanelContainer(Panel *panel) : QWidget(panel), myPanel(panel) {
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight, this);
@@ -46,6 +50,51 @@ Q::Panel::Panel(const QString &name, Q::Shell *shell) : QWidget(shell), Q::Model
     connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(geometryChanged()) );
 }
 
+// rounded corners
+void Q::Panel::roundCorners() {
+    if(!borderRadius) return;
+
+    if(transparent) {
+        setAttribute(Qt::WA_NoSystemBackground, true);
+        setAttribute(Qt::WA_TranslucentBackground, true);
+    }
+
+    const int width = this->width();
+    const int height = this->height();
+    const int dia = 2 * borderRadius;
+
+    // do not try to round if the window would be smaller than the corners
+    if(width < dia || height < dia)
+        return;
+
+    Display *display = QX11Info::display();
+    Pixmap mask = XCreatePixmap(display, winId(), width, height, 1);
+    // if this returns null, the mask is not drawable
+    if(!mask)
+        return;
+
+    XGCValues xgcv;
+    GC shape_gc = XCreateGC(display, mask, 0, &xgcv);
+    if(!shape_gc) {
+        XFreePixmap(display, mask);
+        return;
+    }
+
+    XSetForeground(display, shape_gc, 0);
+    XFillRectangle(display, mask, shape_gc, 0, 0, width, height);
+    XSetForeground(display, shape_gc, 1);
+    XFillArc(display, mask, shape_gc, 0, 0, dia, dia, 0, 23040);
+    XFillArc(display, mask, shape_gc, width-dia-1, 0, dia, dia, 0, 23040);
+    XFillArc(display, mask, shape_gc, 0, height-dia-1, dia, dia, 0, 23040);
+    XFillArc(display, mask, shape_gc, width-dia-1, height-dia-1, dia, dia,
+        0, 23040);
+    XFillRectangle(display, mask, shape_gc, borderRadius, 0, width-dia, height);
+    XFillRectangle(display, mask, shape_gc, 0, borderRadius, width, height-dia);
+    XShapeCombineMask(display, winId(), ShapeBounding, 0, 0, mask, ShapeSet);
+    XFreePixmap(display, mask);
+    XFreeGC(display, shape_gc);
+}
+
 // Configurations
 void Q::Panel::load(KConfigGroup *grp) {
     myWidth = grp->readEntry("Width", "100");
@@ -56,11 +105,11 @@ void Q::Panel::load(KConfigGroup *grp) {
     transparent = grp->readEntry("Transparent", false);
     displayShadow = grp->readEntry("DisplayShadow", true);
     myIconSize = grp->readEntry("IconSize", 24);
-    const QString iconTheme = grp->readEntry("IconTheme", "");
-    offsetTop = grp->readEntry("OffsetTop",0.0);
-    offsetLeft = grp->readEntry("OffsetLeft",0.0);
-    offsetRight = grp->readEntry("OffsetRight",0.0);
-    offsetBottom = grp->readEntry("OffsetBottom",0.0);
+    offsetTop = grp->readEntry("OffsetTop", "0");
+    offsetLeft = grp->readEntry("OffsetLeft", "0");
+    offsetRight = grp->readEntry("OffsetRight", "0");
+    offsetBottom = grp->readEntry("OffsetBottom", "0");
+    borderRadius = grp->readEntry("BorderRadius", 0);
     setStruts = grp->readEntry("Struts", true);
     static_cast<QBoxLayout*>(container->layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
 
@@ -101,29 +150,27 @@ void Q::Panel::load(KConfigGroup *grp) {
 void Q::Panel::geometryChanged() {
     container->hide();
     QSize geometry = QGuiApplication::primaryScreen()->size();
-    QSize size;
-    if(myWidth.endsWith("px"))
-        size.setWidth(QString(myWidth).replace("px","").toInt());
-    else
-        size.setWidth(geometry.width() * (myWidth.toFloat() / 100));
-    if(myHeight.endsWith("px"))
-        size.setHeight(QString(myHeight).replace("px","").toInt());
-    else
-        size.setHeight(geometry.height() * (myHeight.toFloat() / 100));
-    resize(size);
+    resize(QSize(dimFromSetting(myWidth, geometry.width()),
+                 dimFromSetting(myHeight, geometry.height())));
 
     if(myPosition == Position::Left || myPosition == Position::Top) {
-        myPoint.setX(geometry.width() * (offsetLeft / 100));
-        myPoint.setY(geometry.height() * (offsetTop / 100));
+        move(
+            dimFromSetting(offsetLeft, geometry.width()),
+            dimFromSetting(offsetTop, geometry.height())
+        );
     } else if(myPosition == Position::Right) {
-        myPoint.setX(geometry.width() - width() - (geometry.width() * (offsetRight / 100)));
-        myPoint.setY(geometry.height() * (offsetTop / 100));
+        move(
+            geometry.width() - width() - dimFromSetting(offsetRight, geometry.width()),
+            dimFromSetting(offsetTop, geometry.height())
+        );
     } else {
-        myPoint.setX(geometry.width() * (offsetLeft / 100));
-        myPoint.setY(geometry.height() - height() - (geometry.height() * (offsetBottom / 100)));
+        move(
+            dimFromSetting(offsetLeft, geometry.width()),
+            geometry.height() - height() - dimFromSetting(offsetBottom, geometry.height())
+        );
     }
-    move(myPoint);
     container->show();
+    roundCorners();
 }
 
 // Layout management
@@ -140,6 +187,7 @@ void Q::Panel::addStretch(int stretch) {
 
 // Rendering
 void Q::Panel::showEvent(QShowEvent *) {
+    roundCorners();
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     Display *display = QX11Info::display();
     Atom atom = XInternAtom(display, "_KDE_SLIDE", false);

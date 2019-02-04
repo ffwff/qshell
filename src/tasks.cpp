@@ -38,7 +38,7 @@
 #include "shell.h"
 #include "tasks.h"
 #include "frame.h"
-#include "icon.h"
+#include "utils.h"
 
 // ----------
 

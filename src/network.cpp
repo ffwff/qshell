@@ -8,7 +8,7 @@
 #include "model.h"
 #include "shell.h"
 #include "panel.h"
-#include "icon.h"
+#include "utils.h"
 
 Q::Network::Network(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell) {
