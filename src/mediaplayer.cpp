@@ -90,6 +90,8 @@ Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media)
 }
 
 void Q::MediaPlayerDialog::update() {
+    if(!isVisible()) return;
+
     if(!myPropertyInterface || !myPropertyInterface->isValid()) {
         QDBusMessage response = QDBusConnection::sessionBus().call(findPlayerMsg, QDBus::Block, DBUS_TIMEOUT);
 

@@ -63,11 +63,11 @@ class Dash : public Frame, public Model {
     Q_OBJECT
 public:
     Dash(Shell *parent);
-    inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
+    inline QBoxLayout *boxLayout() const { return static_cast<QBoxLayout*>(layout()); };
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;
-    QWidget *searchBarContainer() const { return mySearchBarContainer; }
-    QWidget *searchBar() const { return mySearchBar; }
+    inline QWidget *searchBarContainer() const { return mySearchBarContainer; }
+    inline QWidget *searchBar() const { return mySearchBar; }
 protected:
     void activeWindowChanged(WId wid);
     void showEvent(QShowEvent *);

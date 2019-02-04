@@ -213,9 +213,9 @@ void Q::Dash::load( KConfigGroup *grp ) {
     iconSize = grp->readEntry("IconSize", 48);
     mySearchBar->setVisible(grp->readEntry("ShowSearch", true));
     myPosition = (DashPosition)grp->readEntry("Position", 0);
+    mySlidePosition = grp->readEntry("SlidePosition", 0);
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
-    mySlidePosition = grp->readEntry("SlidePosition", 0);
     bool searchBelow = grp->readEntry("SearchBelow", false);
     if(searchBelow)
         boxLayout()->addWidget(mySearchBarContainer);

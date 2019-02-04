@@ -29,6 +29,14 @@ For Arch, use this:
 sudo pacman -S extra-cmake-modules plasma-meta
 ```
 
+## Cloning the repository
+
+It is recommended that you clone the repository recursively:
+
+```
+git clone -r https://github.com/ffwff/qshell
+```
+
 ## Build
 
 ```
@@ -51,7 +59,7 @@ kquitapp plasmashell; sleep 2; qshell
 
 Although there is an xsession file, it currently doesn't work. To run the shell on startup, you should hijack Plasma's `.desktop` files. To do this, replace `/etc/xdg/autostart/org.kde.plasmashell.desktop` with `org.kde.plasmashell.desktop` in this repository. You can then log in to Q::Shell in your display manager by choosing the KDE Plasma session.
 
-**NOTE**: there is currently a login delay by doing this, I'm currently investigating this, however bear that in mind.
+**NOTE**: there is currently a (small) login delay by doing this, I'm currently investigating this, however bear that in mind.
 
 ## Credits
 

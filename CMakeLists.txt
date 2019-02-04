@@ -2,7 +2,7 @@ PROJECT( qshell )
 
 set(CMAKE_CXX_FLAGS "-Wno-reorder")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -DQT_NO_DEBUG_OUTPUT")
 
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
 set(QT_MIN_VERSION "5.3.0")

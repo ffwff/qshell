@@ -170,11 +170,11 @@ QPoint Q::Task::getContextMenuPos(QWidget *widget) {
     widget->setAttribute(Qt::WA_DontShowOnScreen, false);
 
     QPoint p = myParent->parentWidget()->parentWidget()->pos();
-    PanelPosition position = static_cast<Panel*>(myParent->parentWidget()->parentWidget())->position();
-    if(position == PanelPosition::Bottom) {
+    Position position = static_cast<Panel*>(myParent->parentWidget()->parentWidget())->position();
+    if(position == Position::Bottom) {
         p.setX(p.x() + x());
         p.setY(p.y() - y() - widget->height());
-    } else if(position == PanelPosition::Left || position == PanelPosition::Right) {
+    } else if(position == Position::Left || position == Position::Right) {
         p.setX(p.x() + myParent->parentWidget()->width());
         p.setY(p.y() + y());
     } else {
@@ -258,13 +258,13 @@ void Q::TaskPreview::showEvent(QShowEvent*) {
 
     QVarLengthArray<long, 1024> data(4);
 
-    PanelPosition position = static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->position();
+    Position position = static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->position();
     Shell *shell = static_cast<Panel*>(myTask->tasks()->parentWidget()->parentWidget())->shell();
-    if(position == PanelPosition::Left)
+    if(position == Position::Left)
         data[0] = shell->getStrutLeft();
-    else if(position == PanelPosition::Right)
+    else if(position == Position::Right)
         data[0] = shell->getStrutRight();
-    else if(position == PanelPosition::Top)
+    else if(position == Position::Top)
         data[0] = shell->getStrutTop();
     else
         data[0] = shell->getStrutBottom();

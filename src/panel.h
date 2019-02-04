@@ -12,6 +12,7 @@
 #include <KF5/KConfigCore/KConfigGroup>
 
 #include "model.h"
+#include "position.h"
 
 namespace Q {
 
@@ -27,8 +28,6 @@ private:
     Panel *myPanel;
 };
 
-enum PanelPosition { Left = 0, Top, Right, Bottom };
-
 class Shell;
 class Panel : public QWidget, public Model {
     Q_OBJECT
@@ -36,12 +35,12 @@ public:
     Panel(const QString& name, Shell *shell);
     void addWidget(QWidget *widget);
     void addStretch(int stretch = 0);
-    inline PanelPosition position() const { return myPosition; };
-    inline const QPoint& point() const { return myPoint; };
+    inline Position position() const { return myPosition; };
+    inline const QPoint &point() const { return myPoint; };
     inline bool struts() const { return setStruts; };
-    inline const QString& name() const { return myName; };
+    inline const QString &name() const { return myName; };
     inline bool displaysShadow() const { return displayShadow; };
-    inline int iconSize() { return myIconSize; };
+    inline int iconSize() const { return myIconSize; };
     void load(KConfigGroup *grp) override;
 protected:
     virtual void showEvent(QShowEvent *);
@@ -52,7 +51,8 @@ private:
     Shell *myShell;
     QString myName;
     QString myWidth, myHeight;
-    PanelPosition myPosition;
+    Position myPosition, mySlidePosition;
+    int slideDuration;
     QPoint myPoint;
     bool visibleByDefault;
     bool setStruts;

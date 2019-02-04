@@ -45,12 +45,11 @@ Q::ShellApplication::ShellApplication(int argc, char **argv)
     QDBusConnection bus = QDBusConnection::sessionBus();
     bus.interface()->registerService("org.qshell");
     bus.registerObject("/org/qshell/qshell", myShell, QDBusConnection::ExportAllSlots);
-};
+}
 
 // ----------
 
-Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint )
-{
+Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint ) {
     setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     KWindowSystem::setOnAllDesktops( winId(), true );
@@ -69,7 +68,7 @@ Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint )
     loadAll();
 
     connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(calculateStruts()) );
-};
+}
 
 // Configurations
 void Q::Shell::saveAll() {
@@ -89,14 +88,14 @@ void Q::Shell::saveAll() {
     foreach (Panel *p, myPanels)
         list.append(p->name());
     shGroup.writeEntry("Panels", list.join(","));
-};
+}
 
 void Q::Shell::save(Model *m) {
     KSharedConfig::Ptr sharedConfig = KSharedConfig::openConfig("qshellrc");
     KConfigGroup grp = sharedConfig->group(m->name());
     m->save(&grp);
     sharedConfig->sync();
-};
+}
 
 void Q::Shell::loadAll(const QString &file) {
     if( file == "qshellrc" &&
@@ -142,7 +141,7 @@ void Q::Shell::loadAll(const QString &file) {
     myDash->load(&grp);
 
     myOneSecond->start();
-};
+}
 
 void Q::Shell::reloadAll(const QString &file) {
     myOneSecond->stop();
@@ -159,7 +158,7 @@ void Q::Shell::reloadAll(const QString &file) {
     myDash = new Dash(this);
     loadAll(file);
     myDesktop->repaint();
-};
+}
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }
 
@@ -204,7 +203,7 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
         myModels.insert(name, m);
         return m;
     } else return 0;
-};
+}
 
 #undef COND_LOAD_MODEL
 
@@ -212,13 +211,13 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
 void Q::Shell::addPanel(Q::Panel *panel) {
     qDebug() << "add panel" << panel->name();
     myPanels.append(panel);
-};
+}
 
 void Q::Shell::repaintPanels() {
     foreach (Q::Panel *panel, myPanels) {
         panel->repaint();
     }
-};
+}
 
 // slot
 void Q::Shell::activateLauncherMenu() {
@@ -253,25 +252,25 @@ void Q::Shell::calculateStruts() {
     strut_bottom = 0;
     foreach (Q::Panel *panel, myPanels) {
         if(panel->struts()) {
-            if(panel->position() == Q::PanelPosition::Left)
+            if(panel->position() == Position::Left)
                 strut_left += panel->width();
-            else if(panel->position() == Q::PanelPosition::Right)
+            else if(panel->position() == Position::Right)
                 strut_right += panel->width();
-            else if(panel->position() == Q::PanelPosition::Top)
+            else if(panel->position() == Position::Top)
                 strut_top += panel->height();
             else
                 strut_bottom += panel->height();
         }
     }
     KWindowSystem::setStrut(winId(),strut_left,strut_right,strut_top,strut_bottom);
-};
+}
 
 // Kcmshell5
 void Q::Shell::kcmshell5(const QString &arg) {
     QStringList argument;
     argument.append(arg);
     myProcess.startDetached("kcmshell5", argument);
-};
+}
 
 // ----------
 
