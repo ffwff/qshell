@@ -145,7 +145,9 @@ Q::Desktop::Desktop(Shell *shell)
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 //     setScaledContents(true);
 
-    setWindowFlags(Qt::Window);
+    setAttribute(Qt::WA_StyledBackground, false);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_X11NetWmWindowTypeDesktop, true);
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     populateContextMenu();
