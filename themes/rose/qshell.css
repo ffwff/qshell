@@ -6,28 +6,19 @@ QPushButton {
 #TopPanel QWidget {
 height: 100%;
 background:red;
-/*background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
- *                                stop: 0 #ffffff, stop: 1 #e7e8eb);*/
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
                             stop: 0 rgba(0,0,0,30%), stop: 1 rgba(0,0,0,40%));
 padding: 0 3px;
 }
 
 #TopPanel QLabel {
-/*color: #000000;*/
 color: #ffffff;
 padding: 0 5px;
 }
 
 #TopPanel QPushButton:hover, #TopPanel QLabel:hover {
 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                            stop: 0 #5ca8ff, stop: 1 #61a0ff);
-/*color: white;*/
-}
-
-#TopPanel .Q--Systray:hover {
-background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                            stop: 0 rgba(0,0,0,30%), stop: 1 rgba(0,0,0,40%));
+                            stop: 0 #c05b68, stop: 1 #cc4f5f);
 }
 
 /* Window Controls */
@@ -134,7 +125,7 @@ background-color: rgba(0,0,0,60%);
 
 /* info center */
 #InfoPanel QWidget {
-    padding-top: 30px;
-    padding-left:-1px;
-    background:rgba(0,0,0,60%);
+padding-top: 30px;
+padding-left:-1px;
+background:rgba(0,0,0,60%);
 }
