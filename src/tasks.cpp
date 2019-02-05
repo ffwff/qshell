@@ -332,6 +332,7 @@ void Q::WindowPreview::updatePixmap() {
     if(!isVisible()) return;
     QPixmap pixmap = grabWindow();
     window->setPixmap(pixmap);
+    QTimer::singleShot(0, this, SLOT(updatePixmap()));
 }
 
 // events
@@ -349,8 +350,6 @@ void Q::WindowPreview::showEvent(QShowEvent*) {
         title->setText(name);
     }
     updatePixmap();
-    connect(myTaskPreview->task()->shell()->oneSecond(),
-            SIGNAL(timeout()), this, SLOT(updatePixmap()));
 }
 
 void Q::WindowPreview::mouseReleaseEvent(QMouseEvent *) {
@@ -386,25 +385,10 @@ QPixmap Q::WindowPreview::grabWindow() {
         return QPixmap(); // we don't know
     }
 
-    // The RGB32 format requires data format 0xffRRGGBB, ensure that this fourth byte really is 0xff
-    if (format == QImage::Format_RGB32) {
-        quint32 *data = reinterpret_cast<quint32 *>(ximage->data);
-        for (int i = 0; i < ximage->width * ximage->height; i++) {
-            data[i] |= 0xff000000;
-        }
-    }
+    const QImage image(reinterpret_cast<uchar*>(ximage->data),
+                       ximage->width, ximage->height, format);
 
-    QImage image(reinterpret_cast<uchar*>(ximage->data),
-                 ximage->width, ximage->height, format);
-
-    // work around an abort in QImage::color
-    if (image.format() == QImage::Format_MonoLSB) {
-        image.setColorCount(2);
-        image.setColor(0, QColor(Qt::white).rgb());
-        image.setColor(1, QColor(Qt::black).rgb());
-    }
-
-    QPixmap pixmap = QPixmap::fromImage(image).scaledToWidth(220, Qt::SmoothTransformation);
+    QPixmap pixmap = QPixmap::fromImage(image.scaledToWidth(220, Qt::SmoothTransformation));
     XDestroyImage(ximage);
     return pixmap;
 

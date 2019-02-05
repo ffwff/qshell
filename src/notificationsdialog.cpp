@@ -38,7 +38,7 @@ void Q::NotificationsDialog::hideFrame(WId wid) {
 
 void Q::NotificationsDialog::updateDialog() {
     resize(frame->width(), frame->height());
-    QRect geo = QGuiApplication::primaryScreen()->geometry();
+    const QRect geo = QGuiApplication::primaryScreen()->geometry();
     Model *m = dynamic_cast<Model*>(myButton);
     if(!m) return;
     Shell *shell = m->shell();
