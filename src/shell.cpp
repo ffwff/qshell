@@ -174,7 +174,9 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
         COND_LOAD_MODEL("Panel", Panel)
         COND_LOAD_MODEL("Tasks", Tasks)
         else if(type == "Task" && parent) { // prevents loading outside of Tasks
-            m = new Task(dynamic_cast<Tasks*>(parent), name);
+            Tasks *tasks = dynamic_cast<Tasks*>(parent);
+            if(tasks == nullptr) return 0;
+            m = new Task(tasks, name);
             static_cast<Task *>(m)->load(&group);
         }
         COND_LOAD_MODEL("DashButton", DashButton)
