@@ -63,20 +63,21 @@ void Q::NotificationsDialog::updateDialog() {
 
     XChangeProperty(display, frame->winId(), atom, atom, 32, PropModeReplace,
             reinterpret_cast<unsigned char *>(data.data()), data.size());
-};
+}
 
 
 void Q::NotificationsDialog::toggle() {
     if(!frame->isVisible()) {
         Q::NotificationsDialog::hideAll();
         frame->show();
+        frame->update();
         KWindowSystem::setState(frame->winId(), NET::SkipTaskbar);
     } else {
         frame->hide();
     }
-};
+}
 
 void Q::NotificationsDialog::hideAll() {
     foreach(Frame *frame, notificationFrames)
         frame->hide();
-};
+}

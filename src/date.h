@@ -35,4 +35,4 @@ private:
     DateDialog *myDateDialog;
 };
 
-};
+}

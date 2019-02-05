@@ -16,7 +16,7 @@
 #include "frame.h"
 #include "utils.h"
 
-static const int DBUS_TIMEOUT = 25;
+static const int DBUS_TIMEOUT = 5;
 static const QDBusMessage findPlayerMsg = QDBusMessage::createMethodCall("org.freedesktop.DBus", "/", "org.freedesktop.DBus", "ListNames");
 
 Q::MediaPlayer::MediaPlayer(const QString &name, Q::Shell *shell)
@@ -91,39 +91,38 @@ Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media)
 
 void Q::MediaPlayerDialog::update() {
     if(!isVisible()) return;
+    qDebug() << "update";
 
     if(!myPropertyInterface || !myPropertyInterface->isValid()) {
         QDBusMessage response = QDBusConnection::sessionBus().call(findPlayerMsg, QDBus::Block, DBUS_TIMEOUT);
 
         if (response.type() == QDBusMessage::ReplyMessage) {
-            QList<QVariant> args = response.arguments();
+            const QList<QVariant> args = response.arguments();
             if (args.length() == 1) {
-                QVariant arg = args.at(0);
+                const QVariant arg = args.at(0);
                 if (!arg.isNull() && arg.isValid()) {
-                    QStringList runningBusEndpoints = arg.toStringList();
-                    if (!runningBusEndpoints.isEmpty()) {
-                        QStringList busids;
-                        for (QString& id: runningBusEndpoints) {
-                            if (id.startsWith("org.mpris.MediaPlayer2.")) {
-                                if(myCtrlInterface) delete myCtrlInterface;
-                                myPropertyInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", QDBusConnection::sessionBus(), this);
-                                myCtrlInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", QDBusConnection::sessionBus(), this);
-                                break;
-                            }
+                    const QStringList runningBusEndpoints = arg.toStringList();
+                    for (const QString &id: runningBusEndpoints) {
+                        if (id.startsWith("org.mpris.MediaPlayer2.")) {
+                            qDebug() << "found";
+                            if(myCtrlInterface) delete myCtrlInterface;
+                            myPropertyInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.freedesktop.DBus.Properties", QDBusConnection::sessionBus(), this);
+                            myCtrlInterface = new QDBusInterface(id, "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player", QDBusConnection::sessionBus(), this);
+                            break;
                         }
                     }
                 }
             }
         }
-    } else {
-        QDBusMessage reply = myPropertyInterface->call("Get", "org.mpris.MediaPlayer2.Player", "Metadata");
-        QDBusVariant dbusVariant = qvariant_cast<QDBusVariant>(reply.arguments().first());
-        QVariantMap elems = qdbus_cast<QVariantMap>(dbusVariant.variant().value<QDBusArgument>() );
+    }
+    if (myPropertyInterface && myPropertyInterface->isValid()) {
+        const QDBusMessage reply = myPropertyInterface->call("Get", "org.mpris.MediaPlayer2.Player", "Metadata");
+        const QDBusVariant dbusVariant = qvariant_cast<QDBusVariant>(reply.arguments().first());
+        const QVariantMap elems = qdbus_cast<QVariantMap>(dbusVariant.variant().value<QDBusArgument>());
         if(!elems.isEmpty()) {
-            QString _t = elems["xesam:title"].toString();
-            title->setText(_t.isEmpty() ? QUrl(elems["xesam:url"].toString()).fileName() : _t);
+            const QString titleText = elems["xesam:title"].toString();
+            title->setText(titleText.isEmpty() ? QUrl(elems["xesam:url"].toString()).fileName() : titleText);
             artist->setText(elems["xesam:artist"].toString());
-            slider->setMinimum(0);
             slider->setMaximum(elems["mpris:length"].toLongLong() * 1e-6); // 1 microsecond = 1e-6 seconds
             if(myMedia->showLabel())
                 myMedia->setText(elems["xesam:title"].toString() + " - " + elems["xesam:artist"].toString());

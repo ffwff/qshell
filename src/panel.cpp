@@ -150,8 +150,8 @@ void Q::Panel::load(KConfigGroup *grp) {
 void Q::Panel::geometryChanged() {
     container->hide();
     QSize geometry = QGuiApplication::primaryScreen()->size();
-    resize(QSize(dimFromSetting(myWidth, geometry.width()),
-                 dimFromSetting(myHeight, geometry.height())));
+    resize(dimFromSetting(myWidth, geometry.width()),
+           dimFromSetting(myHeight, geometry.height()));
 
     if(myPosition == Position::Left || myPosition == Position::Top) {
         move(

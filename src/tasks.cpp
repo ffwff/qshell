@@ -47,10 +47,7 @@ Q::Task::Task(Q::Tasks *tasks, const QString &name, const QString &classClass)
     Model(name, tasks->shell()),
     myParent(tasks),
     myClassClass(classClass),
-    myName(name),
-    mySize(QSize(48, 48)) {
-    setIconSize(mySize);
-    setMinimumSize(mySize);
+    myName(name) {
     populateContextMenu();
 
     if(myParent->previewTasks())
@@ -329,7 +326,7 @@ Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
     layout->addWidget(window);
 
     layout->addStretch();
-};
+}
 
 void Q::WindowPreview::updatePixmap() {
     if(!isVisible()) return;
@@ -441,8 +438,8 @@ void Q::Tasks::load(KConfigGroup *grp) {
     byDesktop = grp->readEntry("ByDesktop", false);
     static_cast<QBoxLayout*>(layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
 
-    QStringList pinned = grp->readEntry("Pinned", QStringList());
-    foreach(QString pin, pinned) {
+    const QStringList pinned = grp->readEntry("Pinned", QStringList());
+    foreach(const QString &pin, pinned) {
         Model *m = shell()->getModelByName(pin, this);
         if(m) {
             Task *t = dynamic_cast<Task*>(m);
@@ -472,7 +469,6 @@ void Q::Tasks::windowAdded(WId wid) {
         return;
     const QString cmdline = getCmdline(wid);
     Task *task = getTask(info.windowClassClass());
-    //Task *task = getTaskByClass(info.windowClassClass());
     if(task)
         task->addWindow(wid);
     else {
@@ -504,7 +500,7 @@ void Q::Tasks::populateWindows() {
         windowAdded(wid);
 }
 
-void Q::Tasks::currentDesktopChanged(int desktop) {
+void Q::Tasks::currentDesktopChanged() {
     myWindows.clear();
     QList<Task *> newTasks;
     foreach (Task *task, myTasks) {
@@ -569,8 +565,8 @@ static QString whichCmd(const QString &cmd) { // emulated the which command for 
 
     if(bin.startsWith("/"))
         return bin;
-    QStringList pathEnv = QString(qgetenv("PATH").constData()).split(":");
-    foreach (QString path, pathEnv) {
+    const QStringList pathEnv = QString(qgetenv("PATH").constData()).split(":");
+    foreach (const QString &path, pathEnv) {
         if(QFile::exists(path + "/" + bin)) {
             return path + "/" + bin;
         }
@@ -578,7 +574,7 @@ static QString whichCmd(const QString &cmd) { // emulated the which command for 
     return bin;
 }
 
-QString Q::Tasks::getCmdline(WId wid) {
+QString Q::Tasks::getCmdline(WId wid) const {
     NETWinInfo info(QX11Info::connection(), wid, QX11Info::appRootWindow(), NET::WMPid, NET::WM2DesktopFileName);
     const char *desktopFile = info.desktopFileName();
     if(desktopFile != nullptr) {

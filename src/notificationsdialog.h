@@ -14,6 +14,7 @@ public:
     NotificationsDialog(QPushButton *button);
     void updateDialog();
     static void hideAll();
+    virtual void update() {}
 public slots:
     void toggle();
     void hideFrame(WId wid);

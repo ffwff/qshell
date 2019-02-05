@@ -20,7 +20,7 @@ class MediaPlayerDialog : public NotificationsDialog {
 public:
     MediaPlayerDialog(MediaPlayer *media);
 public slots:
-    void update();
+    void update() override;
 private slots:
     void playPause();
     void previousTrack();

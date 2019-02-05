@@ -128,13 +128,13 @@ private slots:
     void windowAdded(WId wid);
     void windowRemoved(WId wid);
     void populateWindows();
-    void currentDesktopChanged(int desktop);
+    void currentDesktopChanged();
 private:
     QList<Task*> myTasks;
     Task *getTask(const QString &classClass) const;
     bool byDesktop;
     QList<WId> myWindows;
-    QString getCmdline(WId wid);
+    QString getCmdline(WId wid) const;
     int mySize;
     bool myPreviewTasks;
     QTimer *myTimer;

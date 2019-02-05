@@ -26,7 +26,7 @@ class VolumeDialog : public NotificationsDialog
 public:
     VolumeDialog(Volume *volume);
     inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
-    void update();
+    void update() override;
 public slots:
     void valueChanged(int value);
 protected:

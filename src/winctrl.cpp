@@ -27,26 +27,26 @@ static void toggleMaximize() {
         KWindowSystem::clearState(KWindowSystem::activeWindow(), NET::Max);
     else
         KWindowSystem::setState(KWindowSystem::activeWindow(), NET::Max);
-};
+}
 
 static void closeWindow() {
     NETRootInfo(QX11Info::connection(), NET::CloseWindow).closeWindowRequest(KWindowSystem::activeWindow());
-};
+}
 
 static void minimize() {
     KWindowSystem::minimizeWindow(KWindowSystem::activeWindow());
-};
+}
 
 // ----------
 
 Q::WinTitle::WinTitle(QWidget *parent) : QLabel(parent), timer(0) {
     populateContextMenu();
-};
+}
 
 // Clicks
 void Q::WinTitle::doubleClick() {
     toggleMaximize();
-};
+}
 
 void Q::WinTitle::click() {
     KWindowInfo info(KWindowSystem::activeWindow(), NET::WMState);
@@ -59,17 +59,17 @@ void Q::WinTitle::click() {
         std::min(shell->getStrutLeft() + parentWidget()->x(), geometry.width() - width()),
         parentWidget()->y() + parentWidget()->parentWidget()->height()
     ));
-};
+}
 
 // Mouse Events
-void Q::WinTitle::mousePressEvent(QMouseEvent *event) {
+void Q::WinTitle::mousePressEvent(QMouseEvent *) {
     isDoubleClick = false;
-};
+}
 
 void Q::WinTitle::mouseDoubleClickEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton)
         isDoubleClick = true;
-};
+}
 
 void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() == Qt::RightButton)
@@ -90,7 +90,7 @@ void Q::WinTitle::mouseReleaseEvent(QMouseEvent *event) {
     if(timer)
         timer->stop();
 
-};
+}
 
 // Context Menu
 void Q::WinTitle::populateContextMenu() {
@@ -166,7 +166,7 @@ void Q::WinTitle::populateContextMenu() {
     act->setShortcut(QKeySequence("Alt+F4"));
     connect(act, &QAction::triggered, [](){ closeWindow(); });
     myContextMenu.addAction(act);
-};
+}
 
 // ----------
 
