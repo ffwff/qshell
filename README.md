@@ -29,14 +29,6 @@ For Arch, use this:
 sudo pacman -S extra-cmake-modules plasma-meta
 ```
 
-## Cloning the repository
-
-It is recommended that you clone the repository recursively:
-
-```
-git clone -r https://github.com/ffwff/qshell
-```
-
 ## Build
 
 ```
@@ -65,4 +57,3 @@ Although there is an xsession file, it currently doesn't work. To run the shell 
 
  * Qt and KF5
  * [BE::Shell](https://sourceforge.net/projects/be-shell/)
- * [pamixer](https://github.com/cdemoulins/pamixer/)

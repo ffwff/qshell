@@ -178,15 +178,7 @@ Q::Model *Q::Shell::getModelByName(const QString &name, Model *parent) {
             static_cast<Task *>(m)->load(&group);
         }
         COND_LOAD_MODEL("DashButton", DashButton)
-        else if(type == "Volume") {
-            try {
-                m = new Volume(name, this);
-                static_cast<Volume*>(m)->load(&group);
-            } catch(const char *s) {
-                qDebug() << s;
-                return 0;
-            }
-        }
+        COND_LOAD_MODEL("Volume", Volume)
         COND_LOAD_MODEL("Systray", Systray)
         COND_LOAD_MODEL("Network", Network)
         COND_LOAD_MODEL("Date", Date)

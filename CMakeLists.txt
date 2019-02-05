@@ -40,7 +40,6 @@ find_package(KF5Solid NO_MODULE)
 
 find_package(X11 REQUIRED COMPONENTS Xext)
 
-add_definitions("-fexceptions")
 add_definitions(-DQT_NO_URL_CAST_FROM_STRING)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_definitions("-Wno-mismatched-tags")
@@ -53,14 +52,8 @@ set(XSESSION_INSTALL_DIR "/usr/share/xsessions")
 # ----
 file(GLOB shell_SRCS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
 
-set(pamixer_SRCS
-    pamixer/callbacks.cc
-    pamixer/device.cc
-    pamixer/pulseaudio.cc
-)
 
-
-add_executable(qshell ${shell_SRCS} ${pamixer_SRCS})
+add_executable(qshell ${shell_SRCS})
 
 target_link_libraries(qshell
     Qt5::Concurrent

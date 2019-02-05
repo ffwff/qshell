@@ -99,10 +99,10 @@ void Q::Task::addWindow(WId wid) {
 
 void Q::Task::removeWindow(WId wid) {
     myWindows.removeAll(wid);
-    if(myWindows.isEmpty() && !pinned)
-        myParent->removeTask(this);
     if(myParent->previewTasks())
         myTaskPreview->removeWindow(wid);
+    if(myWindows.isEmpty() && !pinned)
+        myParent->removeTask(this);
 }
 
 void Q::Task::removeAllWindows() {
@@ -332,7 +332,7 @@ void Q::WindowPreview::updatePixmap() {
     if(!isVisible()) return;
     QPixmap pixmap = grabWindow();
     window->setPixmap(pixmap);
-    QTimer::singleShot(0, this, SLOT(updatePixmap()));
+    QTimer::singleShot(33, this, SLOT(updatePixmap()));
 }
 
 // events
