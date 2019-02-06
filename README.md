@@ -36,7 +36,6 @@ mkdir build
 cd build
 cmake ..
 make
-sudo make install
 ```
 
 ## Run
@@ -49,9 +48,11 @@ kquitapp plasmashell; sleep 2; qshell
 
 ## Install
 
-Although there is an xsession file, it currently doesn't work. To run the shell on startup, you should hijack Plasma's `.desktop` files. To do this, replace `/etc/xdg/autostart/org.kde.plasmashell.desktop` with `org.kde.plasmashell.desktop` in this repository. You can then log in to Q::Shell in your display manager by choosing the KDE Plasma session.
+```
+sudo make install
+```
 
-**NOTE**: there is currently a (small) login delay by doing this, I'm currently investigating this, however bear that in mind.
+A Q::Shell session will appear on your display manager's session selection.
 
 ## Credits
 
