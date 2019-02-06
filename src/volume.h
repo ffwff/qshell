@@ -41,7 +41,7 @@ class Volume : public QPushButton, public Model {
     Q_OBJECT
 public:
     Volume(const QString &name, Shell *shell);
-    ~Volume() { dialog->deleteLater(); };
+    ~Volume();
     void load(KConfigGroup *grp) override;
     int volumePercent() const;
     void setVolume(int percent);
@@ -51,18 +51,23 @@ public:
 public slots:
     void update();
     void wheelEvent(QWheelEvent *we);
+private slots:
+    void sinkInfoChanged(const pa_sink_info *);
+    void sinkChanged(const char *s);
 private:
 
     enum {
         CONNECTING, CONNECTED, ERROR
     } state;
-    pa_mainloop* mainloop;
-    pa_context* context;
+    pa_threaded_mainloop *mainloop;
+    pa_context *context;
     int retval;
     pa_sink_info sinfo;
     void iterate(pa_operation *op);
     std::string sink;
     pa_cvolume *cvolume;
+    void setupSubscription();
+    void setupDefaultSink();
 
     VolumeDialog *dialog;
     QIcon iconMuted, iconHigh, iconMedium, iconLow;

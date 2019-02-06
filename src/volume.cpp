@@ -16,19 +16,31 @@
 #include "frame.h"
 #include "utils.h"
 
+static const auto success_cb = [](pa_context *, int, void *) {};
+
 Q::Volume::Volume(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell),
     dialog(new Q::VolumeDialog(this)) {
 
-    mainloop = pa_mainloop_new();
-    pa_mainloop_api *api = pa_mainloop_get_api(mainloop);
+    mainloop = pa_threaded_mainloop_new();
+    pa_threaded_mainloop_lock(mainloop);
+    pa_mainloop_api *api = pa_threaded_mainloop_get_api(mainloop);
     context = pa_context_new(api, "qshell");
+
+    if (pa_threaded_mainloop_start(mainloop)) {
+        qDebug() << "Unable to start pulseaudio mainloop";
+        pa_threaded_mainloop_free(mainloop);
+        mainloop = nullptr;
+        return;
+    }
 
     pa_context_set_state_callback(context, [](pa_context *context, void *volume_) {
         Q::Volume *volume = (Q::Volume *)volume_;
         switch(pa_context_get_state(context)) {
             case PA_CONTEXT_READY:
                 volume->state = CONNECTED;
+                volume->setupSubscription();
+                volume->setupDefaultSink();
                 break;
             case PA_CONTEXT_FAILED:
                 volume->state = ERROR;
@@ -43,46 +55,73 @@ Q::Volume::Volume(const QString &name, Q::Shell *shell)
     }, this);
 
     state = CONNECTING;
-    if (pa_context_connect(context, NULL, PA_CONTEXT_NOFLAGS, NULL) < 0) {
+    if (pa_context_connect(context, NULL, PA_CONTEXT_NOFLAGS, NULL) < 0 ||
+        state == ERROR) {
         qDebug() << "Connection error\n";
         return;
     }
-    while (state == CONNECTING) {
-        if (pa_mainloop_iterate(mainloop, 1, &retval) < 0) {
-            qDebug() << "Mainloop error\n";
-            return;
-        }
-    }
-    if (state == ERROR) {
-        qDebug() << "Connection error\n";
-        return;
-    }
-
-    // get default sink name
-    pa_operation *op = pa_context_get_server_info(context, [](pa_context *, const pa_server_info *i, void *volume_) {
-        Q::Volume *volume = (Q::Volume *)volume_;
-        if(volume->sink.size()) return;
-        volume->sink = i->default_sink_name;
-    }, this);
-    iterate(op);
-    pa_operation_unref(op);
+    pa_threaded_mainloop_unlock(mainloop);
 }
 
-void Q::Volume::iterate(pa_operation *op) {
-    while (pa_operation_get_state(op) == PA_OPERATION_RUNNING) {
-        pa_mainloop_iterate(mainloop, 1, &retval);
-    }
+Q::Volume::~Volume() {
+    pa_threaded_mainloop_free(mainloop);
+    dialog->deleteLater();
+}
+
+// setup
+
+void Q::Volume::setupSubscription() {
+    qDebug() << "subscription";
+    pa_operation *op;
+    // subscribe to events
+    pa_context_set_subscribe_callback(context, [](pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *volume_) {
+        qDebug() << "subscribe";
+        Q::Volume *volume = (Q::Volume *)volume_;
+        if(t == PA_SUBSCRIPTION_EVENT_CHANGE && idx == volume->sinfo.index) {
+            volume->populateSinkInfo();
+        }
+    }, this);
+    if(!(op = pa_context_subscribe(context, PA_SUBSCRIPTION_MASK_SINK, success_cb, nullptr)))
+        qDebug() << "Can't subscribe";
+
+}
+
+void Q::Volume::setupDefaultSink() {
+    pa_operation *op = pa_context_get_server_info(context, [](pa_context *, const pa_server_info *i, void *volume_) {
+        Q::Volume *volume = (Q::Volume *)volume_;
+        emit volume->sinkChanged(i->default_sink_name);
+    }, this);
+    pa_operation_unref(op);
 }
 
 void Q::Volume::populateSinkInfo() {
+    qDebug() << "populate...";
     pa_operation *op = pa_context_get_sink_info_by_name(context, sink.c_str(), [](pa_context *, const pa_sink_info *i, int eol, void *volume_) {
         if(eol != 0) return;
         Q::Volume *volume = (Q::Volume *)volume_;
-        volume->sinfo.mute = i->mute;
-        volume->sinfo.volume = i->volume;
+        emit volume->sinkInfoChanged(i);
+        emit volume->update();
     }, this);
-    iterate(op);
     pa_operation_unref(op);
+}
+
+// slots
+void Q::Volume::sinkInfoChanged(const pa_sink_info *i) {
+    sinfo.index = i->index;
+    sinfo.mute = i->mute;
+    sinfo.volume = i->volume;
+}
+
+void Q::Volume::sinkChanged(const char *s) {
+    if(!sink.empty()) return;
+    sink = s;
+    populateSinkInfo();
+}
+
+// etc
+void Q::Volume::iterate(pa_operation *op) {
+    while (pa_operation_get_state(op) == PA_OPERATION_RUNNING)
+        pa_threaded_mainloop_wait(mainloop);
 }
 
 int Q::Volume::volumePercent() const {
@@ -95,8 +134,6 @@ int Q::Volume::volumePercent() const {
 bool Q::Volume::isMute() const {
     return (bool)sinfo.mute;
 }
-
-static const auto success_cb = [](pa_context *, int, void *) {};
 
 void Q::Volume::mute() {
     pa_operation *op = pa_context_set_sink_mute_by_name(context, sink.c_str(), (int)(!isMute()), success_cb, nullptr);
@@ -118,26 +155,20 @@ void Q::Volume::setVolume(int percent) {
 }
 
 void Q::Volume::update() {
-    if(state == CONNECTED) {
-        populateSinkInfo();
-        int percent = volumePercent();
-        if(percent == -1) {
-            setIcon(iconMuted);
-            setToolTip("Muted");
-        } else {
-            if(percent > 60)
-                setIcon(iconHigh);
-            else if(percent > 25)
-                setIcon(iconMedium);
-            else
-                setIcon(iconLow);
-            setToolTip(QString::number(percent) + "%");
-        }
-        if(dialog->isVisible()) {
-            dialog->update();
-        }
+    int percent = volumePercent();
+    if(percent == -1) {
+        setIcon(iconMuted);
+        setToolTip("Muted");
+    } else {
+        if(percent > 60)
+            setIcon(iconHigh);
+        else if(percent > 25)
+            setIcon(iconMedium);
+        else
+            setIcon(iconLow);
+        setToolTip(QString::number(percent) + "%");
     }
-    QTimer::singleShot(250, this, SLOT(update()));
+    dialog->update();
 }
 
 void Q::Volume::load(KConfigGroup *grp) {
@@ -153,7 +184,6 @@ void Q::Volume::load(KConfigGroup *grp) {
 
 void Q::Volume::wheelEvent(QWheelEvent *we) {
     setVolume(volumePercent()+( we->delta()>0 ? 1 : -1 ));
-    update();
 }
 
 // ----------
@@ -172,7 +202,6 @@ Q::VolumeDialog::VolumeDialog(Volume *volume) :
     layout->addWidget(muteButton);
     connect(muteButton, &QPushButton::clicked, [this]() {
         myVolume->mute();
-        update();
     });
 
     slider = new QSlider(Qt::Horizontal, this);
@@ -196,7 +225,6 @@ void Q::VolumeDialog::update() {
 
 void Q::VolumeDialog::showEvent(QShowEvent *) {
     updateDialog();
-    update();
 }
 
 void Q::VolumeDialog::valueChanged(int value) {
