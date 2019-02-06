@@ -1,0 +1,6 @@
+#!/bin/bash
+if [[ "$LAUNCH_QSHELL" = "1" ]]; then
+    exec qshell
+else
+    exec plasmashell
+fi

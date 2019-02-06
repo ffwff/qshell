@@ -216,6 +216,10 @@ if test $? -ne 0; then
   exit 1
 fi
 
+# Hijack user's "org.kde.plasmashell.desktop"
+export LAUNCH_QSHELL="1"
+[[ ! -e "$HOME/.config/autostart/org.kde.plasmashell.desktop" ]] && cp /usr/share/qshell/org.kde.plasmashell.desktop $HOME/.config/autostart/org.kde.plasmashell.desktop
+
 test -n "$KDEWM" && KDEWM="--windowmanager $KDEWM"
 KSMSERVEROPTIONS=""
 test -n "$dl" && KSMSERVEROPTIONS=" --lockscreen"

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Exec=/usr/share/qshell/qshell-init
+X-DBUS-StartupType=Unique
+Name=Plasma Desktop Workspace
+Type=Application
+X-KDE-StartupNotify=false
+X-DBUS-ServiceName=org.kde.plasmashell
+OnlyShowIn=KDE;
+X-KDE-autostart-phase=0
+Icon=plasma
+NoDisplay=true

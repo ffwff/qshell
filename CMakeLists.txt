@@ -71,5 +71,6 @@ target_link_libraries(qshell
 
 install(TARGETS qshell DESTINATION ${BIN_INSTALL_DIR})
 install(PROGRAMS "qshell-session" "qshellctl" DESTINATION ${BIN_INSTALL_DIR})
-install(DIRECTORY "themes" DESTINATION ${CONFIG_INSTALL_DIR})
+install(PROGRAMS "qshell-init" DESTINATION ${CONFIG_INSTALL_DIR})
+install(FILES "org.kde.plasmashell.desktop" DESTINATION ${CONFIG_INSTALL_DIR})
 install(FILES "qshell.desktop" DESTINATION ${XSESSION_INSTALL_DIR})
