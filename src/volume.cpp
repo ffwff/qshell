@@ -64,6 +64,7 @@ Q::Volume::Volume(const QString &name, Q::Shell *shell)
 }
 
 Q::Volume::~Volume() {
+    pa_threaded_mainloop_stop(mainloop);
     pa_threaded_mainloop_free(mainloop);
     dialog->deleteLater();
 }

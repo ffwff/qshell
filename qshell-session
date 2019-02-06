@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if [  ${XDG_CONFIG_HOME} ]; then
   configDir=$XDG_CONFIG_HOME;
@@ -223,7 +223,7 @@ export LAUNCH_QSHELL="1"
 test -n "$KDEWM" && KDEWM="--windowmanager $KDEWM"
 KSMSERVEROPTIONS=""
 test -n "$dl" && KSMSERVEROPTIONS=" --lockscreen"
-LD_BIND_NOW=true kdeinit5 +kcminit_startup
+LD_BIND_NOW=true /usr/lib/kf5/start_kdeinit_wrapper --kded +kcminit_startup
 kwrapper5 ksmserver $KDEWM $KSMSERVEROPTIONS
 
 # Clean up
