@@ -242,9 +242,11 @@ void Q::Task::unpin() {
 // ----------
 
 Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task) {
+    QBoxLayout *layout = new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction());
+    layout->setMargin(0);
+    layout->setSizeConstraint(QLayout::SetFixedSize);
+    setLayout(layout);
     setWindowFlags(Qt::ToolTip);
-    setLayout(new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction()));
-    layout()->setSizeConstraint(QLayout::SetFixedSize);
     resize(0, 0);
 }
 
@@ -307,9 +309,11 @@ void Q::TaskPreview::removeWindow(WId wid) {
 Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
     : QWidget(taskPreview), myWid(wid), myTaskPreview(taskPreview) {
     layout = new QVBoxLayout(this);
+    layout->setMargin(15);
     setLayout(layout);
 
     title = new QLabel();
+    title->setProperty("class", "titleLabel");
     title->setStyleSheet("color: white; max-width: 240px; margin: 0 5px; margin-top: 10px;");
     title->setWordWrap(true);
     layout->addWidget(title);
@@ -322,7 +326,6 @@ Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
 
     window = new QLabel();
     window->setStyleSheet("margin: 0 10px; margin-bottom: 10px;");
-    //window->resize(250,250);
     layout->addWidget(window);
 
     layout->addStretch();

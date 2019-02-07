@@ -196,6 +196,7 @@ Q::VolumeDialog::VolumeDialog(Volume *volume) :
 
     QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
+    layout->setMargin(0);
     setLayout(layout);
 
     muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute", this);

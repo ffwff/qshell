@@ -104,7 +104,6 @@ background-color: rgba(0,0,0,60%);
 /* Tasks */
 .Q--Task {
     padding: 10px 0;
-
 }
 
 /* Trash */
@@ -114,7 +113,7 @@ background-color: rgba(0,0,0,60%);
 }
 
 /* volume */
-.Q--VolumeDialog QWidget {
+.Q--VolumeDialog > QWidget {
     background-color: rgba(0,0,0,30%);
 }
 
