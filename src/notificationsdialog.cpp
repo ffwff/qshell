@@ -48,9 +48,9 @@ void Q::NotificationsDialog::updateDialog() {
     const int yoff = myButton->parentWidget()->parentWidget()->y();
     frame->move(
         std::min(geo.width() - frame->width() + shell->getStrutRight(),
-                 shell->getStrutLeft() + xoff + myButton->x() + myButton->width()/2 - width()/2),
+                 std::max(shell->getStrutLeft() + xoff, shell->getStrutLeft() + xoff + myButton->x() + myButton->width()/2 - width()/2)),
         std::min(geo.height() - frame->height() - shell->getStrutBottom() + shell->getStrutTop(),
-                 shell->getStrutTop() + yoff + myButton->y())
+                 std::max(shell->getStrutTop() + yoff, shell->getStrutTop() + yoff + myButton->y()))
     );
 
     Display *display = QX11Info::display();

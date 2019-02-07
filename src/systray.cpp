@@ -83,7 +83,7 @@ void Q::SystrayItem::update() {
 }
 
 void Q::SystrayItem::mouseReleaseEvent(QMouseEvent *) {
-    itemInterface->call("ContextMenu", 0, 10);
+    itemInterface->call("ContextMenu", 0, 0);
 }
 
 // systray
@@ -91,7 +91,7 @@ Q::Systray::Systray(const QString &name, Q::Shell *shell)
     : QWidget(), Model(name, shell) {
     qDBusRegisterMetaType<IconPixmap>();
 
-    QHBoxLayout *layout = new QHBoxLayout();
+    QHBoxLayout *layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setMargin(0);
     setLayout(layout);

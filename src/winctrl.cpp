@@ -53,11 +53,16 @@ void Q::WinTitle::click() {
     if(info.state() & NET::SkipTaskbar)
         return;
     populateContextMenu();
-    QRect geometry = QGuiApplication::primaryScreen()->geometry();
+    const QRect geo = QGuiApplication::primaryScreen()->geometry();
     Shell *shell = static_cast<WinCtrl*>(parentWidget())->shell();
+    const QWidget *panel = parentWidget()->parentWidget()->parentWidget();
+    const int xoff = panel->x();
+    const int yoff = panel->y();
     myContextMenu.popup(QPoint(
-        std::min(shell->getStrutLeft() + parentWidget()->x(), geometry.width() - width()),
-        parentWidget()->y() + parentWidget()->parentWidget()->height()
+        std::min(geo.width() - myContextMenu.sizeHint().width() + shell->getStrutRight(),
+                 std::max(shell->getStrutLeft() + xoff, shell->getStrutLeft() + xoff + x() + width()/2 - myContextMenu.width()/2)),
+        std::min(geo.height() - myContextMenu.sizeHint().height() - shell->getStrutBottom() + shell->getStrutTop(),
+                 std::max(shell->getStrutTop() + yoff, shell->getStrutTop() + yoff + y()))
     ));
 }
 
@@ -102,7 +107,7 @@ void Q::WinTitle::populateContextMenu() {
 
     QMenu *menu = myContextMenu.addMenu("Move to desktop");
 
-    act = new QAction("All desktops");
+    act = new QAction("All desktops", this);
     act->setCheckable(true);
     act->setChecked(info.onAllDesktops());
     connect(act, &QAction::triggered, [](){
@@ -113,7 +118,7 @@ void Q::WinTitle::populateContextMenu() {
     menu->addSeparator();
 
     for(int i = 1; i <= KWindowSystem::numberOfDesktops(); i++) {
-        act = new QAction(KWindowSystem::desktopName(i));
+        act = new QAction(KWindowSystem::desktopName(i), this);
         act->setCheckable(true);
         act->setChecked(info.isOnDesktop(i));
         connect(act, &QAction::triggered, [i](){
@@ -124,7 +129,7 @@ void Q::WinTitle::populateContextMenu() {
 
     myContextMenu.addSeparator();
 
-    act = new QAction(QIcon::fromTheme("up"), "Keep above others");
+    act = new QAction(QIcon::fromTheme("up"), "Keep above others", this);
     act->setCheckable(true);
     act->setChecked(info.state() & NET::StaysOnTop);
     connect(act, &QAction::triggered, [info](){
@@ -135,7 +140,7 @@ void Q::WinTitle::populateContextMenu() {
     });
     myContextMenu.addAction(act);
 
-    act = new QAction(QIcon::fromTheme("down"), "Keep below others");
+    act = new QAction(QIcon::fromTheme("down"), "Keep below others", this);
     act->setCheckable(true);
     act->setChecked(info.state() & NET::KeepBelow);
     connect(act, &QAction::triggered, [info](){
@@ -148,21 +153,21 @@ void Q::WinTitle::populateContextMenu() {
 
     myContextMenu.addSeparator();
 
-    act = new QAction(QIcon::fromTheme("window-minimize-symbolic"), "Maximize");
+    act = new QAction(QIcon::fromTheme("window-minimize-symbolic"), "Maximize", this);
     connect(act, &QAction::triggered, [](){ minimize(); });
     myContextMenu.addAction(act);
 
     if(info.state() & NET::Max) {
-        act = new QAction(QIcon::fromTheme("window-restore-symbolic"), "Unmaximize");
+        act = new QAction(QIcon::fromTheme("window-restore-symbolic"), "Unmaximize", this);
         connect(act, &QAction::triggered, [](){ toggleMaximize(); });
         myContextMenu.addAction(act);
     } else {
-        act = new QAction(QIcon::fromTheme("window-maximize-symbolic"), "Maximize");
+        act = new QAction(QIcon::fromTheme("window-maximize-symbolic"), "Maximize", this);
         connect(act, &QAction::triggered, [](){ toggleMaximize(); });
         myContextMenu.addAction(act);
     }
 
-    act = new QAction(QIcon::fromTheme("window-close-symbolic"), "Close");
+    act = new QAction(QIcon::fromTheme("window-close-symbolic"), "Close", this);
     act->setShortcut(QKeySequence("Alt+F4"));
     connect(act, &QAction::triggered, [](){ closeWindow(); });
     myContextMenu.addAction(act);
@@ -178,11 +183,11 @@ Q::WinCtrl::WinCtrl(const QString& name, Shell* shell)
     layout->setContentsMargins(0,0,0,0);
     setLayout(layout);
 
-    closeBtn = new QPushButton();
+    closeBtn = new QPushButton(this);
     closeBtn->setIcon(QIcon::fromTheme("window-close-symbolic"));
-    minimizeBtn = new QPushButton();
+    minimizeBtn = new QPushButton(this);
     minimizeBtn->setIcon(QIcon::fromTheme("window-minimize-symbolic"));
-    maximizeBtn = new QPushButton();
+    maximizeBtn = new QPushButton(this);
     maximizeBtn->setIcon(QIcon::fromTheme("window-restore-symbolic"));
 
     label = new WinTitle(this);
