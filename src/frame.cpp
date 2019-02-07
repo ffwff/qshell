@@ -22,10 +22,10 @@ Q::Frame::Frame(QWidget *parent) : QWidget(parent) {
     XChangeProperty(display, winId(), atom, XA_CARDINAL,
                     32, PropModeReplace, 0, 0);
     repaint();
-};
+}
 
 void Q::Frame::setCentralWidget(QWidget *w) {
     widget = w;
     widget->setParent(this);
     widget->move(0, 0);
-};
+}

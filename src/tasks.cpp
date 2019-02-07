@@ -144,8 +144,10 @@ void Q::Task::enterEvent(QEvent *) {
         if(myParent->previewTasks()) {
             connect(myParent->timer(), &QTimer::timeout, this, [this](){ // performance reasons + rid of the annoyance if you just want to use the dash
                 if(underMouse()) {
-                    myTaskPreview->move(getContextMenuPos(myTaskPreview));
                     myTaskPreview->show();
+                    QTimer::singleShot(0, [this]() {
+                        myTaskPreview->move(getContextMenuPos(myTaskPreview));
+                    });
                 }
                 myParent->timer()->disconnect(this);
             });
@@ -161,16 +163,11 @@ void Q::Task::leaveEvent(QEvent *) {
 }
 
 QPoint Q::Task::getContextMenuPos(QWidget *widget) {
-    widget->setAttribute(Qt::WA_DontShowOnScreen, true);
-    widget->show();
-    widget->hide();
-    widget->setAttribute(Qt::WA_DontShowOnScreen, false);
-
     QPoint p = myParent->parentWidget()->parentWidget()->pos();
     Position position = static_cast<Panel*>(myParent->parentWidget()->parentWidget())->position();
     if(position == Position::Bottom) {
         p.setX(p.x() + x());
-        p.setY(p.y() - y() - widget->height());
+        p.setY(p.y() - y() - widget->sizeHint().height());
     } else if(position == Position::Left || position == Position::Right) {
         p.setX(p.x() + myParent->parentWidget()->width());
         p.setY(p.y() + y());
@@ -246,7 +243,11 @@ Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task) {
     layout->setMargin(0);
     layout->setSizeConstraint(QLayout::SetFixedSize);
     setLayout(layout);
-    setWindowFlags(Qt::ToolTip);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setAttribute(Qt::WA_X11NetWmWindowTypeDock);
+    if(!task->shell()->wmManageDialogs()) {
+        setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
+    }
     resize(0, 0);
 }
 
@@ -309,7 +310,7 @@ void Q::TaskPreview::removeWindow(WId wid) {
 Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
     : QWidget(taskPreview), myWid(wid), myTaskPreview(taskPreview) {
     layout = new QVBoxLayout(this);
-    layout->setMargin(15);
+    layout->setMargin(5);
     setLayout(layout);
 
     title = new QLabel();
