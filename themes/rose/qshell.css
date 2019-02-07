@@ -89,6 +89,10 @@ background-color: rgba(0,0,0,60%);
     min-height: 55px;
 }
 
+.Q--DashItem .nameLabel {
+    color: #fff;
+}
+
 .Q--DashItem .descLabel {
     color: #ccc;
 }
@@ -125,7 +129,8 @@ background-color: rgba(0,0,0,60%);
 
 /* info center */
 #InfoPanel QWidget {
-padding-top: 30px;
-padding-left:-1px;
-background:rgba(0,0,0,60%);
+    padding-top: 30px;
+    padding-left:-1px;
+    background:rgba(0,0,0,60%);
+    color: #fff;
 }
