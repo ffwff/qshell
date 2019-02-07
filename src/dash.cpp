@@ -179,15 +179,19 @@ void Q::Dash::activeWindowChanged(WId id) {
 void Q::Dash::showEvent(QShowEvent *) {
     QSize geometry = QGuiApplication::primaryScreen()->size();
     if(myWidth && myHeight)
-        resize(geometry.width() * (myWidth / 100), geometry.height() * (myHeight / 100));
-    if(myPosition == DashPosition::TopLeft)
-        move(shell()->getStrutLeft(), shell()->getStrutTop());
-    else if (myPosition == DashPosition::TopRight)
-        move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), shell()->getStrutTop());
-    else if (myPosition == DashPosition::BottomLeft)
-        move(shell()->getStrutLeft(), geometry.height() - shell()->getStrutBottom() - height());
-    else
-        move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
+        resize(geometry.width() * (myWidth / 100), geometry.height() * (myHeight / 100));\
+    if(offsetTop != -1 && offsetLeft != -1) { // TODO
+    	move(offsetLeft, offsetTop);
+    } else {
+	    if(myPosition == DashPosition::TopLeft)
+	        move(shell()->getStrutLeft(), shell()->getStrutTop());
+	    else if (myPosition == DashPosition::TopRight)
+	        move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), shell()->getStrutTop());
+	    else if (myPosition == DashPosition::BottomLeft)
+	        move(shell()->getStrutLeft(), geometry.height() - shell()->getStrutBottom() - height());
+	    else
+	        move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
+	}
 
     shell()->desktop()->activateWindow(); // HACK to activate for kwin
     activateWindow();
@@ -226,6 +230,8 @@ void Q::Dash::load( KConfigGroup *grp ) {
     mySlidePosition = grp->readEntry("SlidePosition", 0);
     myWidth = grp->readEntry("Width", 0);
     myHeight = grp->readEntry("Height", 0);
+    offsetTop = grp->readEntry("OffsetTop", -1);
+    offsetLeft = grp->readEntry("OffsetLeft", -1);
     bool searchBelow = grp->readEntry("SearchBelow", false);
     if(searchBelow)
         boxLayout()->addWidget(mySearchBarContainer);

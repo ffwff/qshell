@@ -88,6 +88,7 @@ private:
     DashPosition myPosition;
     QPixmap pixmap;
     float myWidth, myHeight;
+    int offsetTop = -1, offsetLeft = -1;
     int mySlidePosition;
     bool noCheckActive = false;
     bool myVisible = false;
