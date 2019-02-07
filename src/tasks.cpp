@@ -364,7 +364,7 @@ QPixmap Q::WindowPreview::grabWindow() {
     XGetWindowAttributes(QX11Info::display(), myWid, &wa);
     XImage *ximage = XGetImage(QX11Info::display(), myWid, 0, 0,
                               wa.width, wa.height, AllPlanes, ZPixmap);
-
+    if(ximage == nullptr) return QPixmap();
     // get format
     QImage::Format format = QImage::Format_Invalid;
     switch (ximage->depth) {

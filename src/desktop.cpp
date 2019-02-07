@@ -183,12 +183,12 @@ void Q::Desktop::paintEvent(QPaintEvent*) {
 }
 
 // configurations
-void Q::Desktop::load(KConfigGroup *group) {
-    setBackground(group->readEntry("Background", ""));
-    showIcons = group->readEntry("ShowIcons", false);
-    myIconSize = group->readEntry("IconSize", 64);
+void Q::Desktop::load(KConfigGroup *grp) {
+    setBackground(grp->readEntry("Background", ""));
+    showIcons = grp->readEntry("ShowIcons", false);
+    myIconSize = grp->readEntry("IconSize", 64);
     iconContainer->setVisible(showIcons);
-    QStringList icons = group->readEntry("Icons", QStringList());
+    QStringList icons = grp->readEntry("Icons", QStringList());
     foreach (const QString &i, icons) {
         DesktopIcon *icon = static_cast<DesktopIcon*>(shell()->getModelByName(i));
         if(icon) {
@@ -202,10 +202,13 @@ void Q::Desktop::load(KConfigGroup *group) {
             myIcons << icon;
         }
     }
+    bool isVisible = grp->readEntry("Visible", true);
+    setVisible(isVisible);
+    myShadows->setVisible(isVisible);
 }
 
-void Q::Desktop::save(KConfigGroup *group) {
-    group->writeEntry("Background", myFileName);
+void Q::Desktop::save(KConfigGroup *grp) {
+    grp->writeEntry("Background", myFileName);
 }
 
 // set background

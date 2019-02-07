@@ -168,6 +168,10 @@ static QString &normalize(QString cmd) {
 
 // Events
 void Q::Dash::activeWindowChanged(WId id) {
+    if(noCheckActive) {
+        noCheckActive = false;
+        return;
+    }
     if(isVisible() && id != shell()->desktop()->winId())
         hide();
 }
@@ -185,7 +189,7 @@ void Q::Dash::showEvent(QShowEvent *) {
     else
         move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
 
-    shell()->desktop()->activateWindow(); // HACK to activate
+    shell()->desktop()->activateWindow(); // HACK to activate for kwin
     activateWindow();
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
 
@@ -206,6 +210,12 @@ void Q::Dash::showEvent(QShowEvent *) {
              reinterpret_cast<unsigned char *>(data.data()), data.size());
 
     mySearchBar->setFocus();
+    noCheckActive = true;
+}
+
+void Q::Dash::hideEvent(QHideEvent *) {
+    KWindowSystem::forceActiveWindow(0);
+    noCheckActive = true;
 }
 
 // Configurations
@@ -221,6 +231,9 @@ void Q::Dash::load( KConfigGroup *grp ) {
         boxLayout()->addWidget(mySearchBarContainer);
     else
         boxLayout()->insertWidget(0, mySearchBarContainer);
+    bool wmManage = grp->readEntry("WmManage", true);
+    if(!wmManage)
+	    setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
 
     connect ( mySearchBar, &QLineEdit::returnPressed, [this](){
         if(!items.isEmpty()) items.first()->runCommand();
@@ -324,8 +337,7 @@ void Q::Dash::setSearch(const QString &s) {
 // ----------
 
 Q::DashButton::DashButton(const QString &name, Shell *parent)
-    : QPushButton(static_cast<QWidget *>(parent)),
-      Q::Model(name, parent) {
+    : QPushButton(), Q::Model(name, parent) {
 }
 
 void Q::DashButton::load(KConfigGroup *grp) {
@@ -344,5 +356,11 @@ void Q::DashButton::load(KConfigGroup *grp) {
 }
 
 void Q::DashButton::mouseReleaseEvent(QMouseEvent *) {
-    shell()->dash()->setVisible(!shell()->dash()->isVisible());
+    qDebug() << KWindowSystem::activeWindow() << shell()->dash()->winId() << shell()->desktop()->winId() << parentWidget()->winId();
+    if(shell()->dash()->deactive()) {
+        // HACK: the dash will automatically hide when a panel is activated
+        shell()->dash()->hide();
+        shell()->dash()->activeWindowChanged(0); // force deactivate
+    }
+    else shell()->dash()->show();
 }

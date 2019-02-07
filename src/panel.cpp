@@ -115,6 +115,11 @@ void Q::Panel::load(KConfigGroup *grp) {
 
     geometryChanged();
 
+    if(!shell()->wmManagePanels()) {
+        setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
+
+    }
+
     if(transparent) {
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);

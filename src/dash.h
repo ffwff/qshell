@@ -68,9 +68,11 @@ public:
     void save(KConfigGroup *grp) override;
     inline QWidget *searchBarContainer() const { return mySearchBarContainer; }
     inline QWidget *searchBar() const { return mySearchBar; }
-protected:
+    inline bool deactive() const { return noCheckActive; }
     void activeWindowChanged(WId wid);
-    void showEvent(QShowEvent *);
+protected:
+    void showEvent(QShowEvent *) override;
+    void hideEvent(QHideEvent *) override;
 private slots:
     void setSearch(const QString &s);
     void slotRepopulate();
@@ -87,6 +89,8 @@ private:
     QPixmap pixmap;
     float myWidth, myHeight;
     int mySlidePosition;
+    bool noCheckActive = false;
+    bool myVisible = false;
 };
 
 class DashButton : public QPushButton, public Model
@@ -96,7 +100,7 @@ public:
     DashButton(const QString &name, Shell *parent);
     void load(KConfigGroup *grp) override;
 protected:
-    void mouseReleaseEvent(QMouseEvent *mouseEvent);
+    void mouseReleaseEvent(QMouseEvent *) override;
 private:
     QSize size;
 };

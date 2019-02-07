@@ -49,15 +49,11 @@ Q::ShellApplication::ShellApplication(int argc, char **argv)
 
 // ----------
 
-Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint ) {
-    setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
-    KWindowSystem::setState(winId(), NET::SkipTaskbar);
-    KWindowSystem::setOnAllDesktops( winId(), true );
+Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint) {
     setMask( QRegion(-1,-1,1,1) );
     show();
 
     myDesktop = new Desktop(this);
-    myDesktop->show();
 
     myDash = new Dash(this);
 
@@ -115,6 +111,8 @@ void Q::Shell::loadAll(const QString &file) {
 
     // shell
     KConfigGroup shGroup = sharedConfig->group("Q::Shell");
+    myWmManagePanels = shGroup.readEntry("WmManagePanels", true);
+    myWmManageDialogs = shGroup.readEntry("WmManageDialogs", true);
     QStringList panels = shGroup.readEntry("Panels", QStringList());
     foreach (const QString &panel, panels) {
         Panel *m = static_cast<Panel *>(getModelByName(panel));
@@ -219,6 +217,8 @@ void Q::Shell::activateLauncherMenu() {
     if(myDash->isVisible()) {
         KWindowSystem::forceActiveWindow(myDesktop->winId());
         myDash->searchBar()->setFocus();
+    } else {
+        myDash->activeWindowChanged(0); // force deactivate
     }
 }
 

@@ -32,6 +32,8 @@ public:
     inline int getStrutBottom() const { return strut_bottom; };
     inline QList<Panel*> panels() const { return myPanels; };
     inline QTimer *oneSecond() const { return myOneSecond; };
+    inline bool wmManagePanels() const { return myWmManagePanels; };
+    inline bool wmManageDialogs() const { return myWmManageDialogs; };
     void save(Model *m);
     void repaintPanels();
     void kcmshell5(const QString &arg);
@@ -54,6 +56,7 @@ private:
     Dash *myDash;
     // Panels
     bool panelsOnTop = false;
+    bool myWmManagePanels = false;
     QList<Panel *> myPanels;
     void addPanel(Panel *panel);
     // Struts
@@ -61,6 +64,8 @@ private:
         strut_right = 0,
         strut_top = 0,
         strut_bottom = 0;
+    // others
+    bool myWmManageDialogs = false;
     QString styleSheet;
     QProcess myProcess;
     QTimer *myOneSecond;

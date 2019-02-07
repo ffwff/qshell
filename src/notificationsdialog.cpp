@@ -13,7 +13,7 @@
 #include "shell.h"
 #include "model.h"
 
-QList<Q::Frame*> notificationFrames;
+static QList<Q::Frame*> notificationFrames;
 
 Q::NotificationsDialog::NotificationsDialog(QPushButton *button)
     : QWidget(), myButton(button) {
@@ -23,7 +23,9 @@ Q::NotificationsDialog::NotificationsDialog(QPushButton *button)
     else
         frame = new Q::Frame();
     frame->setCentralWidget(this);
-    //frame->setWindowFlags(Qt::ToolTip);
+    if(!m->shell()->wmManageDialogs()) {
+        frame->setWindowFlags(frame->windowFlags() | Qt::X11BypassWindowManagerHint);
+    }
     move(0, 0);
     notificationFrames.append(frame);
 
