@@ -42,8 +42,7 @@ public:
     inline int iconSize() const { return myIconSize; };
     void load(KConfigGroup *grp) override;
 protected:
-    virtual void showEvent(QShowEvent *);
-    //virtual void paintEvent(QPaintEvent *);
+    void showEvent(QShowEvent *) override;
 public slots:
     void geometryChanged();
 private:
@@ -61,6 +60,7 @@ private:
     bool displayShadow;
     int myIconSize;
     QString offsetTop, offsetLeft, offsetRight, offsetBottom;
+  	bool alwaysTop, alwaysBottom;
     PanelContainer *container;
 };
 

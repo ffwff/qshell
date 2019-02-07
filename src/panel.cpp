@@ -38,6 +38,7 @@ void Q::PanelContainer::showEvent(QShowEvent *) {
 
 Q::Panel::Panel(const QString &name, Q::Shell *shell) : QWidget(shell), Q::Model(name, shell) {
     setObjectName(name);
+    setWindowTitle(name);
 
     container = new PanelContainer(this);
 
@@ -113,20 +114,18 @@ void Q::Panel::load(KConfigGroup *grp) {
     setStruts = grp->readEntry("Struts", true);
     static_cast<QBoxLayout*>(container->layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
 
-    geometryChanged();
-
-    const bool alwaysBottom = grp->readEntry("AlwaysBottom", false);
-    const bool alwaysTop = grp->readEntry("AlwaysTop", true);
+    alwaysTop = grp->readEntry("AlwaysTop", false);
+    alwaysBottom = grp->readEntry("AlwaysBottom", false);
 
     // xlib windows
     if(!shell()->wmManagePanels()) { // workaround for i3, openbox...
-        setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
         // stack
         if(alwaysTop) {
             XRaiseWindow(QX11Info::display(), winId());
         } else if(alwaysBottom) {
             XLowerWindow(QX11Info::display(), winId());
         }
+        setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
     } else {
         // stack
         if(alwaysTop) {
@@ -162,6 +161,7 @@ void Q::Panel::load(KConfigGroup *grp) {
             }
         }
 
+    geometryChanged();
     visibleByDefault = grp->readEntry("Visible", true);
     if(visibleByDefault) show();
     else hide();
@@ -202,6 +202,7 @@ void Q::Panel::addWidget(QWidget *widget) {
 
 void Q::Panel::addStretch(int stretch) {
     QWidget *w = new QWidget(container);
+    w->setProperty("class", "panel-stretch");
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     static_cast<QBoxLayout*>(container->layout())->addWidget(w, stretch);
 }

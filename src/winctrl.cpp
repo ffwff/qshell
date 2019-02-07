@@ -215,7 +215,13 @@ void Q::WinCtrl::load(KConfigGroup *grp) {
 
 void Q::WinCtrl::update(WId wid) {
     KWindowInfo info(wid, NET::WMName|NET::WMState);
-    label->setText(info.name());
+    const QString &name = info.name();
+    if(name.isEmpty() && !(info.state() & NET::Max)) {
+        hide();
+        return;
+    }
+    show();
+    label->setText(name);
     if(info.state() & NET::Max) {
         closeBtn->show();
         minimizeBtn->show();
