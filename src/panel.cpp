@@ -115,20 +115,36 @@ void Q::Panel::load(KConfigGroup *grp) {
 
     geometryChanged();
 
-    if(!shell()->wmManagePanels()) {
+    const bool alwaysBottom = grp->readEntry("AlwaysBottom", false);
+    const bool alwaysTop = grp->readEntry("AlwaysTop", true);
+
+    // xlib windows
+    if(!shell()->wmManagePanels()) { // workaround for i3, openbox...
         setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
-
+        // stack
+        if(alwaysTop) {
+            XRaiseWindow(QX11Info::display(), winId());
+        } else if(alwaysBottom) {
+            XLowerWindow(QX11Info::display(), winId());
+        }
+    } else {
+        // stack
+        if(alwaysTop) {
+            setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+        } else if(alwaysBottom) {
+            setWindowFlags(windowFlags() | Qt::WindowStaysOnBottomHint);
+        }
+        KWindowSystem::setState(winId(), NET::SkipTaskbar);
+        KWindowSystem::setOnAllDesktops(winId(), true);
     }
-
+    // transparency
     if(transparent) {
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
     }
 
-    KWindowSystem::setState(winId(), NET::SkipTaskbar);
-    KWindowSystem::setOnAllDesktops(winId(), true);
-
-    QStringList widgets = grp->readEntry("Widgets", QStringList());
+    // widgets
+    const QStringList widgets = grp->readEntry("Widgets", QStringList());
     foreach (const QString &w, widgets)
         if(w == "stretch")
             addStretch();
