@@ -20,12 +20,13 @@ static const int DBUS_TIMEOUT = 5;
 static const QDBusMessage findPlayerMsg = QDBusMessage::createMethodCall("org.freedesktop.DBus", "/", "org.freedesktop.DBus", "ListNames");
 
 Q::MediaPlayer::MediaPlayer(const QString &name, Q::Shell *shell)
-    : QPushButton(), Model(name, shell), dialog(new MediaPlayerDialog(this)) {
+    : QPushButton(), Model(name, shell),
+    dialog(new MediaPlayerDialog(this)) {
     connect(shell->oneSecond(), &QTimer::timeout, dialog, &MediaPlayerDialog::update);
 }
 
 void Q::MediaPlayer::load(KConfigGroup *grp) {
-    int size = grp->readEntry("Size", 24);
+    const int size = grp->readEntry("Size", 24);
     setIconSize(QSize(size, size));
     setMinimumSize(QSize(size, size));
     myShowLabel = grp->readEntry("ShowLabel", false);
@@ -41,7 +42,7 @@ Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media)
     QHBoxLayout *playout = new QHBoxLayout(this);
     setLayout(playout);
 
-    QWidget *widget = new QWidget();
+    QWidget *widget = new QWidget(this);
     playout->addWidget(widget);
 
     QVBoxLayout *layout = new QVBoxLayout(widget);

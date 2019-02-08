@@ -27,6 +27,7 @@ class Task : public QPushButton, public Model {
     Q_OBJECT
 public:
     Task(Tasks *tasks, const QString &name, const QString &classClass="");
+    ~Task();
     inline Tasks *tasks() { return myParent; };
     void load(KConfigGroup *grp) override;
     void save(KConfigGroup *grp) override;

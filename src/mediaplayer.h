@@ -46,4 +46,4 @@ private:
     bool myShowLabel;
 };
 
-};
+}

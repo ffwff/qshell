@@ -53,13 +53,11 @@ Q::Shell::Shell() : QWidget( 0, Qt::Window | Qt::FramelessWindowHint | Qt::X11By
     setMask( QRegion(-1,-1,1,1) );
     show();
 
-    myDesktop = new Desktop(this);
-
-    myDash = new Dash(this);
-
     myOneSecond = new QTimer(this);
     myOneSecond->setInterval(1000);
 
+    myDesktop = new Desktop(this);
+    myDash = new Dash(this);
     sharedConfig = KSharedConfig::openConfig("qshellrc");
     loadAll();
 
@@ -93,15 +91,7 @@ void Q::Shell::save(Model *m) {
     sharedConfig->sync();
 }
 
-void Q::Shell::loadAll(const QString &file) {
-    if( file == "qshellrc" &&
-        !QFile::exists(QStandardPaths::locate(QStandardPaths::ConfigLocation, "qshellrc"))) {
-        QFile::copy("/usr/share/qshell/qshellrc", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshellrc");
-        QFile::copy("/usr/share/qshell/qshell.css", QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/qshell.css");
-    }
-    sharedConfig = KSharedConfig::openConfig(file);
-    sharedConfig->reparseConfiguration();
-
+void Q::Shell::loadAll() {
     KConfigGroup grp;
 
     // desktop
@@ -110,10 +100,10 @@ void Q::Shell::loadAll(const QString &file) {
     myDesktop->repaint();
 
     // shell
-    KConfigGroup shGroup = sharedConfig->group("Q::Shell");
-    myWmManagePanels = shGroup.readEntry("WmManagePanels", true);
-    myWmManageDialogs = shGroup.readEntry("WmManageDialogs", true);
-    QStringList panels = shGroup.readEntry("Panels", QStringList());
+    grp = sharedConfig->group("Q::Shell");
+    myWmManagePanels = grp.readEntry("WmManagePanels", true);
+    myWmManageDialogs = grp.readEntry("WmManageDialogs", true);
+    const QStringList panels = grp.readEntry("Panels", QStringList());
     foreach (const QString &panel, panels) {
         Panel *m = static_cast<Panel *>(getModelByName(panel));
         if(m)
@@ -121,7 +111,7 @@ void Q::Shell::loadAll(const QString &file) {
     }
     calculateStruts();
     myDesktop->geometryChanged();
-    QString styleSheetLocation = shGroup.readEntry("Stylesheet", QString());
+    const QString styleSheetLocation = grp.readEntry("Stylesheet", QString());
     if(!styleSheetLocation.isEmpty()) {
         QFile *file = 0;
         if(QFile::exists(styleSheetLocation))
@@ -131,6 +121,7 @@ void Q::Shell::loadAll(const QString &file) {
         if (file && file->open(QIODevice::ReadOnly | QIODevice::Text)) {
             styleSheet = QString::fromUtf8(file->readAll());
             setStyleSheet(styleSheet);
+            delete file;
         }
     }
 
@@ -141,21 +132,27 @@ void Q::Shell::loadAll(const QString &file) {
     myOneSecond->start();
 }
 
-void Q::Shell::reloadAll(const QString &file) {
+void Q::Shell::reloadAll(QString file) {
     myOneSecond->stop();
     myOneSecond->disconnect();
     foreach(Model *m, myModels) {
         QWidget *w = dynamic_cast<QWidget*>(m);
-        if(w) w->deleteLater();
+        w->deleteLater();
     }
     foreach(Panel *p, myPanels)
         p->deleteLater();
     myModels.clear();
     myPanels.clear();
+    Q::NotificationsDialog::clear();
+    myDesktop->deleteLater();
+    myDesktop = new Desktop(this);
     myDash->deleteLater();
     myDash = new Dash(this);
-    loadAll(file);
-    myDesktop->repaint();
+    myWmManagePanels = false;
+    myWmManageDialogs = false;
+    sharedConfig = KSharedConfig::openConfig(file);
+    sharedConfig->reparseConfiguration();
+    QTimer::singleShot(0, this, SLOT(loadAll()));
 }
 
 #define COND_LOAD_MODEL(s,m_) else if(type == s) { m = new m_(name, this); static_cast<m_ *>(m)->load(&group); }

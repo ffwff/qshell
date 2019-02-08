@@ -51,6 +51,9 @@ Q::Panel::Panel(const QString &name, Q::Shell *shell) : QWidget(shell), Q::Model
     connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(geometryChanged()) );
 }
 
+Q::Panel::~Panel() {
+}
+
 // rounded corners
 void Q::Panel::roundCorners() {
     if(!borderRadius) return;
@@ -163,8 +166,8 @@ void Q::Panel::load(KConfigGroup *grp) {
 
     geometryChanged();
     visibleByDefault = grp->readEntry("Visible", true);
-    if(visibleByDefault) show();
-    else hide();
+    if(visibleByDefault) QTimer::singleShot(0, this, &Q::Panel::show);
+    else QTimer::singleShot(0, this, &Q::Panel::hide);
 }
 
 // Slots

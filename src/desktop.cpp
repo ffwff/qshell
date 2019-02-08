@@ -69,27 +69,27 @@ void Q::DesktopIcon::mouseReleaseEvent(QMouseEvent *event) {
     if(event->button() == Qt::LeftButton) {
         runCommand();
     } else if(event->button() == Qt::RightButton) {
-//         populateContextMenu();
-//         myContextMenu.popup(getContextMenuPos());
+        //populateContextMenu();
+        //myContextMenu.popup(getContextMenuPos());
     }
 }
 
 // ----------
 
-Q::DesktopWallpaperDialog::DesktopWallpaperDialog(Desktop *parent) :
-    QFileDialog(parent, "Set desktop background", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)), myParent(parent) {
+Q::DesktopWallpaperDialog::DesktopWallpaperDialog(Desktop *desktop)
+    : QFileDialog(desktop, "Set desktop background", QStandardPaths::writableLocation(QStandardPaths::PicturesLocation)), myDesktop(desktop) {
     connect(this, SIGNAL(fileSelected(const QString &)), this, SLOT(fileSelected(const QString &)));
 }
 
 void Q::DesktopWallpaperDialog::fileSelected(const QString &file) {
-    myParent->setBackground(file);
-    myParent->shell()->save(myParent);
+    myDesktop->setBackground(file);
+    myDesktop->shell()->save(myDesktop);
 }
 
 // ----------
 
 Q::DesktopShadow::DesktopShadow(Desktop *desktop)
-    : QWidget(), myDesktop(desktop) {
+    : QWidget(desktop), myDesktop(desktop) {
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowTransparentForInput | Qt::WindowStaysOnBottomHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -104,7 +104,7 @@ void Q::DesktopShadow::paintEvent(QPaintEvent *) {
     KWindowEffects::enableBlurBehind(winId(), false);
 
     QPainter painter(this);
-    foreach (auto p, myDesktop->shell()->panels()) {
+    foreach (const Panel *p, myDesktop->shell()->panels()) {
         // HACK way to make shadows under windows but on top of desktop
         if(p->displaysShadow() && p->isVisible()) {
             if(p->position() == Position::Top) {
@@ -139,11 +139,8 @@ Q::Desktop::Desktop(Shell *shell)
     : QWidget(), Q::Model("Q::Desktop", shell),
     myShadows(new DesktopShadow(this)),
     myDialog(new DesktopWallpaperDialog(this)) {
-    iconContainer = new QWidget(this);
-
     setBackgroundRole(QPalette::Base);
     setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-//     setScaledContents(true);
 
     setAttribute(Qt::WA_StyledBackground, false);
     setAttribute(Qt::WA_NoSystemBackground);
@@ -164,9 +161,9 @@ void Q::Desktop::geometryChanged() {
     myShadows->setFixedSize(size);
     shell()->repaintPanels();
     repaint();
-    iconContainer->move(shell()->getStrutLeft() + 5, shell()->getStrutTop() + 5);
-    iconContainer->resize(width() - shell()->getStrutLeft() - shell()->getStrutRight() - 5,
-                         height() - shell()->getStrutRight() - shell()->getStrutBottom() - 5);
+    iconContainer.move(shell()->getStrutLeft() + 5, shell()->getStrutTop() + 5);
+    iconContainer.resize(width() - shell()->getStrutLeft() - shell()->getStrutRight() - 5,
+                          height() - shell()->getStrutRight() - shell()->getStrutBottom() - 5);
 }
 
 void Q::Desktop::showEvent(QShowEvent*) {
@@ -185,10 +182,10 @@ void Q::Desktop::paintEvent(QPaintEvent*) {
 // configurations
 void Q::Desktop::load(KConfigGroup *grp) {
     setBackground(grp->readEntry("Background", ""));
-    showIcons = grp->readEntry("ShowIcons", false);
     myIconSize = grp->readEntry("IconSize", 64);
-    iconContainer->setVisible(showIcons);
-    QStringList icons = grp->readEntry("Icons", QStringList());
+    showIcons = grp->readEntry("ShowIcons", false);
+    iconContainer.setVisible(showIcons);
+    const QStringList icons = grp->readEntry("Icons", QStringList());
     foreach (const QString &i, icons) {
         DesktopIcon *icon = static_cast<DesktopIcon*>(shell()->getModelByName(i));
         if(icon) {
@@ -196,13 +193,13 @@ void Q::Desktop::load(KConfigGroup *grp) {
                 icon->setIconSize(QSize(myIconSize,myIconSize));
                 icon->setMinimumSize(QSize(myIconSize,myIconSize));
             }
-            icon->setParent(iconContainer);
+            icon->setParent(&iconContainer);
             icon->move(icon->left(), icon->top());
             icon->show();
             myIcons << icon;
         }
     }
-    bool isVisible = grp->readEntry("Visible", true);
+    const bool isVisible = grp->readEntry("Visible", false);
     setVisible(isVisible);
     myShadows->setVisible(isVisible);
 }

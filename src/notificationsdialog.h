@@ -14,13 +14,14 @@ public:
     NotificationsDialog(QPushButton *button);
     void updateDialog();
     static void hideAll();
+    static void clear();
     virtual void update() {}
 public slots:
     void toggle();
     void hideFrame(WId wid);
 protected:
     Frame *frame;
-    virtual void showEvent(QShowEvent *) { updateDialog(); };
+    void showEvent(QShowEvent *) override { updateDialog(); };
 private:
     QPushButton *myButton;
 };

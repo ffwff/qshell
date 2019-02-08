@@ -54,6 +54,10 @@ Q::Task::Task(Q::Tasks *tasks, const QString &name, const QString &classClass)
         myTaskPreview = new TaskPreview(this);
 }
 
+Q::Task::~Task() {
+    myTaskPreview->deleteLater();
+}
+
 // Configurations
 void Q::Task::save(KConfigGroup *grp) {
     if(!pinned)
@@ -183,22 +187,22 @@ void Q::Task::populateContextMenu() {
     myContextMenu.clear();
     QAction *act;
 
-    act = new QAction("Open new instance");
+    act = new QAction("Open new instance", this);
     connect(act, SIGNAL(triggered()), this, SLOT(runCommand()));
     myContextMenu.addAction(act);
 
     if(pinned) {
-        act = new QAction(QIcon::fromTheme("unpin"), "Unpin from panel");
+        act = new QAction(QIcon::fromTheme("unpin"), "Unpin from panel", this);
         connect(act, SIGNAL(triggered()), this, SLOT(unpin()));
         myContextMenu.addAction(act);
     } else {
-        act = new QAction(QIcon::fromTheme("pin"), "Pin to panel");
+        act = new QAction(QIcon::fromTheme("pin"), "Pin to panel", this);
         connect(act, SIGNAL(triggered()), this, SLOT(pin()));
         myContextMenu.addAction(act);
     }
 
     if(!myWindows.isEmpty()) {
-        act = new QAction(QIcon::fromTheme("exit"), "Close all windows");
+        act = new QAction(QIcon::fromTheme("exit"), "Close all windows", this);
         connect(act, SIGNAL(triggered()), this, SLOT(closeAllWindows()));
         myContextMenu.addAction(act);
     }
@@ -239,7 +243,7 @@ void Q::Task::unpin() {
 // ----------
 
 Q::TaskPreview::TaskPreview(Q::Task *task) : Q::Frame(), myTask(task) {
-    QBoxLayout *layout = new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction());
+    QBoxLayout *layout = new QBoxLayout(static_cast<QBoxLayout*>(myTask->parentWidget()->layout())->direction(), this);
     layout->setMargin(0);
     layout->setSizeConstraint(QLayout::SetFixedSize);
     setLayout(layout);
@@ -313,7 +317,7 @@ Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
     layout->setMargin(5);
     setLayout(layout);
 
-    title = new QLabel();
+    title = new QLabel(this);
     title->setProperty("class", "titleLabel");
     title->setStyleSheet("color: white; max-width: 240px; margin: 0 5px; margin-top: 10px;");
     title->setWordWrap(true);
@@ -325,7 +329,7 @@ Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
     effect->setOffset(0, 0);
     title->setGraphicsEffect(effect);
 
-    window = new QLabel();
+    window = new QLabel(this);
     window->setStyleSheet("margin: 0 10px; margin-bottom: 10px;");
     layout->addWidget(window);
 

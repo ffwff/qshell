@@ -83,3 +83,7 @@ void Q::NotificationsDialog::hideAll() {
     foreach(Frame *frame, notificationFrames)
         frame->hide();
 }
+
+void Q::NotificationsDialog::clear() {
+    notificationFrames.clear();
+}

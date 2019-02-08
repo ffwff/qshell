@@ -33,6 +33,7 @@ class Panel : public QWidget, public Model {
     Q_OBJECT
 public:
     Panel(const QString& name, Shell *shell);
+    ~Panel();
     void addWidget(QWidget *widget);
     void addStretch(int stretch = 0);
     inline Position position() const { return myPosition; };

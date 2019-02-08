@@ -177,20 +177,20 @@ void Q::Dash::activeWindowChanged(WId id) {
 }
 
 void Q::Dash::showEvent(QShowEvent *) {
-    QSize geometry = QGuiApplication::primaryScreen()->size();
+    const QSize geo = QGuiApplication::primaryScreen()->size();
     if(myWidth && myHeight)
-        resize(geometry.width() * (myWidth / 100), geometry.height() * (myHeight / 100));\
+        resize(geo.width() * (myWidth / 100), geo.height() * (myHeight / 100));\
     if(offsetTop != -1 && offsetLeft != -1) { // TODO
     	move(offsetLeft, offsetTop);
     } else {
-	    if(myPosition == DashPosition::TopLeft)
-	        move(shell()->getStrutLeft(), shell()->getStrutTop());
-	    else if (myPosition == DashPosition::TopRight)
-	        move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), shell()->getStrutTop());
-	    else if (myPosition == DashPosition::BottomLeft)
-	        move(shell()->getStrutLeft(), geometry.height() - shell()->getStrutBottom() - height());
-	    else
-	        move(geometry.width() - shell()->getStrutRight() - sizeHint().width(), geometry.height() - shell()->getStrutBottom() - sizeHint().height());
+        if(myPosition == DashPosition::TopLeft)
+            move(shell()->getStrutLeft(), shell()->getStrutTop());
+        else if (myPosition == DashPosition::TopRight)
+            move(geo.width() - shell()->getStrutRight() - sizeHint().width(), shell()->getStrutTop());
+        else if (myPosition == DashPosition::BottomLeft)
+            move(shell()->getStrutLeft(), geo.height() - shell()->getStrutBottom() - height());
+        else
+            move(geo.width() - shell()->getStrutRight() - sizeHint().width(), geo.height() - shell()->getStrutBottom() - sizeHint().height());
 	}
 
     shell()->desktop()->activateWindow(); // HACK to activate for kwin

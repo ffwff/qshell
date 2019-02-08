@@ -13,7 +13,7 @@
 Q::Network::Network(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell) {
 
-    interface = new QDBusInterface("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager", "org.freedesktop.NetworkManager", QDBusConnection::systemBus());
+    interface = new QDBusInterface("org.freedesktop.NetworkManager", "/org/freedesktop/NetworkManager", "org.freedesktop.NetworkManager", QDBusConnection::systemBus(), this);
     qDebug() << interface->isValid();
 
     connect(this, &QPushButton::clicked, [shell]() { shell->kcmshell5("kcm_networkmanagement"); });

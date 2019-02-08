@@ -38,11 +38,11 @@ class Desktop;
 class DesktopWallpaperDialog : public QFileDialog {
     Q_OBJECT
 public:
-    DesktopWallpaperDialog(Desktop *parent);
+    DesktopWallpaperDialog(Desktop *desktop);
 public slots:
     void fileSelected(const QString &file);
 private:
-    Desktop *myParent;
+    Desktop *myDesktop;
 };
 
 class DesktopShadow : public QWidget {
@@ -59,7 +59,6 @@ class Desktop : public QWidget, public Model {
     Q_OBJECT
 public:
     Desktop(Shell *shell);
-    ~Desktop() { delete myShadows; }
     bool setBackground(const QString &fileName);
     inline const QString& fileName() const { return myFileName; };
     inline const QImage& image() const { return myImage; };
@@ -83,7 +82,7 @@ private:
     QMenu myContextMenu;
     void populateContextMenu();
     DesktopWallpaperDialog *myDialog;
-    QWidget *iconContainer;
+    QWidget iconContainer;
     bool showIcons;
     QList<DesktopIcon*> myIcons;
     int myIconSize;
