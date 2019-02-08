@@ -18,8 +18,10 @@ public:
 private slots:
     void update();
 private:
-    QProcess process, clickProcess;
+    QProcess process;
     QString procName;
+    QString output;
+    bool isFifo;
     QTimer *timer;
 };
 

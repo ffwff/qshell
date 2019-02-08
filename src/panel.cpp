@@ -51,9 +51,6 @@ Q::Panel::Panel(const QString &name, Q::Shell *shell) : QWidget(shell), Q::Model
     connect( QGuiApplication::primaryScreen(), SIGNAL(virtualGeometryChanged(QRect)), this, SLOT(geometryChanged()) );
 }
 
-Q::Panel::~Panel() {
-}
-
 // rounded corners
 void Q::Panel::roundCorners() {
     if(!borderRadius) return;
@@ -169,7 +166,7 @@ void Q::Panel::load(KConfigGroup *grp) {
 // Slots
 void Q::Panel::geometryChanged() {
     container->hide();
-    QSize geometry = QGuiApplication::primaryScreen()->size();
+    const QSize geometry = QGuiApplication::primaryScreen()->size();
     resize(dimFromSetting(myWidth, geometry.width()),
            dimFromSetting(myHeight, geometry.height()));
 

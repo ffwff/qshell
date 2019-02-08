@@ -156,10 +156,11 @@ void Q::Volume::setVolume(int percent) {
 }
 
 void Q::Volume::update() {
-    int percent = volumePercent();
+    const int percent = volumePercent();
     if(percent == -1) {
         setIcon(iconMuted);
         setToolTip("Muted");
+        if(showLabel) setText("Muted");
     } else {
         if(percent > 60)
             setIcon(iconHigh);
@@ -168,6 +169,7 @@ void Q::Volume::update() {
         else
             setIcon(iconLow);
         setToolTip(QString::number(percent) + "%");
+        if(showLabel) setText(QString::number(percent) + "%");
     }
     dialog->update();
 }
@@ -181,6 +183,7 @@ void Q::Volume::load(KConfigGroup *grp) {
     iconMedium = iconFromSetting(grp->readEntry("IconMedium", "audio-volume-medium"));
     iconLow    = iconFromSetting(grp->readEntry("IconLow", "audio-volume-low"));
     update();
+    showLabel = grp->readEntry("ShowLabel", false);
 }
 
 void Q::Volume::wheelEvent(QWheelEvent *we) {

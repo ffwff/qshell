@@ -71,6 +71,7 @@ private:
 
     VolumeDialog *dialog;
     QIcon iconMuted, iconHigh, iconMedium, iconLow;
+    bool showLabel;
 };
 
 }
