@@ -58,11 +58,6 @@ Q::Panel::~Panel() {
 void Q::Panel::roundCorners() {
     if(!borderRadius) return;
 
-    if(transparent) {
-        setAttribute(Qt::WA_NoSystemBackground, true);
-        setAttribute(Qt::WA_TranslucentBackground, true);
-    }
-
     const int width = this->width();
     const int height = this->height();
     const int dia = 2 * borderRadius;
@@ -120,6 +115,12 @@ void Q::Panel::load(KConfigGroup *grp) {
     alwaysTop = grp->readEntry("AlwaysTop", false);
     alwaysBottom = grp->readEntry("AlwaysBottom", false);
 
+    // transparency
+    if(transparent) {
+        setAttribute(Qt::WA_NoSystemBackground, true);
+        setAttribute(Qt::WA_TranslucentBackground, true);
+    }
+
     // xlib windows
     if(!shell()->wmManagePanels()) { // workaround for i3, openbox...
         // stack
@@ -138,11 +139,6 @@ void Q::Panel::load(KConfigGroup *grp) {
         }
         KWindowSystem::setState(winId(), NET::SkipTaskbar);
         KWindowSystem::setOnAllDesktops(winId(), true);
-    }
-    // transparency
-    if(transparent) {
-        setAttribute(Qt::WA_NoSystemBackground, true);
-        setAttribute(Qt::WA_TranslucentBackground, true);
     }
 
     // widgets
@@ -213,6 +209,12 @@ void Q::Panel::addStretch(int stretch) {
 // Rendering
 void Q::Panel::showEvent(QShowEvent *) {
     roundCorners();
+
+    if(transparent) {
+        setAttribute(Qt::WA_NoSystemBackground, true);
+        setAttribute(Qt::WA_TranslucentBackground, true);
+    }
+
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     Display *display = QX11Info::display();
     Atom atom = XInternAtom(display, "_KDE_SLIDE", false);
