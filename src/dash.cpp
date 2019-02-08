@@ -69,9 +69,13 @@ Q::DashItem::DashItem(QWidget *parent, const QString &name, const QIcon &icon,
     } else {
         QStringList args = command.split(" ");
         myCommand = args.first();
-        QStringList arguments(args);
-        arguments.removeFirst();
-        myArguments = arguments;
+        myArguments = args;
+        myArguments.removeFirst();
+        static const QStringList removeArgs({
+            "%u", "%U", "%f", "%F", "%c", "%i"
+        });
+        for(const auto &string : removeArgs)
+            myArguments.removeAll(string);
     }
 
     QGridLayout *layout = new QGridLayout(this);
@@ -153,17 +157,6 @@ Q::Dash::Dash(Shell *parent) : Q::Frame(parent), Model("Q::Dash", parent) {
 
     connect(KWindowSystem::self(), &KWindowSystem::activeWindowChanged,
             this, &Q::Dash::activeWindowChanged);
-}
-
-// Misc
-static QString &normalize(QString cmd) {
-    return cmd
-        .replace("%f", "", Qt::CaseInsensitive)
-        .replace("%u", "", Qt::CaseInsensitive)
-        .replace("%d", "", Qt::CaseInsensitive)
-        .replace("%n", "", Qt::CaseInsensitive)
-        .replace("%k", "")
-        .replace("%v", "");
 }
 
 // Events
@@ -292,8 +285,8 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
                     !a->actions().isEmpty() ?
                     a->actions().first().exec() :
                     !a->property("TryExec").toString().isEmpty() ?
-                    a->property("TryExec").toString() :
-                    normalize(a->exec()).simplified(),
+                    a->property("TryExec").toString().simplified() :
+                    a->exec().simplified(),
                     a->comment().isEmpty() ? a->name() : a->name() + ": " + a->comment(),
                     a->terminal(),
                     this
