@@ -13,6 +13,7 @@ class Shell;
 class Label : public QLabel, public Model {
 public:
     Label(const QString &name, Shell *shell);
+    ~Label();
     void load(KConfigGroup *grp);
     void showEvent(QShowEvent *) override;
 private slots:

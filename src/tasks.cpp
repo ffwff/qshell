@@ -339,7 +339,12 @@ Q::WindowPreview::WindowPreview(WId wid, TaskPreview *taskPreview)
 void Q::WindowPreview::updatePixmap() {
     if(!isVisible()) return;
     QPixmap pixmap = grabWindow();
-    window->setPixmap(pixmap);
+    if(pixmap.isNull()) {
+        hide();
+    } else {
+        show();
+        window->setPixmap(pixmap);
+    }
     QTimer::singleShot(33, this, SLOT(updatePixmap()));
 }
 

@@ -5,6 +5,9 @@
 Q::Button::Button(const QString &name, Shell *shell)
     : QPushButton(), Model(name, shell), timer(new QTimer(this)) {
 }
+Q::Button::~Button() {
+    process.kill();
+}
 
 void Q::Button::load(KConfigGroup *grp) {
     setIcon(QIcon::fromTheme(grp->readEntry("Icon")));

@@ -98,14 +98,13 @@ Q::DesktopShadow::DesktopShadow(Desktop *desktop)
 }
 
 void Q::DesktopShadow::paintEvent(QPaintEvent *) {
-    // this is pretty HACK
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     KWindowSystem::setOnAllDesktops(winId(), true);
     KWindowEffects::enableBlurBehind(winId(), false);
 
     QPainter painter(this);
     foreach (const Panel *p, myDesktop->shell()->panels()) {
-        // HACK way to make shadows under windows but on top of desktop
+        // pretty HACK to make shadows appear under windows but on top of desktop
         if(p->displaysShadow() && p->isVisible()) {
             if(p->position() == Position::Top) {
                 QLinearGradient gradient(0, p->y() + p->height(), 0, p->y() + p->height() + 20);

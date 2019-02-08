@@ -6,6 +6,9 @@
 Q::Label::Label(const QString &name, Shell *shell)
     : QLabel(), Model(name, shell) {
 }
+Q::Label::~Label() {
+    process.kill();
+}
 
 void Q::Label::load(KConfigGroup *grp) {
     procName = grp->readEntry("LabelScript", "");

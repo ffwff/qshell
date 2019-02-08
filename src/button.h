@@ -13,6 +13,7 @@ class Shell;
 class Button : public QPushButton, public Model {
 public:
     Button(const QString &name, Shell *shell);
+    ~Button();
     void load(KConfigGroup *grp);
 private slots:
     void update();
