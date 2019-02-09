@@ -4,9 +4,9 @@ source /etc/os-release
 output() {
 
 pkg_last_update=$((($(date +%s) - $(date -d $(sed -n '/upgrade$/x;${x;s/.\([0-9-]*\).*/\1/p}' /var/log/pacman.log) +%s)) / 86400))
-cpu_usage="$(mpstat 1 1 | awk '$12 ~ /[0-9.]+/ { print 100 - $12"%" }' | head -n 1 | xargs)"
-if [[ "$cpu_usage" = "0.00%" ]]; then
-    cpu_usage="0.01%"
+cpu_usage="$(top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1"%"}')"
+if [[ "$cpu_usage" = "0%" ]]; then
+    cpu_usage="1px"
 fi
 mem_usage="$(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')"
 
