@@ -112,31 +112,7 @@ void Q::Panel::load(KConfigGroup *grp) {
     alwaysTop = grp->readEntry("AlwaysTop", false);
     alwaysBottom = grp->readEntry("AlwaysBottom", false);
 
-    // transparency
-    if(transparent) {
-        setAttribute(Qt::WA_NoSystemBackground, true);
-        setAttribute(Qt::WA_TranslucentBackground, true);
-    }
-
-    // xlib windows
-    if(!shell()->wmManagePanels()) { // workaround for i3, openbox...
-        // stack
-        if(alwaysTop) {
-            XRaiseWindow(QX11Info::display(), winId());
-        } else if(alwaysBottom) {
-            XLowerWindow(QX11Info::display(), winId());
-        }
-        setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
-    } else {
-        // stack
-        if(alwaysTop) {
-            setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-        } else if(alwaysBottom) {
-            setWindowFlags(windowFlags() | Qt::WindowStaysOnBottomHint);
-        }
-        KWindowSystem::setState(winId(), NET::SkipTaskbar);
-        KWindowSystem::setOnAllDesktops(winId(), true);
-    }
+    refresh();
 
     // widgets
     const QStringList widgets = grp->readEntry("Widgets", QStringList());
@@ -204,13 +180,37 @@ void Q::Panel::addStretch(int stretch) {
 }
 
 // Rendering
-void Q::Panel::showEvent(QShowEvent *) {
-    roundCorners();
-
+void Q::Panel::refresh() {
+    // transparency
     if(transparent) {
         setAttribute(Qt::WA_NoSystemBackground, true);
         setAttribute(Qt::WA_TranslucentBackground, true);
     }
+
+    // xlib windows
+    if(!shell()->wmManagePanels()) { // workaround for i3, openbox...
+        // stack
+        if(alwaysTop) {
+            XRaiseWindow(QX11Info::display(), winId());
+        } else if(alwaysBottom) {
+            XLowerWindow(QX11Info::display(), winId());
+        }
+        setWindowFlags(windowFlags() | Qt::X11BypassWindowManagerHint);
+    } else {
+        // stack
+        if(alwaysTop) {
+            setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+        } else if(alwaysBottom) {
+            setWindowFlags(windowFlags() | Qt::WindowStaysOnBottomHint);
+        }
+        KWindowSystem::setState(winId(), NET::SkipTaskbar);
+        KWindowSystem::setOnAllDesktops(winId(), true);
+    }
+}
+
+void Q::Panel::showEvent(QShowEvent *) {
+    roundCorners();
+    refresh();
 
     KWindowSystem::setState(winId(), NET::SkipTaskbar);
     Display *display = QX11Info::display();

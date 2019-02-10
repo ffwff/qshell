@@ -57,6 +57,7 @@ private:
     void roundCorners();
     int blurRadius;
     bool transparent;
+    void refresh();
     bool displayShadow;
     int myIconSize;
     QString offsetTop, offsetLeft, offsetRight, offsetBottom;
