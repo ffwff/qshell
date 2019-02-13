@@ -11,6 +11,7 @@ Transparent=true
 AlwaysBottom=true
 Type=Panel
 Widgets=Tasks,stretch,des1,des2,des3,des4,des5
+StretchMask=true
 
 [des1]
 Type=Button
@@ -186,6 +187,7 @@ Transparent=true
 AlwaysBottom=true
 Type=Panel
 Widgets=WinCtrl,stretch,Battery,Systray,MediaPlayer,Network,Volume,Date,Logout,Search,Hamburger
+StretchMask=true
 
 [Trash]
 Type=Trash

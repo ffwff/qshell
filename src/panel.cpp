@@ -18,6 +18,7 @@
 #include "desktop.h"
 #include "utils.h"
 
+// ---
 
 Q::PanelContainer::PanelContainer(Panel *panel) : QWidget(panel), myPanel(panel) {
     QBoxLayout *layout = new QBoxLayout(QBoxLayout::LeftToRight, this);
@@ -31,7 +32,18 @@ void Q::PanelContainer::showEvent(QShowEvent *) {
     move(0, 0);
     resize(myPanel->size());
     setMaximumSize(myPanel->size());
-    qDebug() << size();
+}
+
+// ---
+
+Q::PanelStretch::PanelStretch(QWidget *parent, Panel *panel)
+    : QWidget(parent), myPanel(panel) {
+    setProperty("class", "panel-stretch");
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+}
+
+void Q::PanelStretch::resizeEvent(QResizeEvent *) {
+    myPanel->refreshMask();
 }
 
 // ----------
@@ -107,6 +119,7 @@ void Q::Panel::load(KConfigGroup *grp) {
     offsetBottom = grp->readEntry("OffsetBottom", "0");
     borderRadius = grp->readEntry("BorderRadius", 0);
     setStruts = grp->readEntry("Struts", true);
+    stretchMask = grp->readEntry("StretchMask", false);
     static_cast<QBoxLayout*>(container->layout())->setDirection((QBoxLayout::Direction)grp->readEntry("Direction", 0));
 
     alwaysTop = grp->readEntry("AlwaysTop", false);
@@ -173,9 +186,7 @@ void Q::Panel::addWidget(QWidget *widget) {
 }
 
 void Q::Panel::addStretch(int stretch) {
-    QWidget *w = new QWidget(container);
-    w->setProperty("class", "panel-stretch");
-    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    PanelStretch *w = new PanelStretch(container, this);
     static_cast<QBoxLayout*>(container->layout())->addWidget(w, stretch);
 }
 
@@ -205,6 +216,25 @@ void Q::Panel::refresh() {
         }
         KWindowSystem::setState(winId(), NET::SkipTaskbar);
         KWindowSystem::setOnAllDesktops(winId(), true);
+    }
+
+    // mask
+    refreshMask();
+}
+
+void Q::Panel::refreshMask() {
+    if(stretchMask) {
+        qDebug() << "stretch transparent";
+        QRegion reg(frameGeometry());
+        reg -= QRegion(geometry());
+        reg += childrenRegion();
+        for (int i = 0; i < container->layout()->count(); ++i) {
+            QWidget *w = container->layout()->itemAt(i)->widget();
+            if (w != NULL && w->property("class") == "panel-stretch") {
+                reg -= w->geometry();
+            }
+        }
+        setMask(reg);
     }
 }
 
