@@ -51,10 +51,10 @@ public:
     inline bool displaysShadow() const { return displayShadow; };
     inline int iconSize() const { return myIconSize; };
     void load(KConfigGroup *grp) override;
-    void refreshMask();
 protected:
     void showEvent(QShowEvent *) override;
 public slots:
+    void refreshMask();
     void geometryChanged();
 private:
     Shell *myShell;
