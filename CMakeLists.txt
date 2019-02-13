@@ -66,7 +66,6 @@ file(GLOB shell_SRCS RELATIVE ${CMAKE_SOURCE_DIR} "src/*.cpp")
 add_executable(qshell ${shell_SRCS})
 
 target_link_libraries(qshell
-    Qt5::Concurrent
     Qt5::DBus
     Qt5::X11Extras
     KF5::ConfigCore
