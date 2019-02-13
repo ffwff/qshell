@@ -18,25 +18,6 @@
 #include "desktop.h"
 #include "utils.h"
 
-namespace Q {
-
-class PanelContainerEventFilter : public QObject {
-public:
-    PanelContainerEventFilter(QWidget *w, Panel *p)
-        : QObject(w), panel(p) {}
-private:
-    Panel *panel;
-protected:
-    bool eventFilter(QObject *obj, QEvent *ev) override {
-        if(ev->type() == QEvent::Resize) {
-            QTimer::singleShot(0, panel, SLOT(refreshMask()));
-        }
-        return false;
-    }
-};
-
-}
-
 // ---
 
 Q::PanelContainer::PanelContainer(Panel *panel) : QWidget(panel), myPanel(panel) {
@@ -57,12 +38,9 @@ void Q::PanelContainer::showEvent(QShowEvent *) {
 
 Q::PanelStretch::PanelStretch(QWidget *parent, Panel *panel)
     : QWidget(parent), myPanel(panel) {
-    setProperty("class", "panel-stretch");
-    setStyleSheet("background: red;");
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
-void Q::PanelStretch::resizeEvent(QResizeEvent *) {
+void Q::PanelStretch::resizeEvent(QResizeEvent *ev) {
     myPanel->refreshMask();
 }
 
@@ -206,10 +184,14 @@ void Q::Panel::addWidget(QWidget *widget) {
 }
 
 void Q::Panel::addStretch(int stretch) {
-    QWidget *w = new QWidget(container);
+    QWidget *w;
+    if(stretchMask) {
+        w = new PanelStretch(container, this);
+    } else {
+        w = new QWidget(container);
+    }
     w->setProperty("class", "panel-stretch");
     w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-//     w->installEventFilter(new PanelContainerEventFilter(w, this));
     static_cast<QBoxLayout*>(container->layout())->addWidget(w, stretch);
 }
 
