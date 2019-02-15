@@ -54,6 +54,8 @@ sudo make install
 
 A Q::Shell session will appear on your display manager's session selection.
 
+**NOTE**: it is currently required that KDE Plasma be installed as the session requires several Plasma-specific utilities.
+
 ## Credits
 
  * Qt and KF5
