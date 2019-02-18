@@ -94,23 +94,12 @@ void Q::Shell::save(Model *m) {
 void Q::Shell::loadAll() {
     KConfigGroup grp;
 
-    // desktop
-    grp = sharedConfig->group("Q::Desktop");
-    myDesktop->load(&grp);
-    myDesktop->repaint();
-
     // shell
     grp = sharedConfig->group("Q::Shell");
     myWmManagePanels = grp.readEntry("WmManagePanels", true);
     myWmManageDialogs = grp.readEntry("WmManageDialogs", true);
-    const QStringList panels = grp.readEntry("Panels", QStringList());
-    foreach (const QString &panel, panels) {
-        Panel *m = static_cast<Panel *>(getModelByName(panel));
-        if(m)
-            addPanel(m);
-    }
-    calculateStruts();
-    myDesktop->geometryChanged();
+
+    // stylesheet
     const QString styleSheetLocation = grp.readEntry("Stylesheet", QString());
     if(!styleSheetLocation.isEmpty()) {
         QFile *file = 0;
@@ -124,6 +113,21 @@ void Q::Shell::loadAll() {
             delete file;
         }
     }
+
+    // panels
+    const QStringList panels = grp.readEntry("Panels", QStringList());
+    foreach (const QString &panel, panels) {
+        Panel *m = static_cast<Panel *>(getModelByName(panel));
+        if(m)
+            addPanel(m);
+    }
+    calculateStruts();
+
+    // desktop
+    grp = sharedConfig->group("Q::Desktop");
+    myDesktop->load(&grp);
+    myDesktop->geometryChanged();
+
 
     // dash
     grp = sharedConfig->group("Q::Dash");

@@ -123,6 +123,12 @@ void Q::Panel::load(KConfigGroup *grp) {
     alwaysTop = grp->readEntry("AlwaysTop", false);
     alwaysBottom = grp->readEntry("AlwaysBottom", false);
 
+    const int screen = grp->readEntry("Screen", -1);
+    QList<QScreen *> screens = QGuiApplication::screens();
+    if(screen > 0 && screen <= screens.size()) {
+        windowHandle()->setScreen(screens.at(screen));
+    }
+
     refresh();
 
     // widgets

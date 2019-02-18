@@ -175,7 +175,6 @@ void Q::Desktop::paintEvent(QPaintEvent*) {
     const auto &size = QGuiApplication::primaryScreen()->geometry();
     const auto &image = myImage.scaled(size.width(), size.height(),Qt::KeepAspectRatioByExpanding,Qt::SmoothTransformation);
     painter.drawImage(0, 0, image);
-    myShadows->repaint();
 }
 
 // configurations
@@ -198,6 +197,7 @@ void Q::Desktop::load(KConfigGroup *grp) {
             myIcons << icon;
         }
     }
+
     const bool isVisible = grp->readEntry("Visible", false);
     setVisible(isVisible);
     myShadows->setVisible(isVisible);
