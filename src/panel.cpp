@@ -1,4 +1,5 @@
 #include <QWidget>
+#include <QWindow>
 #include <QBoxLayout>
 #include <QDebug>
 #include <QApplication>
