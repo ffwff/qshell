@@ -23,7 +23,7 @@ public:
     PanelContainer(Panel *panel);
     inline Panel *panel() { return myPanel; };
 protected:
-    void showEvent(QShowEvent *);
+    void showEvent(QShowEvent *) override;
 private:
     Panel *myPanel;
 };

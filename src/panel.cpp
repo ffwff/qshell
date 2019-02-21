@@ -41,7 +41,7 @@ Q::PanelStretch::PanelStretch(QWidget *parent, Panel *panel)
     : QWidget(parent), myPanel(panel) {
 }
 
-void Q::PanelStretch::resizeEvent(QResizeEvent *ev) {
+void Q::PanelStretch::resizeEvent(QResizeEvent *) {
     myPanel->refreshMask();
 }
 

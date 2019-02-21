@@ -17,9 +17,9 @@ class WinTitle : public QLabel {
 public:
     WinTitle(QWidget *parent = 0);
 protected:
-    void mouseDoubleClickEvent(QMouseEvent *ev = 0);
-    void mousePressEvent(QMouseEvent *ev);
-    void mouseReleaseEvent(QMouseEvent *ev);
+    void mouseDoubleClickEvent(QMouseEvent *) override;
+    void mousePressEvent(QMouseEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
 private:
     QMenu myContextMenu;
     void populateContextMenu();

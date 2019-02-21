@@ -29,7 +29,7 @@ public:
 public slots:
     void valueChanged(int value);
 protected:
-    void showEvent(QShowEvent *);
+    void showEvent(QShowEvent *) override;
 private:
     Volume *myVolume;
     QSlider *slider;
@@ -50,7 +50,8 @@ public:
     void populateSinkInfo();
 public slots:
     void update();
-    void wheelEvent(QWheelEvent *we);
+protected:
+    void wheelEvent(QWheelEvent *) override;
 private slots:
     void sinkInfoChanged(const pa_sink_info *);
     void sinkChanged(const char *s);

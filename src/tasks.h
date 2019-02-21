@@ -81,8 +81,8 @@ public:
     void addWindow(WId wid);
     void removeWindow(WId wid);
 protected:
-    void showEvent(QShowEvent *);
-    void leaveEvent(QEvent*);
+    void showEvent(QShowEvent *) override;
+    void leaveEvent(QEvent *) override;
 private:
     Task *myTask;
     QList<WindowPreview*> myPreviews;
@@ -98,8 +98,8 @@ public:
 public slots:
     void updatePixmap();
 protected:
-    void showEvent(QShowEvent*);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void showEvent(QShowEvent*) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 private:
     TaskPreview *myTaskPreview;
     WId myWid;
@@ -123,8 +123,8 @@ public:
     void hideAllPreviews();
     inline QTimer *timer() const { return myTimer; };
 protected:
-    void enterEvent(QEvent *);
-    void leaveEvent(QEvent*);
+    void enterEvent(QEvent *) override;
+    void leaveEvent(QEvent *) override;
 private slots:
     void windowAdded(WId wid);
     void windowRemoved(WId wid);

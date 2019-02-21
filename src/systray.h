@@ -8,8 +8,7 @@
 #include <KF5/KWindowSystem/NETWM>
 #include "model.h"
 
-namespace Q
-{
+namespace Q {
 
 class Systray;
 class SystrayItem : public QPushButton {
@@ -35,7 +34,6 @@ private slots:
     void itemUnregistered(QString str);
 private:
     void update();
-    QProcess xembedsniproxy;
     QDBusInterface *statusNotifierWatcher, *statusNotifierGetter;
     QMap<QString, SystrayItem*> items;
     int myIconSize;

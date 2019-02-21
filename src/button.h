@@ -14,7 +14,7 @@ class Button : public QPushButton, public Model {
 public:
     Button(const QString &name, Shell *shell);
     ~Button();
-    void load(KConfigGroup *grp);
+    void load(KConfigGroup *grp) override;
 private slots:
     void update();
 private:

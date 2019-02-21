@@ -40,7 +40,7 @@ public:
     MediaPlayer(const QString &name, Shell *shell);
     ~MediaPlayer() { dialog->deleteLater(); };
     bool showLabel() { return myShowLabel; };
-    void load(KConfigGroup *grp);
+    void load(KConfigGroup *grp) override;
 private:
     MediaPlayerDialog *dialog;
     bool myShowLabel;

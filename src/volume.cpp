@@ -75,7 +75,7 @@ void Q::Volume::setupSubscription() {
     qDebug() << "subscription";
     pa_operation *op;
     // subscribe to events
-    pa_context_set_subscribe_callback(context, [](pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *volume_) {
+    pa_context_set_subscribe_callback(context, [](pa_context *, pa_subscription_event_type_t t, uint32_t idx, void *volume_) {
         qDebug() << "subscribe";
         Q::Volume *volume = (Q::Volume *)volume_;
         if(t == PA_SUBSCRIPTION_EVENT_CHANGE && idx == volume->sinfo.index) {

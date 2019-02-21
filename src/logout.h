@@ -10,20 +10,18 @@
 #include "model.h"
 #include "notificationsdialog.h"
 
-namespace Q
-{
+namespace Q {
 
 class Shell;
-class Logout : public QPushButton, public Model
-{
+class Logout : public QPushButton, public Model {
     Q_OBJECT
 public:
     Logout(const QString &name, Shell *shell);
     void load(KConfigGroup *grp) override;
 protected:
-    void mouseReleaseEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *) override;
 private:
     QDBusInterface *interface;
 };
 
-};
+}

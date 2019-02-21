@@ -19,12 +19,12 @@ public:
     DesktopIcon(const QString& name, Shell *shell);
     inline int left() const { return myLeft; };
     inline int top() const { return myTop; };
-    void save(KConfigGroup *grp);
-    void load(KConfigGroup *grp);
+    void save(KConfigGroup *grp) override;
+    void load(KConfigGroup *grp) override;
     void runCommand();
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 private:
     QString myName, myCommand;
     QStringList myArguments;
@@ -50,7 +50,7 @@ class DesktopShadow : public QWidget {
 public:
     DesktopShadow(Desktop *desktop);
 protected:
-    void paintEvent(QPaintEvent *);
+    void paintEvent(QPaintEvent *) override;
 private:
     Desktop *myDesktop;
 };
@@ -70,10 +70,10 @@ public:
     void load(KConfigGroup *group) override;
     void save(KConfigGroup *group) override;
 protected:
-    void paintEvent(QPaintEvent *);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void wheelEvent(QWheelEvent *we);
-    void showEvent(QShowEvent *);
+    void paintEvent(QPaintEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
+    void wheelEvent(QWheelEvent *) override;
+    void showEvent(QShowEvent *) override;
 public slots:
     void geometryChanged();
 private:

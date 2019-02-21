@@ -18,9 +18,9 @@ public slots:
     void open();
     void empty();
 protected:
-    void mouseReleaseEvent(QMouseEvent *event);
-    void dragEnterEvent(QDragEnterEvent *dee);
-    void dropEvent(QDropEvent *de);
+    void mouseReleaseEvent(QMouseEvent *) override;
+    void dragEnterEvent(QDragEnterEvent *) override;
+    void dropEvent(QDropEvent *) override;
 private slots:
     void updateStatus();
 private:

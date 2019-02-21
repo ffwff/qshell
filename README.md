@@ -40,7 +40,7 @@ make
 
 ## Run
 
-To replace plasmashell with qshell, run the command:
+You will need a config file for qshell to work, simply copy-paste one (and its corresponding stylesheet) to your `~/.config` directory. To replace plasmashell with qshell, run the command:
 
 ```
 kquitapp plasmashell; sleep 2; qshell

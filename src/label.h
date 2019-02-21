@@ -14,7 +14,8 @@ class Label : public QLabel, public Model {
 public:
     Label(const QString &name, Shell *shell);
     ~Label();
-    void load(KConfigGroup *grp);
+    void load(KConfigGroup *grp) override;
+protected:
     void showEvent(QShowEvent *) override;
 private slots:
     void update();
