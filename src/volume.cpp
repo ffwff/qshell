@@ -197,19 +197,23 @@ Q::VolumeDialog::VolumeDialog(Volume *volume) :
     myVolume(volume) {
     frame->resize(QSize(280,40));
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
-    layout->setSpacing(0);
-    layout->setMargin(0);
-    setLayout(layout);
+    QHBoxLayout *playout = new QHBoxLayout(this);
+    setLayout(playout);
+    QWidget *widget = new QWidget(this);
+    playout->addWidget(widget);
 
-    muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute", this);
+    QHBoxLayout *layout = new QHBoxLayout(widget);
+    layout->setMargin(0);
+    widget->setLayout(layout);
+
+    muteButton = new QPushButton(QIcon::fromTheme("audio-volume-muted"), "Mute", widget);
     muteButton->setFixedSize(100, muteButton->height());
     layout->addWidget(muteButton);
     connect(muteButton, &QPushButton::clicked, [this]() {
         myVolume->mute();
     });
 
-    slider = new QSlider(Qt::Horizontal, this);
+    slider = new QSlider(Qt::Horizontal, widget);
     slider->setMinimum(0);
     slider->setMaximum(200);
     slider->setTracking(true);

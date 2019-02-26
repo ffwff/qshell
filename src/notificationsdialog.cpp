@@ -39,6 +39,8 @@ void Q::NotificationsDialog::hideFrame(WId wid) {
 }
 
 void Q::NotificationsDialog::updateDialog() {
+    update();
+
     resize(frame->width(), frame->height());
     const QRect geo = QGuiApplication::primaryScreen()->geometry();
     Model *m = dynamic_cast<Model*>(myButton);

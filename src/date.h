@@ -16,7 +16,7 @@ class Date;
 class DateDialog : public NotificationsDialog {
 public:
     DateDialog(Date *date);
-    inline QBoxLayout *boxLayout() { return static_cast<QBoxLayout*>(layout()); };
+    virtual void update() override;
 private:
     Date *myDate;
     QCalendarWidget *calendar;
@@ -26,13 +26,13 @@ class Date : public QPushButton, public Model {
     Q_OBJECT
 public:
     Date(const QString &name, Shell *shell);
-    ~Date() { myDateDialog->deleteLater(); };
+    ~Date() { dialog->deleteLater(); };
     void load(KConfigGroup *grp) override;
 private slots:
     void update();
 private:
     QString format;
-    DateDialog *myDateDialog;
+    DateDialog *dialog;
 };
 
 }

@@ -13,7 +13,7 @@
 
 Q::Date::Date(const QString &name, Q::Shell *shell)
     : QPushButton(), Model(name, shell),
-    myDateDialog(new Q::DateDialog(this)),
+    dialog(new Q::DateDialog(this)),
     format("hh:mm AP") {
     connect(shell->oneSecond(), SIGNAL(timeout()), this, SLOT(update()));
 }
@@ -39,4 +39,8 @@ Q::DateDialog::DateDialog(Q::Date *date) : NotificationsDialog(date), myDate(dat
     layout->addWidget(calendar);
 
     frame->resize(500,300);
-};
+}
+
+void Q::DateDialog::update() {
+    calendar->showToday();
+}

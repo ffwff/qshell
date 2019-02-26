@@ -41,7 +41,6 @@ Q::MediaPlayerDialog::MediaPlayerDialog(MediaPlayer *media)
 
     QHBoxLayout *playout = new QHBoxLayout(this);
     setLayout(playout);
-
     QWidget *widget = new QWidget(this);
     playout->addWidget(widget);
 
