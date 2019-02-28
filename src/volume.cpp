@@ -144,10 +144,9 @@ void Q::Volume::mute() {
 }
 
 void Q::Volume::setVolume(int percent) {
+    if(percent < 0) percent = 0;
     pa_volume_t new_volume = round((double)percent * (double)PA_VOLUME_NORM / 100.0);
-    if (new_volume > PA_VOLUME_MAX) {
-        new_volume = PA_VOLUME_MAX;
-    }
+    if (new_volume > PA_VOLUME_MAX) new_volume = PA_VOLUME_MAX;
     pa_cvolume *new_cvolume = pa_cvolume_set(&sinfo.volume, sinfo.volume.channels, new_volume);
     pa_operation *op = pa_context_set_sink_volume_by_name(context, sink.c_str(), new_cvolume, success_cb, nullptr);
     iterate(op);
