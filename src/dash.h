@@ -38,8 +38,8 @@ class DashItem : public QPushButton {
     Q_OBJECT
 public:
     DashItem(QWidget *parent, const QString &name, const QIcon &icon,
-             const QString &command, const QString &tooltip,
-             const bool isTerminal, Dash* dash);
+             QStringList arguments, const QString &tooltip,
+             Dash* dash);
     void load(KConfigGroup *grp);
     void runCommand();
     inline const QSize& size() const { return mySize; };
@@ -47,6 +47,7 @@ public:
 protected:
     void mouseReleaseEvent(QMouseEvent *event) override;
 private:
+    void initLayout();
     void updatePixmapLabels();
     QIcon icon;
     QLabel *iconLabel;

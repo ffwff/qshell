@@ -56,27 +56,15 @@ Q::DashAppsContainer::DashAppsContainer(QWidget *parent) : QWidget(parent) {
 // ----------
 
 Q::DashItem::DashItem(QWidget *parent, const QString &name, const QIcon &icon,
-                      const QString &command, const QString &tooltip,
-                      const bool isTerminal, Dash* dash)
+                      QStringList arguments, const QString &tooltip,
+                      Dash* dash)
     : QPushButton(parent),
       myDash(dash),
       icon(icon) {
 
-    if(isTerminal) {
-        myCommand = "x-terminal-emulator";
-        myArguments.append("-e");
-        myArguments.append(command);
-    } else {
-        QStringList args = command.split(" ");
-        myCommand = args.first();
-        myArguments = args;
-        myArguments.removeFirst();
-        static const QStringList removeArgs({
-            "%u", "%U", "%f", "%F", "%c", "%i"
-        });
-        for(const auto &string : removeArgs)
-            myArguments.removeAll(string);
-    }
+    myCommand = arguments.first();
+    myArguments = arguments;
+    myArguments.removeFirst();
 
     QGridLayout *layout = new QGridLayout(this);
     layout->setColumnStretch(1, 1);
@@ -282,13 +270,8 @@ bool Q::Dash::repopulate( KServiceGroup::Ptr group, QLayout *layout, const QStri
                     layout->parentWidget(),
                     a->name(),
                     QIcon::fromTheme(a->icon()),
-                    !a->actions().isEmpty() ?
-                    a->actions().first().exec() :
-                    !a->property("TryExec").toString().isEmpty() ?
-                    a->property("TryExec").toString().simplified() :
-                    a->exec().simplified(),
+                    QStringList({ "dex", p->entryPath() }),
                     a->comment().isEmpty() ? a->name() : a->name() + ": " + a->comment(),
-                    a->terminal(),
                     this
                 );
                 item->setSize(iconSize);
